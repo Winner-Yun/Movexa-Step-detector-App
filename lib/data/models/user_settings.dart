@@ -1,4 +1,5 @@
-class UserSettings {
+import 'package:step_detector/core/model/base_model.dart';
+class UserSettings implements BaseModel {
   final int dailyStepGoal;
   final bool runTrackingInBackground;
   final bool notificationsEnabled;
@@ -10,7 +11,7 @@ class UserSettings {
     this.runTrackingInBackground = true,
     this.notificationsEnabled = true,
     this.darkModeEnabled = false,
-    this.language = 'ខ្មែរ', // Default to Khmer
+    this.language = 'ខ្មែរ',
   });
 
   UserSettings copyWith({
@@ -30,6 +31,7 @@ class UserSettings {
     );
   }
 
+  @override
   Map<String, dynamic> toMap() {
     return {
       'dailyStepGoal': dailyStepGoal,

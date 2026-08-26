@@ -4,17 +4,13 @@ import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
-
 import 'package:step_detector/data/controller/activity_controller.dart';
 
 enum MotionStatus { idle, walking, stopped, unknown }
 
-const kmPerStep = 0.000762; // ~76cm average stride
+const kmPerStep = 0.000762;
 const kcalPerStep = 0.04;
 
-// Reads the phone's hardware step counter and streams live step totals
-// into ActivityController while the app is running (foreground or
-// backgrounded). Start/stop is user-controlled via the tracking toggle.
 class MotionController extends ChangeNotifier {
   ActivityController? _activityCtrl;
 
@@ -25,14 +21,11 @@ class MotionController extends ChangeNotifier {
   bool _permissionDenied = false;
   MotionStatus _status = MotionStatus.idle;
 
-  int _dailyGoal = 10000;
-  int _alreadyCountedToday = 0; // steps banked before this stream session
-  int? _deviceBaselineSteps; // device's cumulative reading when we started
-  int _lastDeviceSteps = 0; // used to detect a device reboot mid-session
-  int _liveSteps = 0; // steps counted during this stream session
+  int _alreadyCountedToday = 0;
+  int? _deviceBaselineSteps;
+  int _lastDeviceSteps = 0;
+  int _liveSteps = 0;
 
-  // Independent workout-session tracking (separate from daily tracking so a
-  // workout can be timed even if background tracking is off).
   StreamSubscription<StepCount>? _workoutStepSub;
   bool _isWorkoutActive = false;
   int? _workoutBaselineSteps;
@@ -58,7 +51,10 @@ class MotionController extends ChangeNotifier {
     return status.isGranted;
   }
 
-  Future<void> start({required int dailyGoal, int alreadyCountedToday = 0}) async {
+  Future<void> start({
+    required int dailyGoal,
+    int alreadyCountedToday = 0,
+  }) async {
     if (_isTracking) return;
 
     if (!await _ensurePermission()) {
@@ -68,7 +64,6 @@ class MotionController extends ChangeNotifier {
     }
 
     _permissionDenied = false;
-    _dailyGoal = dailyGoal;
     _alreadyCountedToday = alreadyCountedToday;
     _deviceBaselineSteps = null;
     _lastDeviceSteps = 0;
@@ -95,8 +90,6 @@ class MotionController extends ChangeNotifier {
     _stepCountSub = null;
     _statusSub = null;
 
-    // Bank whatever this session counted so restarting later resumes
-    // from the right total instead of losing progress.
     _alreadyCountedToday += _liveSteps;
     _liveSteps = 0;
     _deviceBaselineSteps = null;
@@ -154,8 +147,6 @@ class MotionController extends ChangeNotifier {
     if (_deviceBaselineSteps == null) {
       _deviceBaselineSteps = deviceSteps;
     } else if (deviceSteps < _lastDeviceSteps) {
-      // The device's step counter resets on reboot; bank what we had
-      // and start a fresh baseline from the lower reading.
       _alreadyCountedToday += _liveSteps;
       _deviceBaselineSteps = deviceSteps;
     }
@@ -165,7 +156,6 @@ class MotionController extends ChangeNotifier {
     final totalSteps = todaySteps;
     _activityCtrl?.updateTodaySteps(
       totalSteps,
-      _dailyGoal,
       totalSteps * kmPerStep,
       totalSteps * kcalPerStep,
     );

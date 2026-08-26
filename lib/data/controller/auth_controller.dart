@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -5,17 +6,16 @@ import 'package:google_sign_in/google_sign_in.dart';
 class AuthController extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
-  // Sign In with Google
   Future<String?> signInWithGoogle() async {
     _setLoading(true);
     try {
       final googleUser = await _googleSignIn.signIn();
       if (googleUser == null) {
-        // User cancelled the sign-in flow
         _setLoading(false);
         return null;
       }
@@ -26,9 +26,20 @@ class AuthController extends ChangeNotifier {
         idToken: googleAuth.idToken,
       );
 
-      await _auth.signInWithCredential(credential);
+      final userCredential = await _auth.signInWithCredential(credential);
+      final user = userCredential.user;
+
+      if (user != null) {
+        await _firestore.collection('users').doc(user.uid).set({
+          'id': user.uid,
+          'email': user.email ?? '',
+          'name': user.displayName ?? '',
+          'avatarUrl': user.photoURL ?? '',
+        }, SetOptions(merge: true));
+      }
+
       _setLoading(false);
-      return null; // Success
+      return null;
     } on FirebaseAuthException catch (e) {
       _setLoading(false);
       return e.message;
@@ -38,7 +49,6 @@ class AuthController extends ChangeNotifier {
     }
   }
 
-  // Log Out (clears both Firebase session and Google session/token)
   Future<void> logout() async {
     await Future.wait([
       _auth.signOut(),

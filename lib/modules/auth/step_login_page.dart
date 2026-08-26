@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:step_detector/core/constants/app_colors.dart';
+import 'package:step_detector/core/localization/app_translations.dart';
 import 'package:step_detector/data/controller/auth_controller.dart';
 
 class StepLoginPage extends StatefulWidget {
@@ -19,7 +20,6 @@ class _StepLoginPageState extends State<StepLoginPage> {
     if (error != null && mounted) {
       _showSnack(error);
     }
-    // If successful, the AuthGate in main.dart will automatically send us to the Dashboard!
   }
 
   void _showSnack(String message) {
@@ -38,7 +38,6 @@ class _StepLoginPageState extends State<StepLoginPage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Hero Header
             Container(
               width: double.infinity,
               height: 300,
@@ -88,9 +87,9 @@ class _StepLoginPageState extends State<StepLoginPage> {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    const Text(
-                      'តាមដានជំហានរបស់អ្នក',
-                      style: TextStyle(
+                    Text(
+                      'trackingSteps'.tr(context),
+                      style: const TextStyle(
                         color: Colors.white70,
                         fontWeight: FontWeight.w600,
                       ),
@@ -106,7 +105,7 @@ class _StepLoginPageState extends State<StepLoginPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'ចូលគណនី (Login)',
+                    'loginTitle'.tr(context),
                     style: textTheme.headlineSmall?.copyWith(
                       color: AppColors.darkText,
                       fontWeight: FontWeight.w900,
@@ -123,7 +122,6 @@ class _StepLoginPageState extends State<StepLoginPage> {
 
                   const SizedBox(height: 40),
 
-                  // Google Sign-In Button (only sign-in method)
                   ElevatedButton.icon(
                     onPressed: isLoading ? null : _handleGoogleSignIn,
                     style: ElevatedButton.styleFrom(
@@ -143,9 +141,9 @@ class _StepLoginPageState extends State<StepLoginPage> {
                           ),
                     label: isLoading
                         ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text(
-                            'ចូលគណនីតាម Google',
-                            style: TextStyle(
+                        : Text(
+                            'loginWithGoogle'.tr(context),
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 18,
                               fontWeight: FontWeight.bold,

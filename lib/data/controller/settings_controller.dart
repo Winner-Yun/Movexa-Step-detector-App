@@ -7,7 +7,7 @@ class SettingsController extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  UserSettings _settings = const UserSettings(); // Default settings
+  UserSettings _settings = const UserSettings();
   final bool _isLoading = false;
 
   UserSettings get settings => _settings;
@@ -29,9 +29,8 @@ class SettingsController extends ChangeNotifier {
         _settings = UserSettings.fromMap(doc.data() as Map<String, dynamic>);
         notifyListeners();
       } else {
-        // First login: persist the defaults so a settings doc always
-        // exists for this user, instead of only ever living in memory.
-        await updateSettings(const UserSettings());
+        _settings = const UserSettings();
+        notifyListeners();
       }
     } catch (e) {
       debugPrint('Error fetching settings: $e');
@@ -43,10 +42,9 @@ class SettingsController extends ChangeNotifier {
     if (user == null) return;
 
     _settings = newSettings;
-    notifyListeners(); // Update UI immediately for snappy feel
+    notifyListeners();
 
     try {
-      // Sync to Firebase in the background
       await _firestore
           .collection('users')
           .doc(user.uid)
@@ -58,7 +56,6 @@ class SettingsController extends ChangeNotifier {
     }
   }
 
-  // Quick helper specifically for the step goal dialog
   Future<void> updateStepGoal(int newGoal) async {
     final updated = _settings.copyWith(dailyStepGoal: newGoal);
     await updateSettings(updated);
