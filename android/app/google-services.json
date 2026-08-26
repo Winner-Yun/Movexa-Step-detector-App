@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1087751033948",
+    "project_id": "stepdetectionkhmer",
+    "storage_bucket": "stepdetectionkhmer.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1087751033948:android:e1770bc0cb94744cdc0299",
+        "android_client_info": {
+          "package_name": "com.example.step_detector"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1087751033948-72oggup9snphfp9pud3uk509aeuarhag.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.step_detector",
+            "certificate_hash": "13c613578d73fb0a254c7b174927b488c2d8b579"
+          }
+        },
+        {
+          "client_id": "1087751033948-pll0d7iqgo3k4si2dcbsc9d16gu5ebfk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBmZws3GV1IhaSes7hpfeTGHX-CO0_-4rc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1087751033948-pll0d7iqgo3k4si2dcbsc9d16gu5ebfk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

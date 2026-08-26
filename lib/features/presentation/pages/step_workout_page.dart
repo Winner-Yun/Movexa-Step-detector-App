@@ -1,0 +1,629 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../../core/constants/app_colors.dart';
+import '../../../shared/models/workout_session.dart';
+import '../controllers/activity_controller.dart';
+import '../controllers/motion_controller.dart';
+
+class StepWorkoutPage extends StatefulWidget {
+  const StepWorkoutPage({super.key});
+
+  @override
+  State<StepWorkoutPage> createState() => _StepWorkoutPageState();
+}
+
+class _StepWorkoutPageState extends State<StepWorkoutPage> {
+  bool _isTracking = false;
+  int _secondsElapsed = 0;
+  DateTime? _workoutStartTime;
+  Timer? _timer;
+
+  final int _stepGoal = 50;
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void _toggleTracking() {
+    if (_isTracking) {
+      _stopTracking();
+    } else {
+      _startTracking();
+    }
+  }
+
+  Future<void> _startTracking() async {
+    final motionCtrl = context.read<MotionController>();
+    final started = await motionCtrl.startWorkout();
+
+    if (!started) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'ត្រូវការសិទ្ធិចលនាដើម្បីតាមដានជំហាន (Motion permission required)',
+            ),
+          ),
+        );
+      }
+      return;
+    }
+
+    setState(() {
+      _isTracking = true;
+      _secondsElapsed = 0;
+      _workoutStartTime = DateTime.now();
+    });
+
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() => _secondsElapsed++);
+    });
+  }
+
+  void _stopTracking() {
+    _timer?.cancel();
+
+    final motionCtrl = context.read<MotionController>();
+    final steps = motionCtrl.stopWorkout();
+    final duration = Duration(seconds: _secondsElapsed);
+    final distanceKm = steps * kmPerStep;
+    final calories = steps * kcalPerStep;
+
+    final session = WorkoutSession(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      title: 'ការហាត់ប្រាណ',
+      startTime: _workoutStartTime ?? DateTime.now().subtract(duration),
+      duration: duration,
+      steps: steps,
+      calories: calories,
+      distance: distanceKm,
+      averagePace: _formatPace(duration, distanceKm),
+    );
+
+    context.read<ActivityController>().saveWorkoutSession(session);
+
+    setState(() => _isTracking = false);
+    _showWorkoutSummaryDialog(steps, calories, distanceKm);
+  }
+
+  String _formatPace(Duration duration, double distanceKm) {
+    if (distanceKm <= 0) return '0:00';
+    final paceSecondsPerKm = duration.inSeconds / distanceKm;
+    final paceMinutes = paceSecondsPerKm ~/ 60;
+    final paceSeconds = (paceSecondsPerKm % 60).round();
+    return '$paceMinutes:${paceSeconds.toString().padLeft(2, '0')}';
+  }
+
+  String get _formattedTime {
+    final minutes = (_secondsElapsed / 60).floor().toString().padLeft(2, '0');
+    final seconds = (_secondsElapsed % 60).toString().padLeft(2, '0');
+    return '$minutes:$seconds';
+  }
+
+  void _showWorkoutSummaryDialog(int steps, double calories, double distanceKm) {
+    final bool isProud = steps >= _stepGoal;
+    final caloriesLabel = calories.toStringAsFixed(1);
+    final distanceLabel = distanceKm.toStringAsFixed(2);
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(24, 40, 24, 24),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(32),
+              boxShadow: [
+                BoxShadow(
+                  color: isProud
+                      ? AppColors.brandAccent.withValues(alpha: 0.2)
+                      : AppColors.progressChipText,
+                  blurRadius: 40,
+                  spreadRadius: 10,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: Stack(
+              clipBehavior: Clip.none,
+              alignment: Alignment.topCenter,
+              children: [
+                _buildSummaryFloatingIcon(isProud),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      isProud ? 'ធ្វើបានល្អណាស់!' : 'កុំបោះបង់!',
+                      style: const TextStyle(
+                        color: AppColors.darkText,
+                        fontSize: 28,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      isProud
+                          ? 'អ្នកបានសម្រេចគោលដៅថ្ងៃនេះ។'
+                          : 'ការចាប់ផ្តើមគឺជាភាពជោគជ័យមួយ។',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: AppColors.mutedText,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    _buildSummaryStatsGrid(steps, caloriesLabel, distanceLabel),
+                    const SizedBox(height: 32),
+                    _buildSummaryCloseButton(isProud, context),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildSummaryFloatingIcon(bool isProud) {
+    return Positioned(
+      top: -80,
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: LinearGradient(
+            colors: isProud
+                ? [AppColors.primaryGradientStart, AppColors.primaryGradientEnd]
+                : [AppColors.progressChipText, AppColors.progressChipText],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: isProud
+                  ? AppColors.brandAccent.withValues(alpha: 0.4)
+                  : AppColors.progressChipText.withValues(alpha: 0.4),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Icon(
+          isProud ? Icons.emoji_events_rounded : Icons.directions_run_rounded,
+          color: Colors.white,
+          size: 48,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSummaryStatsGrid(int steps, String calories, String distance) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.scaffoldSoft,
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: _buildSummaryItem(
+                  Icons.timer_rounded,
+                  Colors.orange,
+                  _formattedTime,
+                  'រយៈពេល',
+                ),
+              ),
+              Container(width: 1, height: 40, color: AppColors.progressTrack),
+              Expanded(
+                child: _buildSummaryItem(
+                  Icons.do_not_step_rounded,
+                  AppColors.brandAccent,
+                  steps.toString(),
+                  'ជំហាន',
+                ),
+              ),
+            ],
+          ),
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 16),
+            child: Divider(color: AppColors.progressTrack, height: 1),
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: _buildSummaryItem(
+                  Icons.local_fire_department_rounded,
+                  const Color(0xFFD45529),
+                  calories,
+                  'KCAL',
+                ),
+              ),
+              Container(width: 1, height: 40, color: AppColors.progressTrack),
+              Expanded(
+                child: _buildSummaryItem(
+                  Icons.route_rounded,
+                  const Color(0xFF2980B9),
+                  distance,
+                  'KM',
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSummaryItem(
+    IconData icon,
+    Color color,
+    String value,
+    String label,
+  ) {
+    return Column(
+      children: [
+        Icon(icon, color: color, size: 24),
+        const SizedBox(height: 8),
+        Text(
+          value,
+          style: const TextStyle(
+            color: AppColors.darkText,
+            fontSize: 20,
+            fontWeight: FontWeight.w900,
+            fontFeatures: [FontFeature.tabularFigures()],
+          ),
+        ),
+        Text(
+          label,
+          style: const TextStyle(
+            color: AppColors.mutedText,
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSummaryCloseButton(bool isProud, BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: () => Navigator.pop(context),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: isProud
+              ? AppColors.brandAccent
+              : AppColors.progressChipText,
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+        child: const Text(
+          'បិទ (Close)',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPageHeader(TextTheme textTheme) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: AppColors.brandAccent.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: const Icon(
+            Icons.directions_run_rounded,
+            color: AppColors.brandAccent,
+            size: 24,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Text(
+          'ការហាត់ប្រាណ',
+          style: textTheme.titleLarge?.copyWith(
+            color: AppColors.darkText,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 0.5,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMainTimer(TextTheme textTheme, int currentSteps) {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 500),
+          width: 300,
+          height: 300,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: AppColors.surface,
+            boxShadow: [
+              BoxShadow(
+                color: _isTracking
+                    ? AppColors.brandAccent.withValues(alpha: 0.3)
+                    : AppColors.darkText.withValues(alpha: 0.05),
+                blurRadius: _isTracking ? 50 : 20,
+                spreadRadius: _isTracking ? 5 : 0,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(
+          width: 280,
+          height: 280,
+          child: CircularProgressIndicator(
+            value: _isTracking ? null : 0.0,
+            strokeWidth: 6,
+            color: _isTracking ? AppColors.brandAccent : AppColors.scaffoldSoft,
+            backgroundColor: AppColors.scaffoldSoft,
+          ),
+        ),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              _isTracking ? Icons.timer_rounded : Icons.timer_off_rounded,
+              color: _isTracking
+                  ? AppColors.brandAccent
+                  : AppColors.mutedText.withValues(alpha: 0.5),
+              size: 32,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              _formattedTime,
+              style: textTheme.displayMedium?.copyWith(
+                color: _isTracking ? AppColors.brandAccent : AppColors.darkText,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 2,
+                fontFeatures: const [FontFeature.tabularFigures()],
+              ),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: _isTracking
+                    ? AppColors.progressChip
+                    : AppColors.scaffoldSoft,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.do_not_step_rounded,
+                    color: _isTracking
+                        ? AppColors.progressChipText
+                        : AppColors.mutedText,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    '$currentSteps ជំហាន',
+                    style: textTheme.titleMedium?.copyWith(
+                      color: _isTracking
+                          ? AppColors.progressChipText
+                          : AppColors.mutedText,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatBox(
+    String title,
+    String value,
+    String unit,
+    IconData icon,
+    Color iconColor,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.darkText.withValues(alpha: 0.04),
+            blurRadius: 15,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: iconColor.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, color: iconColor, size: 18),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                title,
+                style: const TextStyle(
+                  color: AppColors.mutedText,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                value,
+                style: const TextStyle(
+                  color: AppColors.darkText,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 26,
+                  fontFeatures: [FontFeature.tabularFigures()],
+                ),
+              ),
+              const SizedBox(width: 4),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 5),
+                child: Text(
+                  unit,
+                  style: TextStyle(
+                    color: AppColors.mutedText.withValues(alpha: 0.8),
+                    fontWeight: FontWeight.w800,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildControlButton() {
+    return GestureDetector(
+      onTap: _toggleTracking,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: _isTracking
+                ? [const Color(0xFFE53935), const Color(0xFFC62828)]
+                : [
+                    AppColors.primaryGradientStart,
+                    AppColors.primaryGradientEnd,
+                  ],
+          ),
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: _isTracking
+                  ? const Color(0xFFE53935).withValues(alpha: 0.3)
+                  : AppColors.brandAccent.withValues(alpha: 0.3),
+              blurRadius: 16,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              _isTracking ? Icons.stop_rounded : Icons.play_arrow_rounded,
+              color: Colors.white,
+              size: 28,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              _isTracking ? 'បញ្ឈប់ (Stop)' : 'ចាប់ផ្តើម (Start)',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 1,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final motionCtrl = context.watch<MotionController>();
+    final currentSteps = _isTracking ? motionCtrl.workoutSteps : 0;
+    final calories = currentSteps * kcalPerStep;
+    final distance = currentSteps * kmPerStep;
+
+    return Scaffold(
+      backgroundColor: AppColors.scaffold,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              _buildPageHeader(textTheme),
+              const Spacer(flex: 1),
+              _buildMainTimer(textTheme, currentSteps),
+              const Spacer(flex: 1),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildStatBox(
+                      'កាឡូរី',
+                      calories.toStringAsFixed(1),
+                      'KCAL',
+                      Icons.local_fire_department_rounded,
+                      const Color(0xFFD45529),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: _buildStatBox(
+                      'ចម្ងាយ',
+                      distance.toStringAsFixed(2),
+                      'KM',
+                      Icons.route_rounded,
+                      const Color(0xFF2980B9),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 40),
+              _buildControlButton(),
+              const SizedBox(height: 20),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

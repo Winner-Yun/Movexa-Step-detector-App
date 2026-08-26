@@ -1,0 +1,78 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:step_detector/shared/models/user_profile.dart';
+
+// import 'your_path_to/user_profile.dart'; // Import your model
+
+class ProfileController extends ChangeNotifier {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  UserProfile? _currentProfile;
+  bool _isLoading = false;
+
+  UserProfile? get currentProfile => _currentProfile;
+  bool get isLoading => _isLoading;
+
+  // Fetch profile when app starts
+  Future<void> fetchProfile() async {
+    final user = _auth.currentUser;
+    if (user == null) return;
+
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      DocumentSnapshot doc = await _firestore
+          .collection('users')
+          .doc(user.uid)
+          .get();
+
+      if (doc.exists) {
+        _currentProfile = UserProfile.fromMap(
+          doc.data() as Map<String, dynamic>,
+        );
+      } else {
+        // First login: seed the profile from the real Google account
+        // instead of a placeholder, since sign-in is Google-only.
+        _currentProfile = UserProfile(
+          id: user.uid,
+          name: user.displayName ?? '',
+          bio: '',
+          age: 0,
+          weight: 0,
+          height: 0,
+          avatarUrl: user.photoURL,
+        );
+        await saveProfile(_currentProfile!);
+      }
+    } catch (e) {
+      debugPrint('Error fetching profile: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  // Save updated profile from the Edit Profile Screen
+  Future<bool> saveProfile(UserProfile profile) async {
+    final user = _auth.currentUser;
+    if (user == null) return false;
+
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      await _firestore.collection('users').doc(user.uid).set(profile.toMap());
+      _currentProfile = profile;
+      return true; // Success
+    } catch (e) {
+      debugPrint('Error saving profile: $e');
+      return false; // Failed
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+}
