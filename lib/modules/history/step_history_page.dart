@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:step_detector/data/controller/activity_controller.dart';
-
 import 'package:step_detector/core/constants/app_colors.dart';
+import 'package:step_detector/data/controller/activity_controller.dart';
+import 'package:step_detector/data/controller/settings_controller.dart';
 import 'package:step_detector/modules/workout/step_workout_detail_page.dart';
 
 class StepHistoryPage extends StatefulWidget {
@@ -15,7 +15,6 @@ class StepHistoryPage extends StatefulWidget {
 class _StepHistoryPageState extends State<StepHistoryPage> {
   int _selectedTabIndex = 0;
 
-  // Track which day is currently selected in the chart
   int _selectedDay = DateTime.now().day;
 
   String _formatDateTime(DateTime date) {
@@ -113,7 +112,6 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
           Expanded(child: _buildTabButton('ប្រចាំថ្ងៃ', 0)),
 
           Expanded(child: _buildTabButton('ការហាត់ប្រាណ', 1)),
-
         ],
       ),
     );
@@ -152,8 +150,6 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
     );
   }
 
-  // --- DAILY VIEW (Uses DailyStepRecord) ---
-
   Widget _buildDailyView(TextTheme textTheme, List<dynamic> monthlyData) {
     if (monthlyData.isEmpty) {
       return const Center(
@@ -164,13 +160,11 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
       );
     }
 
-    // Find the data for the selected day, default to the most recent if not found
     final selectedDayData = monthlyData.firstWhere(
       (record) => record.date.day == _selectedDay,
       orElse: () => monthlyData.first,
     );
 
-    // Ensure the selected day matches the fallback if we had to use it
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_selectedDay != selectedDayData.date.day) {
         setState(() => _selectedDay = selectedDayData.date.day);
@@ -220,12 +214,10 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
   }
 
   Widget _buildMonthChart(TextTheme textTheme, List<dynamic> data) {
-    // Calculate average steps
+    final goal = context.read<SettingsController>().settings.dailyStepGoal;
     final avgSteps =
         data.fold<num>(0, (sum, record) => sum + record.steps) ~/ data.length;
 
-    // Firebase usually fetches descending (newest first).
-    // We reverse it so the chart reads left-to-right (oldest to newest).
     final chartData = data.reversed.toList();
 
     return Container(
@@ -309,10 +301,9 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
               itemCount: chartData.length,
               itemBuilder: (context, i) {
                 final record = chartData[i];
-                final double percentage =
-                    record.progress;
+                final double percentage = record.getProgress(goal);
 
-                final bool reachedGoal = record.isGoalReached;
+                final bool reachedGoal = record.isGoalReached(goal);
                 final bool isSelected = record.date.day == _selectedDay;
 
                 return GestureDetector(
@@ -425,6 +416,7 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
   }
 
   Widget _buildDailySummaryCard(dynamic record, TextTheme textTheme) {
+    final goal = context.read<SettingsController>().settings.dailyStepGoal;
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -433,7 +425,7 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
         boxShadow: [
           BoxShadow(
             color:
-                (record.isGoalReached
+                (record.isGoalReached(goal)
                         ? AppColors.progressValue
                         : AppColors.brandAccent)
                     .withValues(alpha: 0.1),
@@ -443,7 +435,7 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
         ],
         border: Border.all(
           color:
-              (record.isGoalReached
+              (record.isGoalReached(goal)
                       ? AppColors.progressValue
                       : AppColors.brandAccent)
                   .withValues(alpha: 0.2),
@@ -461,7 +453,7 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: record.isGoalReached
+                  color: record.isGoalReached(goal)
                       ? AppColors.progressChip
                       : AppColors.scaffoldSoft,
                   borderRadius: BorderRadius.circular(20),
@@ -469,22 +461,22 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                 child: Row(
                   children: [
                     Icon(
-                      record.isGoalReached
+                      record.isGoalReached(goal)
                           ? Icons.emoji_events_rounded
                           : Icons.directions_walk_rounded,
-                      color: record.isGoalReached
+                      color: record.isGoalReached(goal)
                           ? AppColors.progressChipText
                           : AppColors.mutedText,
                       size: 16,
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      record.isGoalReached
+                      record.isGoalReached(goal)
                           ? 'សម្រេចគោលដៅ'
                           : 'កំពុងដំណើរការ',
 
                       style: TextStyle(
-                        color: record.isGoalReached
+                        color: record.isGoalReached(goal)
                             ? AppColors.progressChipText
                             : AppColors.mutedText,
                         fontWeight: FontWeight.w800,
@@ -506,7 +498,6 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
           ),
           const SizedBox(height: 32),
 
-          // Big Circular Progress
           Stack(
             alignment: Alignment.center,
             children: [
@@ -514,10 +505,10 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                 width: 140,
                 height: 140,
                 child: CircularProgressIndicator(
-                  value: record.progress,
+                  value: record.getProgress(goal),
                   strokeWidth: 12,
                   backgroundColor: AppColors.scaffoldSoft,
-                  color: record.isGoalReached
+                  color: record.isGoalReached(goal)
                       ? AppColors.progressValue
                       : AppColors.brandAccent,
                   strokeCap: StrokeCap.round,
@@ -527,7 +518,7 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                 children: [
                   Icon(
                     Icons.do_not_step_rounded,
-                    color: record.isGoalReached
+                    color: record.isGoalReached(goal)
                         ? AppColors.progressValue
                         : AppColors.brandAccent,
                     size: 28,
@@ -548,7 +539,6 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
 
           const SizedBox(height: 40),
 
-          // Bottom Stats Row
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
@@ -625,8 +615,6 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
     );
   }
 
-  // --- SESSION VIEW (Uses WorkoutSession) ---
-
   Widget _buildSessionView(TextTheme textTheme, List<dynamic> sessions) {
     if (sessions.isEmpty) {
       return const Center(
@@ -650,10 +638,7 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => StepWorkoutDetailPage(
-                    session: session,
-                  ),
-
+                  builder: (context) => StepWorkoutDetailPage(session: session),
                 ),
               );
             },
@@ -707,9 +692,7 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    _formatDateTime(
-                      session.startTime,
-                    ),
+                    _formatDateTime(session.startTime),
 
                     style: const TextStyle(
                       color: AppColors.mutedText,

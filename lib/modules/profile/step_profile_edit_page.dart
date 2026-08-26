@@ -20,7 +20,6 @@ class _StepProfileEditPageState extends State<StepProfileEditPage> {
   @override
   void initState() {
     super.initState();
-    // Load current profile data
     final profile = context.read<ProfileController>().currentProfile;
     _nameController = TextEditingController(text: profile?.name ?? '');
     _bioController = TextEditingController(text: profile?.bio ?? '');
@@ -48,7 +47,6 @@ class _StepProfileEditPageState extends State<StepProfileEditPage> {
     final currentProfile = profileCtrl.currentProfile;
     if (currentProfile == null) return;
 
-    // Prepare updated profile
     final updatedProfile = currentProfile.copyWith(
       name: _nameController.text,
       bio: _bioController.text,
@@ -57,7 +55,6 @@ class _StepProfileEditPageState extends State<StepProfileEditPage> {
       height: double.tryParse(_heightController.text) ?? currentProfile.height,
     );
 
-    // Persist changes
     final success = await profileCtrl.saveProfile(updatedProfile);
 
     if (success && mounted) {

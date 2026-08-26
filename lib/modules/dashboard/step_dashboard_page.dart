@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:step_detector/widgets/activity_section.dart';
-import 'package:step_detector/widgets/primary_button.dart';
-import 'package:step_detector/widgets/stat_card.dart';
-import 'package:step_detector/widgets/tracking_toggle_card.dart';
-
 import 'package:step_detector/core/constants/app_colors.dart';
-import 'package:step_detector/widgets/dashboard_widgets.dart';
 import 'package:step_detector/data/controller/activity_controller.dart';
-// IMPORTANT: Import your controllers here!
 import 'package:step_detector/data/controller/motion_controller.dart';
 import 'package:step_detector/data/controller/profile_controller.dart';
 import 'package:step_detector/data/controller/settings_controller.dart';
+import 'package:step_detector/widgets/activity_section.dart';
+import 'package:step_detector/widgets/dashboard_widgets.dart';
+import 'package:step_detector/widgets/primary_button.dart';
+import 'package:step_detector/widgets/stat_card.dart';
+import 'package:step_detector/widgets/tracking_toggle_card.dart';
 
 class StepDashboardPage extends StatefulWidget {
   const StepDashboardPage({super.key});
@@ -145,7 +144,6 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
                                 _goalInputController.text,
                               );
                               if (newGoal != null && newGoal > 0) {
-                                // Save to Firebase!
                                 settingsCtrl.updateStepGoal(newGoal);
                                 _showSnack('បានកំណត់គោលដៅថ្មី: $newGoal');
                                 Navigator.pop(context);
@@ -283,7 +281,6 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
     MotionController motionCtrl,
     ActivityController activityCtrl,
   ) async {
-    // Update Firebase settings
     final newSettings = settingsCtrl.settings.copyWith(
       runTrackingInBackground: val,
     );
@@ -362,81 +359,79 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
 
-    // Watch the controllers!
     final profileCtrl = context.watch<ProfileController>();
     final settingsCtrl = context.watch<SettingsController>();
     final activityCtrl = context.watch<ActivityController>();
     final motionCtrl = context.watch<MotionController>();
 
-    // Calculate real data
     final todayRecord = activityCtrl.todayRecord;
     final currentSteps = todayRecord?.steps ?? 0;
     final goal = settingsCtrl.settings.dailyStepGoal;
     final progress = (currentSteps / goal).clamp(0.0, 1.0);
 
-    return Scaffold(
-      backgroundColor: AppColors.scaffold,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(14, 10, 14, 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildTopHeader(textTheme),
-                const SizedBox(height: 14),
-                _buildGreeting(
-                  textTheme,
-                  profileCtrl.currentProfile?.name ?? "",
-                ),
-                const SizedBox(height: 12),
-
-                // YOUR EXACT PROGRESS PANEL
-                ProgressPanel(
-                  progress: progress,
-                  steps: currentSteps,
-                  progressGreen: AppColors.progressValue,
-                  textColor: AppColors.darkText,
-                  subTextColor: AppColors.mutedText,
-                ),
-                const SizedBox(height: 12),
-
-                // YOUR EXACT TOGGLE SWITCH
-                TrackingToggleCard(
-                  enabled: settingsCtrl.settings.runTrackingInBackground,
-                  motionStatus: motionCtrl.status,
-                  isTracking: motionCtrl.isTracking,
-                  permissionDenied: motionCtrl.permissionDenied,
-                  onChanged: (val) => _onTrackingToggled(
-                    val,
-                    settingsCtrl,
-                    motionCtrl,
-                    activityCtrl,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+      ),
+      child: Scaffold(
+        backgroundColor: AppColors.scaffold,
+        body: SafeArea(
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(14, 10, 14, 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildTopHeader(textTheme),
+                  const SizedBox(height: 14),
+                  _buildGreeting(
+                    textTheme,
+                    profileCtrl.currentProfile?.name ?? "",
                   ),
-                ),
-                const SizedBox(height: 12),
+                  const SizedBox(height: 12),
 
-                // YOUR EXACT BUTTON
-                PrimaryButton(
-                  onTap: () => _showSetGoalDialog(context, settingsCtrl),
-                  text: 'កំណត់គោលដៅថ្មី',
-                ),
-                const SizedBox(height: 14),
+                  ProgressPanel(
+                    progress: progress,
+                    steps: currentSteps,
+                    progressGreen: AppColors.progressValue,
+                    textColor: AppColors.darkText,
+                    subTextColor: AppColors.mutedText,
+                  ),
+                  const SizedBox(height: 12),
 
-                // YOUR EXACT STATS GRID
-                _buildStatsGrid(todayRecord),
-                const SizedBox(height: 14),
+                  TrackingToggleCard(
+                    enabled: settingsCtrl.settings.runTrackingInBackground,
+                    motionStatus: motionCtrl.status,
+                    isTracking: motionCtrl.isTracking,
+                    permissionDenied: motionCtrl.permissionDenied,
+                    onChanged: (val) => _onTrackingToggled(
+                      val,
+                      settingsCtrl,
+                      motionCtrl,
+                      activityCtrl,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
 
-                // YOUR EXACT RECENT ACTIVITIES HEADER
-                _buildRecentActivitiesHeader(textTheme),
-                const SizedBox(height: 8),
+                  PrimaryButton(
+                    onTap: () => _showSetGoalDialog(context, settingsCtrl),
+                    text: 'កំណត់គោលដៅថ្មី',
+                  ),
+                  const SizedBox(height: 14),
 
-                // YOUR EXACT RECENT ACTIVITIES LIST (Connected to Firebase history)
-                ActivitySection(activities: activityCtrl.workoutHistory),
+                  _buildStatsGrid(todayRecord),
+                  const SizedBox(height: 14),
 
-                const SizedBox(height: 8),
-              ],
+                  _buildRecentActivitiesHeader(textTheme),
+                  const SizedBox(height: 8),
+
+                  ActivitySection(activities: activityCtrl.workoutHistory),
+
+                  const SizedBox(height: 8),
+                ],
+              ),
             ),
           ),
         ),
