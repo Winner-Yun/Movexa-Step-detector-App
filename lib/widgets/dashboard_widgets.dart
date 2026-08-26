@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:step_detector/core/constants/app_colors.dart';
 
-import 'format_number.dart';
+import 'package:step_detector/widgets/format_number.dart';
 
 class ProgressPanel extends StatelessWidget {
   const ProgressPanel({

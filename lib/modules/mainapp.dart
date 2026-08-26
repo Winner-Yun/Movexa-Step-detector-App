@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../core/constants/app_colors.dart';
-import 'controllers/activity_controller.dart';
-import 'controllers/motion_controller.dart';
-import 'controllers/profile_controller.dart';
-import 'controllers/settings_controller.dart';
-import 'pages/step_dashboard_page.dart';
-import 'pages/step_history_page.dart';
-import 'pages/step_settings_page.dart';
-import 'pages/step_workout_page.dart';
+import 'package:step_detector/core/constants/app_colors.dart';
+import 'package:step_detector/data/controller/activity_controller.dart';
+import 'package:step_detector/data/controller/motion_controller.dart';
+import 'package:step_detector/data/controller/profile_controller.dart';
+import 'package:step_detector/data/controller/settings_controller.dart';
+import 'package:step_detector/modules/dashboard/step_dashboard_page.dart';
+import 'package:step_detector/modules/history/step_history_page.dart';
+import 'package:step_detector/modules/settings/step_settings_page.dart';
+import 'package:step_detector/modules/workout/step_workout_page.dart';
 
 class StepMainApp extends StatefulWidget {
   const StepMainApp({super.key});

@@ -1,9 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:step_detector/shared/models/user_profile.dart';
+import 'package:step_detector/data/models/user_profile.dart';
 
-// import 'your_path_to/user_profile.dart'; // Import your model
 
 class ProfileController extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;

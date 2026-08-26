@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:step_detector/shared/widgets/activity_section.dart';
-import 'package:step_detector/shared/widgets/primary_button.dart';
-import 'package:step_detector/shared/widgets/stat_card.dart';
-import 'package:step_detector/shared/widgets/tracking_toggle_card.dart';
+import 'package:step_detector/widgets/activity_section.dart';
+import 'package:step_detector/widgets/primary_button.dart';
+import 'package:step_detector/widgets/stat_card.dart';
+import 'package:step_detector/widgets/tracking_toggle_card.dart';
 
-import '../../../core/constants/app_colors.dart';
-import '../../../shared/widgets/dashboard_widgets.dart';
-import '../controllers/activity_controller.dart';
+import 'package:step_detector/core/constants/app_colors.dart';
+import 'package:step_detector/widgets/dashboard_widgets.dart';
+import 'package:step_detector/data/controller/activity_controller.dart';
 // IMPORTANT: Import your controllers here!
-import '../controllers/motion_controller.dart';
-import '../controllers/profile_controller.dart';
-import '../controllers/settings_controller.dart';
+import 'package:step_detector/data/controller/motion_controller.dart';
+import 'package:step_detector/data/controller/profile_controller.dart';
+import 'package:step_detector/data/controller/settings_controller.dart';
 
 class StepDashboardPage extends StatefulWidget {
   const StepDashboardPage({super.key});

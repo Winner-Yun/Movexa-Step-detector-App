@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../core/constants/app_colors.dart';
-import '../controllers/auth_controller.dart';
-import '../controllers/motion_controller.dart';
-import '../controllers/profile_controller.dart';
-import '../controllers/settings_controller.dart';
-import 'step_profile_edit_page.dart'; // We will create this next!
+import 'package:step_detector/core/constants/app_colors.dart';
+import 'package:step_detector/data/controller/auth_controller.dart';
+import 'package:step_detector/data/controller/motion_controller.dart';
+import 'package:step_detector/data/controller/profile_controller.dart';
+import 'package:step_detector/data/controller/settings_controller.dart';
+import 'package:step_detector/modules/profile/step_profile_edit_page.dart';
 
 class StepSettingsPage extends StatefulWidget {
   const StepSettingsPage({super.key});
@@ -199,9 +199,6 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
     );
   }
 
-  // --- REAL APP BEHAVIORS ---
-
-  // 1. Navigation to a real sub-screen
   void _navigateToProfileEdit() {
     Navigator.push(
       context,
@@ -209,9 +206,6 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
     );
   }
 
-  // 2. A Premium Bottom Sheet for selecting Language
-
-  // 3. A Premium Alert Dialog for Logging Out
   void _showLogoutDialog() {
     showDialog(
       context: context,
@@ -278,9 +272,7 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
                           final navigator = Navigator.of(context);
                           context.read<MotionController>().stop();
                           await context.read<AuthController>().logout();
-                          // The AuthGate in main.dart reacts to the sign-out
-                          // and swaps to the login screen; only pop the
-                          // dialog if this tree is still around to pop.
+                          // Close dialog after logout
                           if (navigator.mounted) {
                             navigator.pop();
                           }
@@ -358,7 +350,6 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Removed _buildHeader(textTheme), since now in AppBar
               const SizedBox(height: 24),
               _buildProfileCard(textTheme, profileCtrl),
               const SizedBox(height: 32),
@@ -368,7 +359,7 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
                 _buildSettingsTile(
                   Icons.person_outline_rounded,
                   'ព័ត៌មានផ្ទាល់ខ្លួន',
-                  onTap: _navigateToProfileEdit, // Pushes to new screen
+                  onTap: _navigateToProfileEdit,
                 ),
                 _buildSettingsTile(
                   Icons.flag_outlined,
@@ -395,7 +386,7 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
               const SizedBox(height: 40),
               Center(
                 child: TextButton.icon(
-                  onPressed: _showLogoutDialog, // Triggers Dialog
+                  onPressed: _showLogoutDialog,
                   icon: const Icon(
                     Icons.logout_rounded,
                     color: Colors.redAccent,

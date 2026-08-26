@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:step_detector/features/presentation/controllers/activity_controller.dart';
+import 'package:step_detector/data/controller/activity_controller.dart';
 
-import '../../../core/constants/app_colors.dart';
-import 'step_workout_detail_page.dart';
-// IMPORTANT: Import your controllers and models here!
-// import '../controllers/activity_controller.dart';
-// import '../../data/models/workout_session.dart';
-// import '../../data/models/daily_step_record.dart';
+import 'package:step_detector/core/constants/app_colors.dart';
+import 'package:step_detector/modules/workout/step_workout_detail_page.dart';
 
 class StepHistoryPage extends StatefulWidget {
   const StepHistoryPage({super.key});
@@ -17,13 +13,11 @@ class StepHistoryPage extends StatefulWidget {
 }
 
 class _StepHistoryPageState extends State<StepHistoryPage> {
-  // 0 for Daily, 1 for Sessions
   int _selectedTabIndex = 0;
 
   // Track which day is currently selected in the chart
   int _selectedDay = DateTime.now().day;
 
-  // Helper to format DateTime nicely without needing extra packages
   String _formatDateTime(DateTime date) {
     final hour = date.hour > 12
         ? date.hour - 12
@@ -37,7 +31,6 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
 
-    // Watch the controller to rebuild when Firebase data changes!
     final activityCtrl = context.watch<ActivityController>();
 
     return Scaffold(
@@ -89,7 +82,8 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
         ),
         const SizedBox(width: 12),
         Text(
-          'ប្រវត្តិសកម្មភាព', // Activity History
+          'ប្រវត្តិសកម្មភាព',
+
           style: textTheme.titleLarge?.copyWith(
             color: AppColors.darkText,
             fontWeight: FontWeight.w900,
@@ -116,8 +110,10 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
       ),
       child: Row(
         children: [
-          Expanded(child: _buildTabButton('ប្រចាំថ្ងៃ', 0)), // Daily
-          Expanded(child: _buildTabButton('ការហាត់ប្រាណ', 1)), // Workouts
+          Expanded(child: _buildTabButton('ប្រចាំថ្ងៃ', 0)),
+
+          Expanded(child: _buildTabButton('ការហាត់ប្រាណ', 1)),
+
         ],
       ),
     );
@@ -159,7 +155,6 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
   // --- DAILY VIEW (Uses DailyStepRecord) ---
 
   Widget _buildDailyView(TextTheme textTheme, List<dynamic> monthlyData) {
-    // Use List<DailyStepRecord> here
     if (monthlyData.isEmpty) {
       return const Center(
         child: Text(
@@ -204,7 +199,8 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  'សេចក្តីសង្ខេប ថ្ងៃទី $_selectedDay', // Summary for Day X
+                  'សេចក្តីសង្ខេប ថ្ងៃទី $_selectedDay',
+
                   style: textTheme.titleMedium?.copyWith(
                     color: AppColors.darkText,
                     fontWeight: FontWeight.w900,
@@ -224,7 +220,6 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
   }
 
   Widget _buildMonthChart(TextTheme textTheme, List<dynamic> data) {
-    // Use List<DailyStepRecord> here
     // Calculate average steps
     final avgSteps =
         data.fold<num>(0, (sum, record) => sum + record.steps) ~/ data.length;
@@ -257,7 +252,8 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'មធ្យមប្រចាំខែ', // Monthly Average
+                    'មធ្យមប្រចាំខែ',
+
                     style: textTheme.titleSmall?.copyWith(
                       color: AppColors.mutedText,
                       fontWeight: FontWeight.w700,
@@ -314,7 +310,8 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
               itemBuilder: (context, i) {
                 final record = chartData[i];
                 final double percentage =
-                    record.progress; // Uses the helper from the model
+                    record.progress;
+
                 final bool reachedGoal = record.isGoalReached;
                 final bool isSelected = record.date.day == _selectedDay;
 
@@ -355,7 +352,8 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                           children: [
                             Container(
                               width: 16,
-                              height: 100, // Max height
+                              height: 100,
+
                               decoration: BoxDecoration(
                                 color: AppColors.scaffoldSoft,
                                 borderRadius: BorderRadius.circular(8),
@@ -427,7 +425,6 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
   }
 
   Widget _buildDailySummaryCard(dynamic record, TextTheme textTheme) {
-    // Use DailyStepRecord here
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -484,7 +481,8 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                     Text(
                       record.isGoalReached
                           ? 'សម្រេចគោលដៅ'
-                          : 'កំពុងដំណើរការ', // Goal Reached vs In Progress
+                          : 'កំពុងដំណើរការ',
+
                       style: TextStyle(
                         color: record.isGoalReached
                             ? AppColors.progressChipText
@@ -630,7 +628,6 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
   // --- SESSION VIEW (Uses WorkoutSession) ---
 
   Widget _buildSessionView(TextTheme textTheme, List<dynamic> sessions) {
-    // Use List<WorkoutSession> here
     if (sessions.isEmpty) {
       return const Center(
         child: Text(
@@ -655,7 +652,8 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                 MaterialPageRoute(
                   builder: (context) => StepWorkoutDetailPage(
                     session: session,
-                  ), // Passes the real model
+                  ),
+
                 ),
               );
             },
@@ -711,7 +709,8 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                   Text(
                     _formatDateTime(
                       session.startTime,
-                    ), // Uses our helper format
+                    ),
+
                     style: const TextStyle(
                       color: AppColors.mutedText,
                       fontSize: 13,
@@ -726,7 +725,8 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                     children: [
                       _buildSessionMiniStat(
                         Icons.schedule_rounded,
-                        session.formattedDuration, // Helper from your model
+                        session.formattedDuration,
+
                         'នាទី',
                       ),
                       Container(

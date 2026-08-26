@@ -1,8 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:step_detector/shared/models/user_settings.dart';
-// import 'your_path_to/user_settings.dart'; // Import your model
+import 'package:step_detector/data/models/user_settings.dart';
 
 class SettingsController extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;

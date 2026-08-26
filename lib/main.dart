@@ -3,16 +3,16 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:step_detector/features/presentation/auth/step_login_page.dart';
-import 'package:step_detector/features/presentation/controllers/activity_controller.dart';
-import 'package:step_detector/features/presentation/controllers/auth_controller.dart';
-import 'package:step_detector/features/presentation/controllers/motion_controller.dart';
-import 'package:step_detector/features/presentation/controllers/profile_controller.dart';
-import 'package:step_detector/features/presentation/controllers/settings_controller.dart';
-import 'package:step_detector/features/presentation/mainapp.dart';
+import 'package:step_detector/modules/auth/step_login_page.dart';
+import 'package:step_detector/data/controller/activity_controller.dart';
+import 'package:step_detector/data/controller/auth_controller.dart';
+import 'package:step_detector/data/controller/motion_controller.dart';
+import 'package:step_detector/data/controller/profile_controller.dart';
+import 'package:step_detector/data/controller/settings_controller.dart';
+import 'package:step_detector/modules/mainapp.dart';
 
-import 'config/firebase_options.dart';
-import 'core/constants/app_colors.dart';
+import 'package:step_detector/core/config/firebase_options.dart';
+import 'package:step_detector/core/constants/app_colors.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
