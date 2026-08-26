@@ -272,7 +272,6 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
                           final navigator = Navigator.of(context);
                           context.read<MotionController>().stop();
                           await context.read<AuthController>().logout();
-                          // Close dialog after logout
                           if (navigator.mounted) {
                             navigator.pop();
                           }
