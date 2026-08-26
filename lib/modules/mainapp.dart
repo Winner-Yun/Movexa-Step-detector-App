@@ -40,8 +40,6 @@ class _StepMainAppState extends State<StepMainApp> {
     final activityCtrl = context.read<ActivityController>();
     final motionCtrl = context.read<MotionController>();
 
-    // Settings must resolve first so a first-time today's-record gets
-    // seeded with the user's real daily goal, not a hardcoded fallback.
     await Future.wait([profileCtrl.fetchProfile(), settingsCtrl.fetchSettings()]);
 
     if (!mounted) return;
