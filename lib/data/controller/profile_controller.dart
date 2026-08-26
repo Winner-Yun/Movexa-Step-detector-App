@@ -14,7 +14,6 @@ class ProfileController extends ChangeNotifier {
   UserProfile? get currentProfile => _currentProfile;
   bool get isLoading => _isLoading;
 
-  // Fetch profile when app starts
   Future<void> fetchProfile() async {
     final user = _auth.currentUser;
     if (user == null) return;
@@ -33,10 +32,9 @@ class ProfileController extends ChangeNotifier {
           doc.data() as Map<String, dynamic>,
         );
       } else {
-        // First login: seed the profile from the real Google account
-        // instead of a placeholder, since sign-in is Google-only.
         _currentProfile = UserProfile(
           id: user.uid,
+          email: user.email ?? '',
           name: user.displayName ?? '',
           bio: '',
           age: 0,
@@ -44,7 +42,6 @@ class ProfileController extends ChangeNotifier {
           height: 0,
           avatarUrl: user.photoURL,
         );
-        await saveProfile(_currentProfile!);
       }
     } catch (e) {
       debugPrint('Error fetching profile: $e');
@@ -54,7 +51,6 @@ class ProfileController extends ChangeNotifier {
     }
   }
 
-  // Save updated profile from the Edit Profile Screen
   Future<bool> saveProfile(UserProfile profile) async {
     final user = _auth.currentUser;
     if (user == null) return false;
@@ -65,10 +61,10 @@ class ProfileController extends ChangeNotifier {
     try {
       await _firestore.collection('users').doc(user.uid).set(profile.toMap());
       _currentProfile = profile;
-      return true; // Success
+      return true;
     } catch (e) {
       debugPrint('Error saving profile: $e');
-      return false; // Failed
+      return false;
     } finally {
       _isLoading = false;
       notifyListeners();

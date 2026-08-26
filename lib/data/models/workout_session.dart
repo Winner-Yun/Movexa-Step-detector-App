@@ -1,13 +1,14 @@
-class WorkoutSession {
+import 'package:step_detector/core/model/base_model.dart';
+class WorkoutSession implements BaseModel {
   final String id;
   final String title;
   final DateTime startTime;
   final Duration duration;
   final int steps;
   final double calories;
-  final double distance; // in km
-  final String averagePace; // e.g., "6:35"
-  final List<double>? paceChartData; // For the bar chart on the detail page
+  final double distance;
+  final String averagePace;
+  final List<double>? paceChartData;
 
   const WorkoutSession({
     required this.id,
@@ -21,7 +22,6 @@ class WorkoutSession {
     this.paceChartData,
   });
 
-  // Helper method to format duration to "MM:SS" for UI
   String get formattedDuration {
     String twoDigits(int n) => n.toString().padLeft(2, "0");
     String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
@@ -32,6 +32,7 @@ class WorkoutSession {
     return "$twoDigitMinutes:$twoDigitSeconds";
   }
 
+  @override
   Map<String, dynamic> toMap() {
     return {
       'id': id,
