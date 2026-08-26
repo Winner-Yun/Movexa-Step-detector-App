@@ -1,12 +1,12 @@
 # Epic 1: Authentication & User Onboarding
 
-## Issue 1: Implement Google Sign-In and Email Auth
-**Description**: Users need to be able to securely create an account and log in using Google or Email/Password.
+## Issue 1: Implement Google Sign-In
+**Description**: Users need to be able to securely create an account and log in using Google.
 **Tasks**:
-- [ ] Set up Firebase Auth UI screens in `features/auth`
-- [ ] Connect Google Sign-In integration with Firebase
-- [ ] Handle auth state changes using Provider
-- [ ] Route user to Main Dashboard or Onboarding based on new user status
+- [x] Set up Firebase Auth UI screens in `features/auth`
+- [x] Connect Google Sign-In integration with Firebase
+- [x] Handle auth state changes using Provider
+- [x] Route user to Main Dashboard or Onboarding based on new user status
 **Labels**: `enhancement`, `auth`
 
 ## Issue 2: User Onboarding & Profile Setup
