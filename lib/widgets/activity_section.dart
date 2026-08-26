@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 // IMPORTANT: Import your new WorkoutSession model here!
 
 import 'package:step_detector/widgets/activity_row.dart';
