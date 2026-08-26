@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 
 // IMPORTANT: Import your new WorkoutSession model here!
-// import '../../data/models/workout_session.dart';
 
-import 'activity_row.dart';
+import 'package:step_detector/widgets/activity_row.dart';
 
 class ActivitySection extends StatelessWidget {
   const ActivitySection({super.key, required this.activities});

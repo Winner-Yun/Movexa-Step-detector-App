@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:step_detector/shared/models/workout_session.dart';
+import 'package:step_detector/data/models/workout_session.dart';
 
-import '../../../core/constants/app_colors.dart';
-// Import your WorkoutSession model
+import 'package:step_detector/core/constants/app_colors.dart';
 
 class StepWorkoutDetailPage extends StatelessWidget {
-  final WorkoutSession session; // Using the real Firebase Model now!
+  final WorkoutSession session;
+
 
   const StepWorkoutDetailPage({super.key, required this.session});
 
@@ -73,7 +73,6 @@ class StepWorkoutDetailPage extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 4),
-        // Simple date formatting for now
         Text(
           '${session.startTime.day}/${session.startTime.month}/${session.startTime.year}',
           style: textTheme.bodyMedium?.copyWith(color: AppColors.mutedText),

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:step_detector/features/presentation/controllers/profile_controller.dart';
+import 'package:step_detector/data/controller/profile_controller.dart';
 
-import '../../../core/constants/app_colors.dart';
-// Import your controllers and models
+import 'package:step_detector/core/constants/app_colors.dart';
 
 class StepProfileEditPage extends StatefulWidget {
   const StepProfileEditPage({super.key});
@@ -21,7 +20,7 @@ class _StepProfileEditPageState extends State<StepProfileEditPage> {
   @override
   void initState() {
     super.initState();
-    // Pre-fill the text fields with the data from Firebase
+    // Load current profile data
     final profile = context.read<ProfileController>().currentProfile;
     _nameController = TextEditingController(text: profile?.name ?? '');
     _bioController = TextEditingController(text: profile?.bio ?? '');
@@ -49,7 +48,7 @@ class _StepProfileEditPageState extends State<StepProfileEditPage> {
     final currentProfile = profileCtrl.currentProfile;
     if (currentProfile == null) return;
 
-    // Create a new updated model
+    // Prepare updated profile
     final updatedProfile = currentProfile.copyWith(
       name: _nameController.text,
       bio: _bioController.text,
@@ -58,7 +57,7 @@ class _StepProfileEditPageState extends State<StepProfileEditPage> {
       height: double.tryParse(_heightController.text) ?? currentProfile.height,
     );
 
-    // Save to Firebase
+    // Persist changes
     final success = await profileCtrl.saveProfile(updatedProfile);
 
     if (success && mounted) {

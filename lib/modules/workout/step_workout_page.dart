@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../core/constants/app_colors.dart';
-import '../../../shared/models/workout_session.dart';
-import '../controllers/activity_controller.dart';
-import '../controllers/motion_controller.dart';
+import 'package:step_detector/core/constants/app_colors.dart';
+import 'package:step_detector/data/models/workout_session.dart';
+import 'package:step_detector/data/controller/activity_controller.dart';
+import 'package:step_detector/data/controller/motion_controller.dart';
 
 class StepWorkoutPage extends StatefulWidget {
   const StepWorkoutPage({super.key});

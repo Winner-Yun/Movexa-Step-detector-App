@@ -2,8 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:step_detector/shared/models/daily_step_record.dart';
-import 'package:step_detector/shared/models/workout_session.dart';
+import 'package:step_detector/data/models/daily_step_record.dart';
+import 'package:step_detector/data/models/workout_session.dart';
 
 // import your models here
 

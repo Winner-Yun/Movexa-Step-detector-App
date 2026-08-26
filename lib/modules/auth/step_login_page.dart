@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../core/constants/app_colors.dart';
-import '../controllers/auth_controller.dart';
+import 'package:step_detector/core/constants/app_colors.dart';
+import 'package:step_detector/data/controller/auth_controller.dart';
 
 class StepLoginPage extends StatefulWidget {
   const StepLoginPage({super.key});

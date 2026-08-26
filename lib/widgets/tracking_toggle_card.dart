@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../core/constants/app_colors.dart';
-import '../../features/presentation/controllers/motion_controller.dart';
+import 'package:step_detector/core/constants/app_colors.dart';
+import 'package:step_detector/data/controller/motion_controller.dart';
 
 class TrackingToggleCard extends StatelessWidget {
   const TrackingToggleCard({

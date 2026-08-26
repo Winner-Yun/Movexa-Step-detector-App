@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import 'activity_controller.dart';
+import 'package:step_detector/data/controller/activity_controller.dart';
 
 enum MotionStatus { idle, walking, stopped, unknown }
 
