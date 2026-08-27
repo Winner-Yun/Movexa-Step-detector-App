@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:step_detector/core/theme/theme_colors.dart';
 import 'package:step_detector/data/controller/profile_controller.dart';
-
-import 'package:step_detector/core/constants/app_colors.dart';
 
 class StepProfileEditPage extends StatefulWidget {
   const StepProfileEditPage({super.key});
@@ -70,19 +69,15 @@ class _StepProfileEditPageState extends State<StepProfileEditPage> {
     final isSaving = context.watch<ProfileController>().isLoading;
 
     return Scaffold(
-      backgroundColor: AppColors.scaffold,
       appBar: AppBar(
-        backgroundColor: AppColors.primaryGradientStart,
+        backgroundColor: ThemeColors.getPrimaryGradientStart(context),
         elevation: 0,
-        title: const Text(
+        title: Text(
           'កែប្រែប្រវត្តិរូប',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
         ),
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_new_rounded,
-            color: Colors.white,
-          ),
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -95,13 +90,13 @@ class _StepProfileEditPageState extends State<StepProfileEditPage> {
               Icons.person_rounded,
               _nameController,
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             _buildPremiumInputField(
               'អំពីខ្ញុំ',
               Icons.info_rounded,
               _bioController,
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             Row(
               children: [
                 Expanded(
@@ -112,7 +107,7 @@ class _StepProfileEditPageState extends State<StepProfileEditPage> {
                     isNumber: true,
                   ),
                 ),
-                const SizedBox(width: 16),
+                SizedBox(width: 16),
                 Expanded(
                   child: _buildPremiumInputField(
                     'ទម្ងន់',
@@ -123,11 +118,11 @@ class _StepProfileEditPageState extends State<StepProfileEditPage> {
                 ),
               ],
             ),
-            const SizedBox(height: 40),
+            SizedBox(height: 40),
             ElevatedButton(
               onPressed: isSaving ? null : _handleSave,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.brandAccent,
+                backgroundColor: ThemeColors.getBrandAccent(context),
                 minimumSize: const Size(double.infinity, 56),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
@@ -135,7 +130,7 @@ class _StepProfileEditPageState extends State<StepProfileEditPage> {
               ),
               child: isSaving
                   ? const CircularProgressIndicator(color: Colors.white)
-                  : const Text(
+                  : Text(
                       'រក្សាទុក (Save)',
                       style: TextStyle(
                         color: Colors.white,
@@ -160,10 +155,10 @@ class _StepProfileEditPageState extends State<StepProfileEditPage> {
       controller: controller,
       keyboardType: isNumber ? TextInputType.number : TextInputType.text,
       decoration: InputDecoration(
-        prefixIcon: Icon(icon, color: AppColors.brandAccent),
+        prefixIcon: Icon(icon, color: ThemeColors.getBrandAccent(context)),
         labelText: hint,
         filled: true,
-        fillColor: AppColors.surface,
+        fillColor: ThemeColors.getSurface(context),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
           borderSide: BorderSide.none,

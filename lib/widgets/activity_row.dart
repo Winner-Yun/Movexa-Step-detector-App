@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:step_detector/core/constants/app_colors.dart';
+import 'package:step_detector/core/theme/theme_colors.dart';
 
 class ActivityRow extends StatelessWidget {
   const ActivityRow({
@@ -18,7 +18,7 @@ class ActivityRow extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
       decoration: BoxDecoration(
-        color: AppColors.activityCard,
+        color: ThemeColors.getActivityCard(context),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Row(
@@ -27,16 +27,16 @@ class ActivityRow extends StatelessWidget {
             width: 22,
             height: 22,
             decoration: BoxDecoration(
-              color: AppColors.iconChip,
+              color: ThemeColors.getIconChip(context),
               borderRadius: BorderRadius.circular(11),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.directions_walk_rounded,
               size: 14,
               color: Color(0xFF996F1C),
             ),
           ),
-          const SizedBox(width: 10),
+          SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -44,11 +44,11 @@ class ActivityRow extends StatelessWidget {
                 Text(
                   title,
                   style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    color: AppColors.darkText,
+                    color: ThemeColors.getText(context),
                     fontWeight: FontWeight.w800,
                   ),
                 ),
-                const SizedBox(height: 1),
+                SizedBox(height: 1),
                 Text(
                   subtitle,
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
@@ -62,7 +62,7 @@ class ActivityRow extends StatelessWidget {
           Text(
             delta,
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
-              color: AppColors.positiveText,
+              color: ThemeColors.getPositiveText(context),
               fontWeight: FontWeight.w900,
             ),
           ),

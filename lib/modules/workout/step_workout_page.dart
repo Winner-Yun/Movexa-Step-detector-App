@@ -2,11 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import 'package:step_detector/core/constants/app_colors.dart';
-import 'package:step_detector/data/models/workout_session.dart';
+import 'package:step_detector/core/theme/theme_colors.dart';
 import 'package:step_detector/data/controller/activity_controller.dart';
 import 'package:step_detector/data/controller/motion_controller.dart';
+import 'package:step_detector/data/models/workout_session.dart';
 
 class StepWorkoutPage extends StatefulWidget {
   const StepWorkoutPage({super.key});
@@ -105,7 +104,11 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
     return '$minutes:$seconds';
   }
 
-  void _showWorkoutSummaryDialog(int steps, double calories, double distanceKm) {
+  void _showWorkoutSummaryDialog(
+    int steps,
+    double calories,
+    double distanceKm,
+  ) {
     final bool isProud = steps >= _stepGoal;
     final caloriesLabel = calories.toStringAsFixed(1);
     final distanceLabel = distanceKm.toStringAsFixed(2);
@@ -120,13 +123,15 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
           child: Container(
             padding: const EdgeInsets.fromLTRB(24, 40, 24, 24),
             decoration: BoxDecoration(
-              color: AppColors.surface,
+              color: ThemeColors.getSurface(context),
               borderRadius: BorderRadius.circular(32),
               boxShadow: [
                 BoxShadow(
                   color: isProud
-                      ? AppColors.brandAccent.withValues(alpha: 0.2)
-                      : AppColors.progressChipText,
+                      ? ThemeColors.getBrandAccent(
+                          context,
+                        ).withValues(alpha: 0.2)
+                      : ThemeColors.getProgressChipText(context),
                   blurRadius: 40,
                   spreadRadius: 10,
                   offset: const Offset(0, 10),
@@ -143,28 +148,28 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
                   children: [
                     Text(
                       isProud ? 'ធ្វើបានល្អណាស់!' : 'កុំបោះបង់!',
-                      style: const TextStyle(
-                        color: AppColors.darkText,
+                      style: TextStyle(
+                        color: ThemeColors.getText(context),
                         fontSize: 28,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 0.5,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8),
                     Text(
                       isProud
                           ? 'អ្នកបានសម្រេចគោលដៅថ្ងៃនេះ។'
                           : 'ការចាប់ផ្តើមគឺជាភាពជោគជ័យមួយ។',
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: AppColors.mutedText,
+                      style: TextStyle(
+                        color: ThemeColors.getMutedText(context),
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const SizedBox(height: 32),
+                    SizedBox(height: 32),
                     _buildSummaryStatsGrid(steps, caloriesLabel, distanceLabel),
-                    const SizedBox(height: 32),
+                    SizedBox(height: 32),
                     _buildSummaryCloseButton(isProud, context),
                   ],
                 ),
@@ -185,16 +190,24 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
           shape: BoxShape.circle,
           gradient: LinearGradient(
             colors: isProud
-                ? [AppColors.primaryGradientStart, AppColors.primaryGradientEnd]
-                : [AppColors.progressChipText, AppColors.progressChipText],
+                ? [
+                    ThemeColors.getPrimaryGradientStart(context),
+                    ThemeColors.getPrimaryGradientEnd(context),
+                  ]
+                : [
+                    ThemeColors.getProgressChipText(context),
+                    ThemeColors.getProgressChipText(context),
+                  ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           boxShadow: [
             BoxShadow(
               color: isProud
-                  ? AppColors.brandAccent.withValues(alpha: 0.4)
-                  : AppColors.progressChipText.withValues(alpha: 0.4),
+                  ? ThemeColors.getBrandAccent(context).withValues(alpha: 0.4)
+                  : ThemeColors.getProgressChipText(
+                      context,
+                    ).withValues(alpha: 0.4),
               blurRadius: 20,
               offset: const Offset(0, 8),
             ),
@@ -213,7 +226,7 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.scaffoldSoft,
+        color: ThemeColors.getScaffoldSoft(context),
         borderRadius: BorderRadius.circular(24),
       ),
       child: Column(
@@ -228,20 +241,27 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
                   'រយៈពេល',
                 ),
               ),
-              Container(width: 1, height: 40, color: AppColors.progressTrack),
+              Container(
+                width: 1,
+                height: 40,
+                color: ThemeColors.getProgressTrack(context),
+              ),
               Expanded(
                 child: _buildSummaryItem(
                   Icons.do_not_step_rounded,
-                  AppColors.brandAccent,
+                  ThemeColors.getBrandAccent(context),
                   steps.toString(),
                   'ជំហាន',
                 ),
               ),
             ],
           ),
-          const Padding(
+          Padding(
             padding: EdgeInsets.symmetric(vertical: 16),
-            child: Divider(color: AppColors.progressTrack, height: 1),
+            child: Divider(
+              color: ThemeColors.getProgressTrack(context),
+              height: 1,
+            ),
           ),
           Row(
             children: [
@@ -253,7 +273,11 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
                   'KCAL',
                 ),
               ),
-              Container(width: 1, height: 40, color: AppColors.progressTrack),
+              Container(
+                width: 1,
+                height: 40,
+                color: ThemeColors.getProgressTrack(context),
+              ),
               Expanded(
                 child: _buildSummaryItem(
                   Icons.route_rounded,
@@ -278,11 +302,11 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
     return Column(
       children: [
         Icon(icon, color: color, size: 24),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         Text(
           value,
-          style: const TextStyle(
-            color: AppColors.darkText,
+          style: TextStyle(
+            color: ThemeColors.getText(context),
             fontSize: 20,
             fontWeight: FontWeight.w900,
             fontFeatures: [FontFeature.tabularFigures()],
@@ -290,8 +314,8 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
         ),
         Text(
           label,
-          style: const TextStyle(
-            color: AppColors.mutedText,
+          style: TextStyle(
+            color: ThemeColors.getMutedText(context),
             fontSize: 12,
             fontWeight: FontWeight.w700,
           ),
@@ -307,15 +331,15 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
         onPressed: () => Navigator.pop(context),
         style: ElevatedButton.styleFrom(
           backgroundColor: isProud
-              ? AppColors.brandAccent
-              : AppColors.progressChipText,
+              ? ThemeColors.getBrandAccent(context)
+              : ThemeColors.getProgressChipText(context),
           padding: const EdgeInsets.symmetric(vertical: 16),
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
         ),
-        child: const Text(
+        child: Text(
           'បិទ (Close)',
           style: TextStyle(
             color: Colors.white,
@@ -334,20 +358,20 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: AppColors.brandAccent.withValues(alpha: 0.1),
+            color: ThemeColors.getBrandAccent(context).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
           ),
-          child: const Icon(
+          child: Icon(
             Icons.directions_run_rounded,
-            color: AppColors.brandAccent,
+            color: ThemeColors.getBrandAccent(context),
             size: 24,
           ),
         ),
-        const SizedBox(width: 12),
+        SizedBox(width: 12),
         Text(
           'ការហាត់ប្រាណ',
           style: textTheme.titleLarge?.copyWith(
-            color: AppColors.darkText,
+            color: ThemeColors.getText(context),
             fontWeight: FontWeight.w900,
             letterSpacing: 0.5,
           ),
@@ -366,12 +390,12 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
           height: 300,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: AppColors.surface,
+            color: ThemeColors.getSurface(context),
             boxShadow: [
               BoxShadow(
                 color: _isTracking
-                    ? AppColors.brandAccent.withValues(alpha: 0.3)
-                    : AppColors.darkText.withValues(alpha: 0.05),
+                    ? ThemeColors.getBrandAccent(context).withValues(alpha: 0.3)
+                    : ThemeColors.getText(context).withValues(alpha: 0.05),
                 blurRadius: _isTracking ? 50 : 20,
                 spreadRadius: _isTracking ? 5 : 0,
                 offset: const Offset(0, 10),
@@ -385,8 +409,10 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
           child: CircularProgressIndicator(
             value: _isTracking ? null : 0.0,
             strokeWidth: 6,
-            color: _isTracking ? AppColors.brandAccent : AppColors.scaffoldSoft,
-            backgroundColor: AppColors.scaffoldSoft,
+            color: _isTracking
+                ? ThemeColors.getBrandAccent(context)
+                : ThemeColors.getScaffoldSoft(context),
+            backgroundColor: ThemeColors.getScaffoldSoft(context),
           ),
         ),
         Column(
@@ -395,27 +421,29 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
             Icon(
               _isTracking ? Icons.timer_rounded : Icons.timer_off_rounded,
               color: _isTracking
-                  ? AppColors.brandAccent
-                  : AppColors.mutedText.withValues(alpha: 0.5),
+                  ? ThemeColors.getBrandAccent(context)
+                  : ThemeColors.getMutedText(context).withValues(alpha: 0.5),
               size: 32,
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             Text(
               _formattedTime,
               style: textTheme.displayMedium?.copyWith(
-                color: _isTracking ? AppColors.brandAccent : AppColors.darkText,
+                color: _isTracking
+                    ? ThemeColors.getBrandAccent(context)
+                    : ThemeColors.getText(context),
                 fontWeight: FontWeight.w900,
                 letterSpacing: 2,
                 fontFeatures: const [FontFeature.tabularFigures()],
               ),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
                 color: _isTracking
-                    ? AppColors.progressChip
-                    : AppColors.scaffoldSoft,
+                    ? ThemeColors.getProgressChip(context)
+                    : ThemeColors.getScaffoldSoft(context),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Row(
@@ -424,17 +452,17 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
                   Icon(
                     Icons.do_not_step_rounded,
                     color: _isTracking
-                        ? AppColors.progressChipText
-                        : AppColors.mutedText,
+                        ? ThemeColors.getProgressChipText(context)
+                        : ThemeColors.getMutedText(context),
                     size: 20,
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: 8),
                   Text(
                     '$currentSteps ជំហាន',
                     style: textTheme.titleMedium?.copyWith(
                       color: _isTracking
-                          ? AppColors.progressChipText
-                          : AppColors.mutedText,
+                          ? ThemeColors.getProgressChipText(context)
+                          : ThemeColors.getMutedText(context),
                       fontWeight: FontWeight.w800,
                     ),
                   ),
@@ -457,11 +485,11 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: ThemeColors.getSurface(context),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: AppColors.darkText.withValues(alpha: 0.04),
+            color: ThemeColors.getText(context).withValues(alpha: 0.04),
             blurRadius: 15,
             offset: const Offset(0, 6),
           ),
@@ -480,37 +508,39 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
                 ),
                 child: Icon(icon, color: iconColor, size: 18),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               Text(
                 title,
-                style: const TextStyle(
-                  color: AppColors.mutedText,
+                style: TextStyle(
+                  color: ThemeColors.getMutedText(context),
                   fontWeight: FontWeight.w700,
                   fontSize: 14,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
                 value,
-                style: const TextStyle(
-                  color: AppColors.darkText,
+                style: TextStyle(
+                  color: ThemeColors.getText(context),
                   fontWeight: FontWeight.w900,
                   fontSize: 26,
                   fontFeatures: [FontFeature.tabularFigures()],
                 ),
               ),
-              const SizedBox(width: 4),
+              SizedBox(width: 4),
               Padding(
                 padding: const EdgeInsets.only(bottom: 5),
                 child: Text(
                   unit,
                   style: TextStyle(
-                    color: AppColors.mutedText.withValues(alpha: 0.8),
+                    color: ThemeColors.getMutedText(
+                      context,
+                    ).withValues(alpha: 0.8),
                     fontWeight: FontWeight.w800,
                     fontSize: 12,
                   ),
@@ -535,8 +565,8 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
             colors: _isTracking
                 ? [const Color(0xFFE53935), const Color(0xFFC62828)]
                 : [
-                    AppColors.primaryGradientStart,
-                    AppColors.primaryGradientEnd,
+                    ThemeColors.getPrimaryGradientStart(context),
+                    ThemeColors.getPrimaryGradientEnd(context),
                   ],
           ),
           borderRadius: BorderRadius.circular(24),
@@ -544,7 +574,7 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
             BoxShadow(
               color: _isTracking
                   ? const Color(0xFFE53935).withValues(alpha: 0.3)
-                  : AppColors.brandAccent.withValues(alpha: 0.3),
+                  : ThemeColors.getBrandAccent(context).withValues(alpha: 0.3),
               blurRadius: 16,
               offset: const Offset(0, 6),
             ),
@@ -558,10 +588,10 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
               color: Colors.white,
               size: 28,
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: 8),
             Text(
               _isTracking ? 'បញ្ឈប់ (Stop)' : 'ចាប់ផ្តើម (Start)',
-              style: const TextStyle(
+              style: TextStyle(
                 color: Colors.white,
                 fontSize: 20,
                 fontWeight: FontWeight.w900,
@@ -583,7 +613,6 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
     final distance = currentSteps * kmPerStep;
 
     return Scaffold(
-      backgroundColor: AppColors.scaffold,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -605,7 +634,7 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
                       const Color(0xFFD45529),
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  SizedBox(width: 16),
                   Expanded(
                     child: _buildStatBox(
                       'ចម្ងាយ',
@@ -617,9 +646,9 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
                   ),
                 ],
               ),
-              const SizedBox(height: 40),
+              SizedBox(height: 40),
               _buildControlButton(),
-              const SizedBox(height: 20),
+              SizedBox(height: 20),
             ],
           ),
         ),

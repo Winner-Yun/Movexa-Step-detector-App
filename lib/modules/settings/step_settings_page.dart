@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import 'package:step_detector/core/constants/app_colors.dart';
+import 'package:step_detector/core/theme/theme_colors.dart';
 import 'package:step_detector/data/controller/auth_controller.dart';
 import 'package:step_detector/data/controller/motion_controller.dart';
 import 'package:step_detector/data/controller/profile_controller.dart';
@@ -30,7 +29,7 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(24),
               ),
-              backgroundColor: AppColors.surface,
+              backgroundColor: ThemeColors.getSurface(context),
               elevation: 8,
               child: Padding(
                 padding: const EdgeInsets.all(24.0),
@@ -38,9 +37,9 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     _buildGoalDialogHeader(),
-                    const SizedBox(height: 24),
+                    SizedBox(height: 24),
                     _buildGoalInput(errorMessage, setState),
-                    const SizedBox(height: 28),
+                    SizedBox(height: 28),
                     _buildGoalDialogActions(context, setState, settingsCtrl),
                   ],
                 ),
@@ -58,29 +57,29 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: AppColors.brandAccent.withValues(alpha: 0.1),
+            color: ThemeColors.getBrandAccent(context).withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
-          child: const Icon(
+          child: Icon(
             Icons.flag_rounded,
-            color: AppColors.brandAccent,
+            color: ThemeColors.getBrandAccent(context),
             size: 36,
           ),
         ),
-        const SizedBox(height: 16),
-        const Text(
+        SizedBox(height: 16),
+        Text(
           'កំណត់គោលដៅថ្មី',
           style: TextStyle(
-            color: AppColors.darkText,
+            color: ThemeColors.getText(context),
             fontWeight: FontWeight.w800,
             fontSize: 22,
           ),
         ),
-        const SizedBox(height: 6),
-        const Text(
+        SizedBox(height: 6),
+        Text(
           'កំណត់គោលដៅជំហានប្រចាំថ្ងៃរបស់អ្នក',
           style: TextStyle(
-            color: AppColors.mutedText,
+            color: ThemeColors.getMutedText(context),
             fontWeight: FontWeight.w500,
             fontSize: 14,
           ),
@@ -94,11 +93,11 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
       controller: _goalInputController,
       keyboardType: TextInputType.number,
       textAlign: TextAlign.center,
-      cursorColor: AppColors.brandAccent,
-      style: const TextStyle(
+      cursorColor: ThemeColors.getBrandAccent(context),
+      style: TextStyle(
         fontSize: 28,
         fontWeight: FontWeight.w900,
-        color: AppColors.brandAccent,
+        color: ThemeColors.getBrandAccent(context),
       ),
       onChanged: (value) {
         if (errorMessage != null) {
@@ -108,15 +107,15 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
       decoration: InputDecoration(
         hintText: '10000',
         hintStyle: TextStyle(
-          color: AppColors.brandAccent.withValues(alpha: 0.3),
+          color: ThemeColors.getBrandAccent(context).withValues(alpha: 0.3),
           fontSize: 24,
           fontWeight: FontWeight.w700,
         ),
         filled: true,
-        fillColor: AppColors.scaffoldSoft,
+        fillColor: ThemeColors.getScaffoldSoft(context),
         contentPadding: const EdgeInsets.symmetric(vertical: 16),
         errorText: errorMessage,
-        errorStyle: const TextStyle(
+        errorStyle: TextStyle(
           color: Colors.redAccent,
           fontWeight: FontWeight.w600,
           fontSize: 13,
@@ -127,11 +126,11 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: Colors.redAccent, width: 1.5),
+          borderSide: BorderSide(color: Colors.redAccent, width: 1.5),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: Colors.redAccent, width: 2),
+          borderSide: BorderSide(color: Colors.redAccent, width: 2),
         ),
       ),
     );
@@ -156,17 +155,17 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
                 borderRadius: BorderRadius.circular(14),
               ),
             ),
-            child: const Text(
+            child: Text(
               'បោះបង់',
               style: TextStyle(
-                color: AppColors.mutedText,
+                color: ThemeColors.getMutedText(context),
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
               ),
             ),
           ),
         ),
-        const SizedBox(width: 12),
+        SizedBox(width: 12),
         Expanded(
           child: ElevatedButton(
             onPressed: () {
@@ -181,7 +180,7 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.brandAccent,
+              backgroundColor: ThemeColors.getBrandAccent(context),
               foregroundColor: Colors.white,
               elevation: 0,
               padding: const EdgeInsets.symmetric(vertical: 16),
@@ -189,7 +188,7 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
                 borderRadius: BorderRadius.circular(14),
               ),
             ),
-            child: const Text(
+            child: Text(
               'រក្សាទុក',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
@@ -214,7 +213,7 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
           ),
-          backgroundColor: AppColors.surface,
+          backgroundColor: ThemeColors.getSurface(context),
           child: Padding(
             padding: const EdgeInsets.all(24),
             child: Column(
@@ -226,28 +225,31 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
                     color: Colors.redAccent.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.logout_rounded,
                     color: Colors.redAccent,
                     size: 32,
                   ),
                 ),
-                const SizedBox(height: 16),
-                const Text(
+                SizedBox(height: 16),
+                Text(
                   'ចាកចេញពីគណនី?',
                   style: TextStyle(
-                    color: AppColors.darkText,
+                    color: ThemeColors.getText(context),
                     fontSize: 22,
                     fontWeight: FontWeight.w900,
                   ),
                 ),
-                const SizedBox(height: 8),
-                const Text(
+                SizedBox(height: 8),
+                Text(
                   'តើអ្នកពិតជាចង់ចាកចេញពីគណនីមែនទេ?',
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: AppColors.mutedText, fontSize: 14),
+                  style: TextStyle(
+                    color: ThemeColors.getMutedText(context),
+                    fontSize: 14,
+                  ),
                 ),
-                const SizedBox(height: 32),
+                SizedBox(height: 32),
                 Row(
                   children: [
                     Expanded(
@@ -256,16 +258,16 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
                         style: TextButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
                         ),
-                        child: const Text(
+                        child: Text(
                           'បោះបង់',
                           style: TextStyle(
-                            color: AppColors.mutedText,
+                            color: ThemeColors.getMutedText(context),
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: 12),
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () async {
@@ -284,7 +286,7 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
                           ),
                           elevation: 0,
                         ),
-                        child: const Text(
+                        child: Text(
                           'ចាកចេញ',
                           style: TextStyle(
                             color: Colors.white,
@@ -310,9 +312,9 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
     final settingsCtrl = context.watch<SettingsController>();
 
     return Scaffold(
-      backgroundColor: AppColors.scaffold,
       appBar: AppBar(
-        backgroundColor: AppColors.scaffold,
+        backgroundColor: ThemeColors.getScaffold(context),
+        scrolledUnderElevation: 0,
         elevation: 0,
         automaticallyImplyLeading: false,
         title: Row(
@@ -320,20 +322,22 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AppColors.brandAccent.withValues(alpha: 0.1),
+                color: ThemeColors.getBrandAccent(
+                  context,
+                ).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.settings_rounded,
-                color: AppColors.brandAccent,
+                color: ThemeColors.getBrandAccent(context),
                 size: 24,
               ),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: 12),
             Text(
               'ការកំណត់',
               style: textTheme.titleLarge?.copyWith(
-                color: AppColors.darkText,
+                color: ThemeColors.getText(context),
                 fontWeight: FontWeight.w900,
                 letterSpacing: 0.5,
               ),
@@ -349,48 +353,48 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 24),
+              SizedBox(height: 24),
               _buildProfileCard(textTheme, profileCtrl),
-              const SizedBox(height: 32),
+              SizedBox(height: 32),
 
               _buildSectionTitle('គណនី (Account)', textTheme),
               _buildSettingsGroup([
-                _buildSettingsTile(
-                  Icons.person_outline_rounded,
-                  'ព័ត៌មានផ្ទាល់ខ្លួន',
+                _SettingsItemTile(
+                  context: context,
+                  icon: Icons.person_outline_rounded,
+                  title: 'ព័ត៌មានផ្ទាល់ខ្លួន',
                   onTap: _navigateToProfileEdit,
                 ),
-                _buildSettingsTile(
-                  Icons.flag_outlined,
-                  'គោលដៅជំហាន',
+                _SettingsItemTile(
+                  context: context,
+                  icon: Icons.flag_outlined,
+                  title: 'គោលដៅជំហាន',
                   trailingText: '${settingsCtrl.settings.dailyStepGoal}',
                   onTap: () => _showSetGoalDialog(settingsCtrl),
                 ),
               ]),
-              const SizedBox(height: 24),
+              SizedBox(height: 24),
 
               _buildSectionTitle('ចំណូលចិត្ត (Preferences)', textTheme),
               _buildSettingsGroup([
-                _buildSettingsTile(
-                  Icons.notifications_none_rounded,
-                  'ការជូនដំណឹង',
+                _SettingsItemTile(
+                  context: context,
+                  icon: Icons.dark_mode_outlined,
+                  title: 'ម៉ូដងងឹត (Dark Mode)',
                   isSwitch: true,
-                  switchValue: settingsCtrl.settings.notificationsEnabled,
+                  switchValue: settingsCtrl.settings.darkModeEnabled,
                   onSwitchChanged: (val) => settingsCtrl.updateSettings(
-                    settingsCtrl.settings.copyWith(notificationsEnabled: val),
+                    settingsCtrl.settings.copyWith(darkModeEnabled: val),
                   ),
                 ),
               ]),
 
-              const SizedBox(height: 40),
+              SizedBox(height: 40),
               Center(
                 child: TextButton.icon(
                   onPressed: _showLogoutDialog,
-                  icon: const Icon(
-                    Icons.logout_rounded,
-                    color: Colors.redAccent,
-                  ),
-                  label: const Text(
+                  icon: Icon(Icons.logout_rounded, color: Colors.redAccent),
+                  label: Text(
                     'ចាកចេញ (Log Out)',
                     style: TextStyle(
                       color: Colors.redAccent,
@@ -416,10 +420,10 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           colors: [
-            AppColors.primaryGradientStart,
-            AppColors.primaryGradientEnd,
+            ThemeColors.getPrimaryGradientStart(context),
+            ThemeColors.getPrimaryGradientEnd(context),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -427,7 +431,7 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: AppColors.brandAccent.withValues(alpha: 0.3),
+            color: ThemeColors.getBrandAccent(context).withValues(alpha: 0.3),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -449,15 +453,15 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
             child: Center(
               child: Text(
                 initial,
-                style: const TextStyle(
-                  color: AppColors.brandAccent,
+                style: TextStyle(
+                  color: ThemeColors.getBrandAccent(context),
                   fontSize: 32,
                   fontWeight: FontWeight.w900,
                 ),
               ),
             ),
           ),
-          const SizedBox(width: 16),
+          SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -469,7 +473,7 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
                     fontWeight: FontWeight.w900,
                   ),
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: 4),
                 Text(
                   bio,
                   style: textTheme.bodyMedium?.copyWith(
@@ -482,7 +486,7 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
           ),
           IconButton(
             onPressed: _navigateToProfileEdit,
-            icon: const Icon(Icons.edit_rounded, color: Colors.white),
+            icon: Icon(Icons.edit_rounded, color: Colors.white),
             style: IconButton.styleFrom(
               backgroundColor: Colors.white.withValues(alpha: 0.2),
             ),
@@ -498,7 +502,7 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
       child: Text(
         title,
         style: textTheme.titleSmall?.copyWith(
-          color: AppColors.mutedText,
+          color: ThemeColors.getMutedText(context),
           fontWeight: FontWeight.w800,
           letterSpacing: 0.5,
         ),
@@ -509,11 +513,11 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
   Widget _buildSettingsGroup(List<Widget> children) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: ThemeColors.getSurface(context),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: AppColors.darkText.withValues(alpha: 0.03),
+            color: ThemeColors.getText(context).withValues(alpha: 0.03),
             blurRadius: 15,
             offset: const Offset(0, 5),
           ),
@@ -527,9 +531,12 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
           return Column(
             children: [
               child,
-              const Padding(
+              Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20),
-                child: Divider(color: AppColors.scaffoldSoft, height: 1),
+                child: Divider(
+                  color: ThemeColors.getScaffoldSoft(context),
+                  height: 1,
+                ),
               ),
             ],
           );
@@ -537,18 +544,69 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
       ),
     );
   }
+}
 
-  Widget _buildSettingsTile(
-    IconData icon,
-    String title, {
-    String? trailingText,
-    bool isSwitch = false,
-    bool switchValue = false,
-    ValueChanged<bool>? onSwitchChanged,
-    VoidCallback? onTap,
-  }) {
+class _SettingsItemTile extends StatefulWidget {
+  final BuildContext context;
+  final IconData icon;
+  final String title;
+  final String? trailingText;
+  final bool isSwitch;
+  final bool switchValue;
+  final ValueChanged<bool>? onSwitchChanged;
+  final VoidCallback? onTap;
+
+  const _SettingsItemTile({
+    required this.context,
+    required this.icon,
+    required this.title,
+    this.trailingText,
+    this.isSwitch = false,
+    this.switchValue = false,
+    this.onSwitchChanged,
+    this.onTap,
+  });
+
+  @override
+  State<_SettingsItemTile> createState() => _SettingsItemTileState();
+}
+
+class _SettingsItemTileState extends State<_SettingsItemTile> {
+  late bool _localSwitchValue;
+
+  @override
+  void initState() {
+    super.initState();
+    _localSwitchValue = widget.switchValue;
+  }
+
+  @override
+  void didUpdateWidget(_SettingsItemTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.switchValue != widget.switchValue) {
+      _localSwitchValue = widget.switchValue;
+    }
+  }
+
+  void _handleTap() {
+    if (widget.isSwitch) {
+      setState(() {
+        _localSwitchValue = !_localSwitchValue;
+      });
+      Future.delayed(const Duration(milliseconds: 300), () {
+        if (mounted) {
+          widget.onSwitchChanged?.call(_localSwitchValue);
+        }
+      });
+    } else {
+      widget.onTap?.call();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return InkWell(
-      onTap: isSwitch ? () => onSwitchChanged?.call(!switchValue) : onTap,
+      onTap: _handleTap,
       borderRadius: BorderRadius.circular(20),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -557,44 +615,79 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AppColors.scaffoldSoft,
+                color: ThemeColors.getScaffoldSoft(context),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(icon, color: AppColors.brandAccent, size: 20),
+              child: Icon(
+                widget.icon,
+                color: ThemeColors.getBrandAccent(context),
+                size: 20,
+              ),
             ),
-            const SizedBox(width: 16),
+            SizedBox(width: 16),
             Expanded(
               child: Text(
-                title,
-                style: const TextStyle(
-                  color: AppColors.darkText,
+                widget.title,
+                style: TextStyle(
+                  color: ThemeColors.getText(context),
                   fontWeight: FontWeight.w700,
                   fontSize: 16,
                 ),
               ),
             ),
-            if (trailingText != null) ...[
+            if (widget.trailingText != null) ...[
               Text(
-                trailingText,
-                style: const TextStyle(
-                  color: AppColors.mutedText,
+                widget.trailingText!,
+                style: TextStyle(
+                  color: ThemeColors.getMutedText(context),
                   fontWeight: FontWeight.w600,
                   fontSize: 14,
                 ),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
             ],
-            if (isSwitch)
-              Switch.adaptive(
-                value: switchValue,
-                activeColor: AppColors.brandAccent,
-                activeTrackColor: AppColors.brandAccent.withValues(alpha: 0.3),
-                onChanged: onSwitchChanged,
+            if (widget.isSwitch)
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOutBack,
+                width: 52,
+                height: 30,
+                padding: const EdgeInsets.all(3),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: _localSwitchValue
+                      ? ThemeColors.getBrandAccent(context)
+                      : ThemeColors.getMutedText(
+                          context,
+                        ).withValues(alpha: 0.2),
+                ),
+                child: AnimatedAlign(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOutBack,
+                  alignment: _localSwitchValue
+                      ? Alignment.centerRight
+                      : Alignment.centerLeft,
+                  child: Container(
+                    width: 24,
+                    height: 24,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.1),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               )
             else
-              const Icon(
+              Icon(
                 Icons.chevron_right_rounded,
-                color: AppColors.mutedText,
+                color: ThemeColors.getMutedText(context),
                 size: 24,
               ),
           ],

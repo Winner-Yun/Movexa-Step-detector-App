@@ -61,3 +61,4 @@ class WorkoutSession implements BaseModel {
     );
   }
 }
+

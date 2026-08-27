@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:step_detector/core/constants/app_colors.dart';
+import 'package:step_detector/core/theme/theme_colors.dart';
 
 class PrimaryButton extends StatelessWidget {
   const PrimaryButton({super.key, required this.onTap, required this.text});
@@ -15,10 +15,10 @@ class PrimaryButton extends StatelessWidget {
       child: DecoratedBox(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(30),
-          gradient: const LinearGradient(
+          gradient: LinearGradient(
             colors: [
-              AppColors.primaryGradientStart,
-              AppColors.primaryGradientEnd,
+              ThemeColors.getPrimaryGradientStart(context),
+              ThemeColors.getPrimaryGradientEnd(context),
             ],
           ),
           boxShadow: const [
@@ -38,12 +38,12 @@ class PrimaryButton extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.directions_walk_rounded,
                     color: Colors.white,
                     size: 18,
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: 8),
                   Text(
                     text,
                     style: Theme.of(context).textTheme.titleSmall?.copyWith(

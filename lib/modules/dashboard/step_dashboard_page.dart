@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:step_detector/core/constants/app_colors.dart';
+import 'package:step_detector/core/theme/theme_colors.dart';
 import 'package:step_detector/data/controller/activity_controller.dart';
 import 'package:step_detector/data/controller/motion_controller.dart';
 import 'package:step_detector/data/controller/profile_controller.dart';
@@ -49,7 +48,7 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(24),
               ),
-              backgroundColor: AppColors.surface,
+              backgroundColor: ThemeColors.getSurface(context),
               elevation: 8,
               child: Padding(
                 padding: const EdgeInsets.all(24.0),
@@ -57,16 +56,16 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     _buildDialogHeader(),
-                    const SizedBox(height: 24),
+                    SizedBox(height: 24),
                     TextField(
                       controller: _goalInputController,
                       keyboardType: TextInputType.number,
                       textAlign: TextAlign.center,
-                      cursorColor: AppColors.brandAccent,
-                      style: const TextStyle(
+                      cursorColor: ThemeColors.getBrandAccent(context),
+                      style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.w900,
-                        color: AppColors.brandAccent,
+                        color: ThemeColors.getBrandAccent(context),
                       ),
                       onChanged: (value) {
                         if (errorMessage != null) {
@@ -76,17 +75,19 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
                       decoration: InputDecoration(
                         hintText: '${settingsCtrl.settings.dailyStepGoal}',
                         hintStyle: TextStyle(
-                          color: AppColors.brandAccent.withValues(alpha: 0.3),
+                          color: ThemeColors.getBrandAccent(
+                            context,
+                          ).withValues(alpha: 0.3),
                           fontSize: 24,
                           fontWeight: FontWeight.w700,
                         ),
                         filled: true,
-                        fillColor: AppColors.scaffoldSoft,
+                        fillColor: ThemeColors.getScaffoldSoft(context),
                         contentPadding: const EdgeInsets.symmetric(
                           vertical: 16,
                         ),
                         errorText: errorMessage,
-                        errorStyle: const TextStyle(
+                        errorStyle: TextStyle(
                           color: Colors.redAccent,
                           fontWeight: FontWeight.w600,
                           fontSize: 13,
@@ -97,21 +98,21 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
                         ),
                         errorBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(
+                          borderSide: BorderSide(
                             color: Colors.redAccent,
                             width: 1.5,
                           ),
                         ),
                         focusedErrorBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(
+                          borderSide: BorderSide(
                             color: Colors.redAccent,
                             width: 2,
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 28),
+                    SizedBox(height: 28),
                     Row(
                       children: [
                         Expanded(
@@ -126,17 +127,17 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
                                 borderRadius: BorderRadius.circular(14),
                               ),
                             ),
-                            child: const Text(
+                            child: Text(
                               'បោះបង់',
                               style: TextStyle(
-                                color: AppColors.mutedText,
+                                color: ThemeColors.getMutedText(context),
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
                               ),
                             ),
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        SizedBox(width: 12),
                         Expanded(
                           child: ElevatedButton(
                             onPressed: () {
@@ -156,7 +157,9 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
                               }
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.brandAccent,
+                              backgroundColor: ThemeColors.getBrandAccent(
+                                context,
+                              ),
                               foregroundColor: Colors.white,
                               elevation: 0,
                               padding: const EdgeInsets.symmetric(vertical: 16),
@@ -164,7 +167,7 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
                                 borderRadius: BorderRadius.circular(14),
                               ),
                             ),
-                            child: const Text(
+                            child: Text(
                               'រក្សាទុក',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
@@ -191,29 +194,29 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: AppColors.brandAccent.withValues(alpha: 0.1),
+            color: ThemeColors.getBrandAccent(context).withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
-          child: const Icon(
+          child: Icon(
             Icons.flag_rounded,
-            color: AppColors.brandAccent,
+            color: ThemeColors.getBrandAccent(context),
             size: 36,
           ),
         ),
-        const SizedBox(height: 16),
-        const Text(
+        SizedBox(height: 16),
+        Text(
           'កំណត់គោលដៅថ្មី',
           style: TextStyle(
-            color: AppColors.darkText,
+            color: ThemeColors.getText(context),
             fontWeight: FontWeight.w800,
             fontSize: 22,
           ),
         ),
-        const SizedBox(height: 6),
-        const Text(
+        SizedBox(height: 6),
+        Text(
           'កំណត់គោលដៅជំហានប្រចាំថ្ងៃរបស់អ្នក',
           style: TextStyle(
-            color: AppColors.mutedText,
+            color: ThemeColors.getMutedText(context),
             fontWeight: FontWeight.w500,
             fontSize: 14,
           ),
@@ -225,16 +228,16 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
   Widget _buildTopHeader(TextTheme textTheme) {
     return Row(
       children: [
-        const Icon(
+        Icon(
           Icons.fitness_center_rounded,
           size: 17,
-          color: AppColors.brandAccent,
+          color: ThemeColors.getBrandAccent(context),
         ),
-        const SizedBox(width: 6),
+        SizedBox(width: 6),
         Text(
           'Kinetic',
           style: textTheme.labelLarge?.copyWith(
-            color: AppColors.brandAccent,
+            color: ThemeColors.getBrandAccent(context),
             fontWeight: FontWeight.w700,
           ),
         ),
@@ -243,7 +246,7 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
           width: 22,
           height: 22,
           decoration: BoxDecoration(
-            color: AppColors.primaryYellow.withValues(alpha: 0.4),
+            color: ThemeColors.getPrimaryYellow(context).withValues(alpha: 0.4),
             shape: BoxShape.circle,
           ),
         ),
@@ -258,16 +261,16 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
         Text(
           name.isEmpty ? 'សួស្តី!' : 'សួស្តី $name!',
           style: textTheme.headlineSmall?.copyWith(
-            color: AppColors.darkText,
+            color: ThemeColors.getText(context),
             fontWeight: FontWeight.w900,
             letterSpacing: 0.2,
           ),
         ),
-        const SizedBox(height: 3),
+        SizedBox(height: 3),
         Text(
           'បន្តដំណើរ! ថ្ងៃនេះល្អណាស់',
           style: textTheme.bodyMedium?.copyWith(
-            color: AppColors.mutedText,
+            color: ThemeColors.getMutedText(context),
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -311,7 +314,7 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
             unit: 'KM',
           ),
         ),
-        const SizedBox(width: 10),
+        SizedBox(width: 10),
         Expanded(
           child: StatCard(
             icon: Icons.local_fire_department_rounded,
@@ -331,7 +334,7 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
         Text(
           'សកម្មភាពថ្មីៗ',
           style: textTheme.titleSmall?.copyWith(
-            color: AppColors.darkText,
+            color: ThemeColors.getText(context),
             fontWeight: FontWeight.w800,
           ),
         ),
@@ -346,7 +349,7 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
           child: Text(
             'See all',
             style: textTheme.labelMedium?.copyWith(
-              color: AppColors.brandAccent,
+              color: ThemeColors.getBrandAccent(context),
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -369,69 +372,62 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
     final goal = settingsCtrl.settings.dailyStepGoal;
     final progress = (currentSteps / goal).clamp(0.0, 1.0);
 
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.dark,
-      ),
-      child: Scaffold(
-        backgroundColor: AppColors.scaffold,
-        body: SafeArea(
-          child: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(14, 10, 14, 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildTopHeader(textTheme),
-                  const SizedBox(height: 14),
-                  _buildGreeting(
-                    textTheme,
-                    profileCtrl.currentProfile?.name ?? "",
+    return Scaffold(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(14, 10, 14, 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildTopHeader(textTheme),
+                SizedBox(height: 14),
+                _buildGreeting(
+                  textTheme,
+                  profileCtrl.currentProfile?.name ?? "",
+                ),
+                SizedBox(height: 12),
+
+                ProgressPanel(
+                  progress: progress,
+                  steps: currentSteps,
+                  progressGreen: ThemeColors.getProgressValue(context),
+                  textColor: ThemeColors.getText(context),
+                  subTextColor: ThemeColors.getMutedText(context),
+                ),
+                SizedBox(height: 12),
+
+                TrackingToggleCard(
+                  enabled: settingsCtrl.settings.runTrackingInBackground,
+                  motionStatus: motionCtrl.status,
+                  isTracking: motionCtrl.isTracking,
+                  permissionDenied: motionCtrl.permissionDenied,
+                  onChanged: (val) => _onTrackingToggled(
+                    val,
+                    settingsCtrl,
+                    motionCtrl,
+                    activityCtrl,
                   ),
-                  const SizedBox(height: 12),
+                ),
+                SizedBox(height: 12),
 
-                  ProgressPanel(
-                    progress: progress,
-                    steps: currentSteps,
-                    progressGreen: AppColors.progressValue,
-                    textColor: AppColors.darkText,
-                    subTextColor: AppColors.mutedText,
-                  ),
-                  const SizedBox(height: 12),
+                PrimaryButton(
+                  onTap: () => _showSetGoalDialog(context, settingsCtrl),
+                  text: 'កំណត់គោលដៅថ្មី',
+                ),
+                SizedBox(height: 14),
 
-                  TrackingToggleCard(
-                    enabled: settingsCtrl.settings.runTrackingInBackground,
-                    motionStatus: motionCtrl.status,
-                    isTracking: motionCtrl.isTracking,
-                    permissionDenied: motionCtrl.permissionDenied,
-                    onChanged: (val) => _onTrackingToggled(
-                      val,
-                      settingsCtrl,
-                      motionCtrl,
-                      activityCtrl,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
+                _buildStatsGrid(todayRecord),
+                SizedBox(height: 14),
 
-                  PrimaryButton(
-                    onTap: () => _showSetGoalDialog(context, settingsCtrl),
-                    text: 'កំណត់គោលដៅថ្មី',
-                  ),
-                  const SizedBox(height: 14),
+                _buildRecentActivitiesHeader(textTheme),
+                SizedBox(height: 8),
 
-                  _buildStatsGrid(todayRecord),
-                  const SizedBox(height: 14),
+                ActivitySection(activities: activityCtrl.workoutHistory),
 
-                  _buildRecentActivitiesHeader(textTheme),
-                  const SizedBox(height: 8),
-
-                  ActivitySection(activities: activityCtrl.workoutHistory),
-
-                  const SizedBox(height: 8),
-                ],
-              ),
+                SizedBox(height: 8),
+              ],
             ),
           ),
         ),

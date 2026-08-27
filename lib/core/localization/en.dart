@@ -6,3 +6,4 @@ const Map<String, String> enTranslations = {
   'continueToApp': 'Continue to App',
   'onboardingDesc': 'This is your setup page to be developed next.',
 };
+

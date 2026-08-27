@@ -18,3 +18,4 @@ final List<SingleChildWidget> appProviders = [
     update: (_, activityCtrl, motionCtrl) => motionCtrl!..attach(activityCtrl),
   ),
 ];
+

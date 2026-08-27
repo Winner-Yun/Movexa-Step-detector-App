@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import 'package:step_detector/core/constants/app_colors.dart';
 import 'package:step_detector/core/localization/app_translations.dart';
+import 'package:step_detector/core/theme/theme_colors.dart';
 import 'package:step_detector/data/controller/auth_controller.dart';
 import 'package:step_detector/modules/mainapp.dart';
 
@@ -18,11 +17,11 @@ class StepOnboardingPage extends StatelessWidget {
         title: Text('welcomeMessage'.tr(context)),
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout),
+            icon: Icon(Icons.logout),
             onPressed: () {
               context.read<AuthController>().logout();
             },
-          )
+          ),
         ],
       ),
       body: Padding(
@@ -31,20 +30,24 @@ class StepOnboardingPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Icon(Icons.fitness_center, size: 80, color: AppColors.primaryYellow),
-            const SizedBox(height: 24),
+            Icon(
+              Icons.fitness_center,
+              size: 80,
+              color: ThemeColors.getPrimaryYellow(context),
+            ),
+            SizedBox(height: 24),
             Text(
               'welcomeMessage'.tr(context),
               style: textTheme.headlineSmall,
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             Text(
               'onboardingDesc'.tr(context),
               style: textTheme.bodyMedium,
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 48),
+            SizedBox(height: 48),
             ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pushReplacement(
@@ -52,14 +55,17 @@ class StepOnboardingPage extends StatelessWidget {
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.brandAccent,
+                backgroundColor: ThemeColors.getBrandAccent(context),
                 foregroundColor: Colors.white,
                 minimumSize: const Size(double.infinity, 56),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
-              child: Text('continueToApp'.tr(context), style: const TextStyle(fontSize: 18)),
+              child: Text(
+                'continueToApp'.tr(context),
+                style: TextStyle(fontSize: 18),
+              ),
             ),
           ],
         ),

@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:step_detector/core/theme/theme_colors.dart';
 import 'package:step_detector/data/models/workout_session.dart';
-
-import 'package:step_detector/core/constants/app_colors.dart';
 
 class StepWorkoutDetailPage extends StatelessWidget {
   final WorkoutSession session;
-
 
   const StepWorkoutDetailPage({super.key, required this.session});
 
@@ -14,21 +12,20 @@ class StepWorkoutDetailPage extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      backgroundColor: AppColors.scaffold,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_ios_new_rounded,
-            color: AppColors.darkText,
+            color: ThemeColors.getText(context),
           ),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           'សេចក្តីលម្អិត',
           style: textTheme.titleMedium?.copyWith(
-            color: AppColors.darkText,
+            color: ThemeColors.getText(context),
             fontWeight: FontWeight.w800,
           ),
         ),
@@ -38,58 +35,60 @@ class StepWorkoutDetailPage extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(24, 8, 24, 40),
         child: Column(
           children: [
-            _buildHeaderInfo(textTheme),
-            const SizedBox(height: 24),
-            _buildMainHeroCard(textTheme),
-            const SizedBox(height: 24),
-            _buildMetricsGrid(),
+            _buildHeaderInfo(context, textTheme),
+            SizedBox(height: 24),
+            _buildMainHeroCard(context, textTheme),
+            SizedBox(height: 24),
+            _buildMetricsGrid(context),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHeaderInfo(TextTheme textTheme) {
+  Widget _buildHeaderInfo(BuildContext context, TextTheme textTheme) {
     return Column(
       children: [
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: AppColors.brandAccent.withValues(alpha: 0.1),
+            color: ThemeColors.getBrandAccent(context).withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
-          child: const Icon(
+          child: Icon(
             Icons.directions_run_rounded,
-            color: AppColors.brandAccent,
+            color: ThemeColors.getBrandAccent(context),
             size: 32,
           ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
         Text(
           session.title,
           style: textTheme.headlineSmall?.copyWith(
-            color: AppColors.darkText,
+            color: ThemeColors.getText(context),
             fontWeight: FontWeight.w900,
           ),
         ),
-        const SizedBox(height: 4),
+        SizedBox(height: 4),
         Text(
           '${session.startTime.day}/${session.startTime.month}/${session.startTime.year}',
-          style: textTheme.bodyMedium?.copyWith(color: AppColors.mutedText),
+          style: textTheme.bodyMedium?.copyWith(
+            color: ThemeColors.getMutedText(context),
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildMainHeroCard(TextTheme textTheme) {
+  Widget _buildMainHeroCard(BuildContext context, TextTheme textTheme) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 40),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           colors: [
-            AppColors.primaryGradientStart,
-            AppColors.primaryGradientEnd,
+            ThemeColors.getPrimaryGradientStart(context),
+            ThemeColors.getPrimaryGradientEnd(context),
           ],
         ),
         borderRadius: BorderRadius.circular(32),
@@ -103,7 +102,7 @@ class StepWorkoutDetailPage extends StatelessWidget {
               fontWeight: FontWeight.w900,
             ),
           ),
-          const Text(
+          Text(
             'សរុបជំហាន (Total Steps)',
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
           ),
@@ -112,13 +111,14 @@ class StepWorkoutDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildMetricsGrid() {
+  Widget _buildMetricsGrid(BuildContext context) {
     return Column(
       children: [
         Row(
           children: [
             Expanded(
               child: _buildSimpleStatBox(
+                context,
                 Icons.timer_rounded,
                 'រយៈពេល',
                 session.formattedDuration,
@@ -126,9 +126,10 @@ class StepWorkoutDetailPage extends StatelessWidget {
                 Colors.orange,
               ),
             ),
-            const SizedBox(width: 16),
+            SizedBox(width: 16),
             Expanded(
               child: _buildSimpleStatBox(
+                context,
                 Icons.route_rounded,
                 'ចម្ងាយ',
                 session.distance.toStringAsFixed(2),
@@ -138,11 +139,12 @@ class StepWorkoutDetailPage extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
         Row(
           children: [
             Expanded(
               child: _buildSimpleStatBox(
+                context,
                 Icons.local_fire_department_rounded,
                 'កាឡូរី',
                 session.calories.toStringAsFixed(0),
@@ -150,9 +152,10 @@ class StepWorkoutDetailPage extends StatelessWidget {
                 const Color(0xFFD45529),
               ),
             ),
-            const SizedBox(width: 16),
+            SizedBox(width: 16),
             Expanded(
               child: _buildSimpleStatBox(
+                context,
                 Icons.speed_rounded,
                 'ល្បឿន',
                 session.averagePace,
@@ -167,6 +170,7 @@ class StepWorkoutDetailPage extends StatelessWidget {
   }
 
   Widget _buildSimpleStatBox(
+    BuildContext context,
     IconData icon,
     String title,
     String value,
@@ -176,26 +180,26 @@ class StepWorkoutDetailPage extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: ThemeColors.getSurface(context),
         borderRadius: BorderRadius.circular(24),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(icon, color: iconColor, size: 22),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           Text(
             value,
-            style: const TextStyle(
-              color: AppColors.darkText,
+            style: TextStyle(
+              color: ThemeColors.getText(context),
               fontWeight: FontWeight.w900,
               fontSize: 22,
             ),
           ),
           Text(
             title,
-            style: const TextStyle(
-              color: AppColors.mutedText,
+            style: TextStyle(
+              color: ThemeColors.getMutedText(context),
               fontWeight: FontWeight.w600,
               fontSize: 13,
             ),

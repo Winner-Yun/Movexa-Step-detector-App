@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:step_detector/core/constants/app_colors.dart';
+import 'package:step_detector/core/theme/theme_colors.dart';
 import 'package:step_detector/data/controller/activity_controller.dart';
 import 'package:step_detector/data/controller/settings_controller.dart';
 import 'package:step_detector/modules/workout/step_workout_detail_page.dart';
@@ -33,7 +33,6 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
     final activityCtrl = context.watch<ActivityController>();
 
     return Scaffold(
-      backgroundColor: AppColors.scaffold,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -46,7 +45,7 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: _buildSegmentedControl(),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
             Expanded(
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 300),
@@ -70,21 +69,21 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: AppColors.brandAccent.withValues(alpha: 0.1),
+            color: ThemeColors.getBrandAccent(context).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
           ),
-          child: const Icon(
+          child: Icon(
             Icons.history_rounded,
-            color: AppColors.brandAccent,
+            color: ThemeColors.getBrandAccent(context),
             size: 24,
           ),
         ),
-        const SizedBox(width: 12),
+        SizedBox(width: 12),
         Text(
           'ប្រវត្តិសកម្មភាព',
 
           style: textTheme.titleLarge?.copyWith(
-            color: AppColors.darkText,
+            color: ThemeColors.getText(context),
             fontWeight: FontWeight.w900,
             letterSpacing: 0.5,
           ),
@@ -97,11 +96,11 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: ThemeColors.getSurface(context),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: AppColors.darkText.withValues(alpha: 0.04),
+            color: ThemeColors.getText(context).withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -125,12 +124,16 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.brandAccent : Colors.transparent,
+          color: isSelected
+              ? ThemeColors.getBrandAccent(context)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: AppColors.brandAccent.withValues(alpha: 0.3),
+                    color: ThemeColors.getBrandAccent(
+                      context,
+                    ).withValues(alpha: 0.3),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),
@@ -141,7 +144,9 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
         child: Text(
           title,
           style: TextStyle(
-            color: isSelected ? Colors.white : AppColors.mutedText,
+            color: isSelected
+                ? Colors.white
+                : ThemeColors.getMutedText(context),
             fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
             fontSize: 14,
           ),
@@ -152,10 +157,10 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
 
   Widget _buildDailyView(TextTheme textTheme, List<dynamic> monthlyData) {
     if (monthlyData.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
           'មិនទាន់មានទិន្នន័យ (No data yet)',
-          style: TextStyle(color: AppColors.mutedText),
+          style: TextStyle(color: ThemeColors.getMutedText(context)),
         ),
       );
     }
@@ -178,7 +183,7 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildMonthChart(textTheme, monthlyData),
-          const SizedBox(height: 32),
+          SizedBox(height: 32),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Row(
@@ -187,23 +192,23 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                   width: 4,
                   height: 20,
                   decoration: BoxDecoration(
-                    color: AppColors.brandAccent,
+                    color: ThemeColors.getBrandAccent(context),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 Text(
                   'សេចក្តីសង្ខេប ថ្ងៃទី $_selectedDay',
 
                   style: textTheme.titleMedium?.copyWith(
-                    color: AppColors.darkText,
+                    color: ThemeColors.getText(context),
                     fontWeight: FontWeight.w900,
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: _buildDailySummaryCard(selectedDayData, textTheme),
@@ -224,11 +229,11 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
       margin: const EdgeInsets.symmetric(horizontal: 24),
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: ThemeColors.getSurface(context),
         borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: AppColors.darkText.withValues(alpha: 0.05),
+            color: ThemeColors.getText(context).withValues(alpha: 0.05),
             blurRadius: 24,
             offset: const Offset(0, 10),
           ),
@@ -247,28 +252,28 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                     'មធ្យមប្រចាំខែ',
 
                     style: textTheme.titleSmall?.copyWith(
-                      color: AppColors.mutedText,
+                      color: ThemeColors.getMutedText(context),
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
                         '$avgSteps',
                         style: textTheme.headlineMedium?.copyWith(
-                          color: AppColors.darkText,
+                          color: ThemeColors.getText(context),
                           fontWeight: FontWeight.w900,
                         ),
                       ),
-                      const SizedBox(width: 4),
-                      const Padding(
+                      SizedBox(width: 4),
+                      Padding(
                         padding: EdgeInsets.only(bottom: 6),
                         child: Text(
                           'ជំហាន',
                           style: TextStyle(
-                            color: AppColors.brandAccent,
+                            color: ThemeColors.getBrandAccent(context),
                             fontWeight: FontWeight.w800,
                             fontSize: 14,
                           ),
@@ -281,18 +286,18 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppColors.scaffoldSoft,
+                  color: ThemeColors.getScaffoldSoft(context),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.insights_rounded,
-                  color: AppColors.brandAccent,
+                  color: ThemeColors.getBrandAccent(context),
                   size: 28,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 32),
+          SizedBox(height: 32),
           SizedBox(
             height: 160,
             child: ListView.builder(
@@ -313,14 +318,16 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                     margin: const EdgeInsets.only(right: 8),
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? AppColors.brandAccent.withValues(alpha: 0.08)
+                          ? ThemeColors.getBrandAccent(
+                              context,
+                            ).withValues(alpha: 0.08)
                           : Colors.transparent,
                       borderRadius: BorderRadius.circular(12),
                       border: isSelected
                           ? Border.all(
-                              color: AppColors.brandAccent.withValues(
-                                alpha: 0.3,
-                              ),
+                              color: ThemeColors.getBrandAccent(
+                                context,
+                              ).withValues(alpha: 0.3),
                               width: 1,
                             )
                           : Border.all(color: Colors.transparent, width: 1),
@@ -331,13 +338,13 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                         if (isSelected)
                           Text(
                             '${(record.steps / 1000).toStringAsFixed(1)}k',
-                            style: const TextStyle(
-                              color: AppColors.brandAccent,
+                            style: TextStyle(
+                              color: ThemeColors.getBrandAccent(context),
                               fontWeight: FontWeight.bold,
                               fontSize: 10,
                             ),
                           ),
-                        const SizedBox(height: 4),
+                        SizedBox(height: 4),
                         Stack(
                           alignment: Alignment.bottomCenter,
                           children: [
@@ -346,7 +353,7 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                               height: 100,
 
                               decoration: BoxDecoration(
-                                color: AppColors.scaffoldSoft,
+                                color: ThemeColors.getScaffoldSoft(context),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                             ),
@@ -359,14 +366,16 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                                 gradient: LinearGradient(
                                   colors: reachedGoal
                                       ? [
-                                          AppColors.progressValue,
-                                          AppColors.progressValue.withValues(
-                                            alpha: 0.7,
-                                          ),
+                                          ThemeColors.getProgressValue(context),
+                                          ThemeColors.getProgressValue(
+                                            context,
+                                          ).withValues(alpha: 0.7),
                                         ]
                                       : [
-                                          AppColors.brandAccent,
-                                          AppColors.primaryGradientStart,
+                                          ThemeColors.getBrandAccent(context),
+                                          ThemeColors.getPrimaryGradientStart(
+                                            context,
+                                          ),
                                         ],
                                   begin: Alignment.bottomCenter,
                                   end: Alignment.topCenter,
@@ -377,8 +386,12 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                                         BoxShadow(
                                           color:
                                               (reachedGoal
-                                                      ? AppColors.progressValue
-                                                      : AppColors.brandAccent)
+                                                      ? ThemeColors.getProgressValue(
+                                                          context,
+                                                        )
+                                                      : ThemeColors.getBrandAccent(
+                                                          context,
+                                                        ))
                                                   .withValues(alpha: 0.4),
                                           blurRadius: 8,
                                           offset: const Offset(0, 4),
@@ -389,20 +402,20 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 12),
+                        SizedBox(height: 12),
                         Text(
                           record.date.day.toString(),
                           style: TextStyle(
                             color: isSelected
-                                ? AppColors.brandAccent
-                                : AppColors.mutedText,
+                                ? ThemeColors.getBrandAccent(context)
+                                : ThemeColors.getMutedText(context),
                             fontWeight: isSelected
                                 ? FontWeight.w900
                                 : FontWeight.w600,
                             fontSize: 13,
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        SizedBox(height: 8),
                       ],
                     ),
                   ),
@@ -420,14 +433,14 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: ThemeColors.getSurface(context),
         borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
             color:
                 (record.isGoalReached(goal)
-                        ? AppColors.progressValue
-                        : AppColors.brandAccent)
+                        ? ThemeColors.getProgressValue(context)
+                        : ThemeColors.getBrandAccent(context))
                     .withValues(alpha: 0.1),
             blurRadius: 30,
             offset: const Offset(0, 10),
@@ -436,8 +449,8 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
         border: Border.all(
           color:
               (record.isGoalReached(goal)
-                      ? AppColors.progressValue
-                      : AppColors.brandAccent)
+                      ? ThemeColors.getProgressValue(context)
+                      : ThemeColors.getBrandAccent(context))
                   .withValues(alpha: 0.2),
           width: 2,
         ),
@@ -454,8 +467,8 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                 ),
                 decoration: BoxDecoration(
                   color: record.isGoalReached(goal)
-                      ? AppColors.progressChip
-                      : AppColors.scaffoldSoft,
+                      ? ThemeColors.getProgressChip(context)
+                      : ThemeColors.getScaffoldSoft(context),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Row(
@@ -465,11 +478,11 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                           ? Icons.emoji_events_rounded
                           : Icons.directions_walk_rounded,
                       color: record.isGoalReached(goal)
-                          ? AppColors.progressChipText
-                          : AppColors.mutedText,
+                          ? ThemeColors.getProgressChipText(context)
+                          : ThemeColors.getMutedText(context),
                       size: 16,
                     ),
-                    const SizedBox(width: 6),
+                    SizedBox(width: 6),
                     Text(
                       record.isGoalReached(goal)
                           ? 'សម្រេចគោលដៅ'
@@ -477,8 +490,8 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
 
                       style: TextStyle(
                         color: record.isGoalReached(goal)
-                            ? AppColors.progressChipText
-                            : AppColors.mutedText,
+                            ? ThemeColors.getProgressChipText(context)
+                            : ThemeColors.getMutedText(context),
                         fontWeight: FontWeight.w800,
                         fontSize: 12,
                       ),
@@ -488,15 +501,15 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
               ),
               Text(
                 'គោលដៅ: ${record.target}',
-                style: const TextStyle(
-                  color: AppColors.mutedText,
+                style: TextStyle(
+                  color: ThemeColors.getMutedText(context),
                   fontWeight: FontWeight.w700,
                   fontSize: 13,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 32),
+          SizedBox(height: 32),
 
           Stack(
             alignment: Alignment.center,
@@ -507,10 +520,10 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                 child: CircularProgressIndicator(
                   value: record.getProgress(goal),
                   strokeWidth: 12,
-                  backgroundColor: AppColors.scaffoldSoft,
+                  backgroundColor: ThemeColors.getScaffoldSoft(context),
                   color: record.isGoalReached(goal)
-                      ? AppColors.progressValue
-                      : AppColors.brandAccent,
+                      ? ThemeColors.getProgressValue(context)
+                      : ThemeColors.getBrandAccent(context),
                   strokeCap: StrokeCap.round,
                 ),
               ),
@@ -519,15 +532,15 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                   Icon(
                     Icons.do_not_step_rounded,
                     color: record.isGoalReached(goal)
-                        ? AppColors.progressValue
-                        : AppColors.brandAccent,
+                        ? ThemeColors.getProgressValue(context)
+                        : ThemeColors.getBrandAccent(context),
                     size: 28,
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   Text(
                     '${record.steps}',
                     style: textTheme.headlineSmall?.copyWith(
-                      color: AppColors.darkText,
+                      color: ThemeColors.getText(context),
                       fontWeight: FontWeight.w900,
                       letterSpacing: -0.5,
                     ),
@@ -537,12 +550,12 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
             ],
           ),
 
-          const SizedBox(height: 40),
+          SizedBox(height: 40),
 
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: AppColors.scaffoldSoft,
+              color: ThemeColors.getScaffoldSoft(context),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Row(
@@ -557,7 +570,9 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                 Container(
                   width: 2,
                   height: 30,
-                  color: AppColors.progressTrack.withValues(alpha: 0.5),
+                  color: ThemeColors.getProgressTrack(
+                    context,
+                  ).withValues(alpha: 0.5),
                 ),
                 _buildCardMiniStat(
                   Icons.route_rounded,
@@ -589,22 +604,22 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
           ),
           child: Icon(icon, color: color, size: 20),
         ),
-        const SizedBox(width: 12),
+        SizedBox(width: 12),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               value,
-              style: const TextStyle(
-                color: AppColors.darkText,
+              style: TextStyle(
+                color: ThemeColors.getText(context),
                 fontWeight: FontWeight.w900,
                 fontSize: 18,
               ),
             ),
             Text(
               unit,
-              style: const TextStyle(
-                color: AppColors.mutedText,
+              style: TextStyle(
+                color: ThemeColors.getMutedText(context),
                 fontWeight: FontWeight.w700,
                 fontSize: 12,
               ),
@@ -617,10 +632,10 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
 
   Widget _buildSessionView(TextTheme textTheme, List<dynamic> sessions) {
     if (sessions.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
           'មិនទាន់មានទិន្នន័យហាត់ប្រាណ (No workouts yet)',
-          style: TextStyle(color: AppColors.mutedText),
+          style: TextStyle(color: ThemeColors.getMutedText(context)),
         ),
       );
     }
@@ -646,11 +661,11 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
             child: Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: AppColors.surface,
+                color: ThemeColors.getSurface(context),
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.darkText.withValues(alpha: 0.03),
+                    color: ThemeColors.getText(context).withValues(alpha: 0.03),
                     blurRadius: 15,
                     offset: const Offset(0, 5),
                   ),
@@ -664,16 +679,16 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                     children: [
                       Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.timer_outlined,
-                            color: AppColors.brandAccent,
+                            color: ThemeColors.getBrandAccent(context),
                             size: 20,
                           ),
-                          const SizedBox(width: 8),
+                          SizedBox(width: 8),
                           Text(
                             session.title,
-                            style: const TextStyle(
-                              color: AppColors.darkText,
+                            style: TextStyle(
+                              color: ThemeColors.getText(context),
                               fontWeight: FontWeight.w800,
                               fontSize: 16,
                             ),
@@ -682,26 +697,29 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                       ),
                       Text(
                         '${session.steps}',
-                        style: const TextStyle(
-                          color: AppColors.brandAccent,
+                        style: TextStyle(
+                          color: ThemeColors.getBrandAccent(context),
                           fontWeight: FontWeight.w900,
                           fontSize: 18,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 6),
+                  SizedBox(height: 6),
                   Text(
                     _formatDateTime(session.startTime),
 
-                    style: const TextStyle(
-                      color: AppColors.mutedText,
+                    style: TextStyle(
+                      color: ThemeColors.getMutedText(context),
                       fontSize: 13,
                     ),
                   ),
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.symmetric(vertical: 12),
-                    child: Divider(color: AppColors.scaffoldSoft, height: 1),
+                    child: Divider(
+                      color: ThemeColors.getScaffoldSoft(context),
+                      height: 1,
+                    ),
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -715,7 +733,7 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                       Container(
                         width: 1,
                         height: 24,
-                        color: AppColors.scaffoldSoft,
+                        color: ThemeColors.getScaffoldSoft(context),
                       ),
                       _buildSessionMiniStat(
                         Icons.local_fire_department_rounded,
@@ -736,19 +754,22 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
   Widget _buildSessionMiniStat(IconData icon, String value, String unit) {
     return Row(
       children: [
-        Icon(icon, color: AppColors.mutedText, size: 16),
-        const SizedBox(width: 6),
+        Icon(icon, color: ThemeColors.getMutedText(context), size: 16),
+        SizedBox(width: 6),
         Text(
           value,
-          style: const TextStyle(
-            color: AppColors.darkText,
+          style: TextStyle(
+            color: ThemeColors.getText(context),
             fontWeight: FontWeight.bold,
           ),
         ),
-        const SizedBox(width: 4),
+        SizedBox(width: 4),
         Text(
           unit,
-          style: const TextStyle(color: AppColors.mutedText, fontSize: 12),
+          style: TextStyle(
+            color: ThemeColors.getMutedText(context),
+            fontSize: 12,
+          ),
         ),
       ],
     );

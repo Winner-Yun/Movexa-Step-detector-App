@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import 'package:step_detector/core/constants/app_colors.dart';
 import 'package:step_detector/core/localization/app_translations.dart';
+import 'package:step_detector/core/theme/theme_colors.dart';
 import 'package:step_detector/data/controller/auth_controller.dart';
 
 class StepLoginPage extends StatefulWidget {
@@ -34,7 +33,6 @@ class _StepLoginPageState extends State<StepLoginPage> {
     final isLoading = context.watch<AuthController>().isLoading;
 
     return Scaffold(
-      backgroundColor: AppColors.scaffold,
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -42,10 +40,10 @@ class _StepLoginPageState extends State<StepLoginPage> {
               width: double.infinity,
               height: 300,
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
+                gradient: LinearGradient(
                   colors: [
-                    AppColors.primaryGradientStart,
-                    AppColors.primaryGradientEnd,
+                    ThemeColors.getPrimaryGradientStart(context),
+                    ThemeColors.getPrimaryGradientEnd(context),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -56,7 +54,9 @@ class _StepLoginPageState extends State<StepLoginPage> {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.brandAccent.withValues(alpha: 0.3),
+                    color: ThemeColors.getBrandAccent(
+                      context,
+                    ).withValues(alpha: 0.3),
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   ),
@@ -72,13 +72,13 @@ class _StepLoginPageState extends State<StepLoginPage> {
                         color: Colors.white.withValues(alpha: 0.2),
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.directions_run_rounded,
                         color: Colors.white,
                         size: 50,
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16),
                     Text(
                       'Kinetic',
                       style: textTheme.displaySmall?.copyWith(
@@ -86,10 +86,10 @@ class _StepLoginPageState extends State<StepLoginPage> {
                         fontWeight: FontWeight.w900,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: 4),
                     Text(
                       'trackingSteps'.tr(context),
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white70,
                         fontWeight: FontWeight.w600,
                       ),
@@ -107,25 +107,25 @@ class _StepLoginPageState extends State<StepLoginPage> {
                   Text(
                     'loginTitle'.tr(context),
                     style: textTheme.headlineSmall?.copyWith(
-                      color: AppColors.darkText,
+                      color: ThemeColors.getText(context),
                       fontWeight: FontWeight.w900,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   Text(
                     'ចូលគណនីតាមរយៈ Google របស់អ្នក',
                     style: textTheme.bodyMedium?.copyWith(
-                      color: AppColors.mutedText,
+                      color: ThemeColors.getMutedText(context),
                       fontWeight: FontWeight.w600,
                     ),
                   ),
 
-                  const SizedBox(height: 40),
+                  SizedBox(height: 40),
 
                   ElevatedButton.icon(
                     onPressed: isLoading ? null : _handleGoogleSignIn,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.brandAccent,
+                      backgroundColor: ThemeColors.getBrandAccent(context),
                       minimumSize: const Size(double.infinity, 56),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
@@ -134,7 +134,7 @@ class _StepLoginPageState extends State<StepLoginPage> {
                     ),
                     icon: isLoading
                         ? const SizedBox.shrink()
-                        : const Icon(
+                        : Icon(
                             Icons.g_mobiledata_rounded,
                             color: Colors.white,
                             size: 28,
@@ -143,7 +143,7 @@ class _StepLoginPageState extends State<StepLoginPage> {
                         ? const CircularProgressIndicator(color: Colors.white)
                         : Text(
                             'loginWithGoogle'.tr(context),
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: Colors.white,
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
