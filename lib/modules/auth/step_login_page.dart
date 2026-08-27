@@ -113,7 +113,7 @@ class _StepLoginPageState extends State<StepLoginPage> {
                   ),
                   SizedBox(height: 8),
                   Text(
-                    'ចូលគណនីតាមរយៈ Google របស់អ្នក',
+                    'loginWithGoogleSubtitle'.tr(context),
                     style: textTheme.bodyMedium?.copyWith(
                       color: ThemeColors.getMutedText(context),
                       fontWeight: FontWeight.w600,

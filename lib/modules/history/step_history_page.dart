@@ -4,6 +4,7 @@ import 'package:step_detector/core/theme/theme_colors.dart';
 import 'package:step_detector/data/controller/activity_controller.dart';
 import 'package:step_detector/data/controller/settings_controller.dart';
 import 'package:step_detector/modules/workout/step_workout_detail_page.dart';
+import 'package:step_detector/core/localization/app_translations.dart';
 
 class StepHistoryPage extends StatefulWidget {
   const StepHistoryPage({super.key});
@@ -80,7 +81,7 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
         ),
         SizedBox(width: 12),
         Text(
-          'ប្រវត្តិសកម្មភាព',
+          'activityHistory'.tr(context),
 
           style: textTheme.titleLarge?.copyWith(
             color: ThemeColors.getText(context),
@@ -108,9 +109,9 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
       ),
       child: Row(
         children: [
-          Expanded(child: _buildTabButton('ប្រចាំថ្ងៃ', 0)),
+          Expanded(child: _buildTabButton('daily'.tr(context), 0)),
 
-          Expanded(child: _buildTabButton('ការហាត់ប្រាណ', 1)),
+          Expanded(child: _buildTabButton('workout'.tr(context), 1)),
         ],
       ),
     );
@@ -159,7 +160,7 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
     if (monthlyData.isEmpty) {
       return Center(
         child: Text(
-          'មិនទាន់មានទិន្នន័យ (No data yet)',
+          'noDataYet'.tr(context),
           style: TextStyle(color: ThemeColors.getMutedText(context)),
         ),
       );
@@ -198,7 +199,7 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                 ),
                 SizedBox(width: 8),
                 Text(
-                  'សេចក្តីសង្ខេប ថ្ងៃទី $_selectedDay',
+                  '${'summaryFor'.tr(context)} $_selectedDay',
 
                   style: textTheme.titleMedium?.copyWith(
                     color: ThemeColors.getText(context),
@@ -249,7 +250,7 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'មធ្យមប្រចាំខែ',
+                    'monthlyAvg'.tr(context),
 
                     style: textTheme.titleSmall?.copyWith(
                       color: ThemeColors.getMutedText(context),
@@ -271,7 +272,7 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                       Padding(
                         padding: EdgeInsets.only(bottom: 6),
                         child: Text(
-                          'ជំហាន',
+                          'steps'.tr(context),
                           style: TextStyle(
                             color: ThemeColors.getBrandAccent(context),
                             fontWeight: FontWeight.w800,
@@ -485,8 +486,8 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                     SizedBox(width: 6),
                     Text(
                       record.isGoalReached(goal)
-                          ? 'សម្រេចគោលដៅ'
-                          : 'កំពុងដំណើរការ',
+                          ? 'goalReachedShort'.tr(context)
+                          : 'inProgress'.tr(context),
 
                       style: TextStyle(
                         color: record.isGoalReached(goal)
@@ -500,7 +501,7 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                 ),
               ),
               Text(
-                'គោលដៅ: ${record.target}',
+                '${'stepGoal'.tr(context)}: ${record.target}',
                 style: TextStyle(
                   color: ThemeColors.getMutedText(context),
                   fontWeight: FontWeight.w700,
@@ -634,7 +635,7 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
     if (sessions.isEmpty) {
       return Center(
         child: Text(
-          'មិនទាន់មានទិន្នន័យហាត់ប្រាណ (No workouts yet)',
+          'noDataYet'.tr(context),
           style: TextStyle(color: ThemeColors.getMutedText(context)),
         ),
       );
@@ -728,7 +729,7 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                         Icons.schedule_rounded,
                         session.formattedDuration,
 
-                        'នាទី',
+                        'minutes'.tr(context),
                       ),
                       Container(
                         width: 1,

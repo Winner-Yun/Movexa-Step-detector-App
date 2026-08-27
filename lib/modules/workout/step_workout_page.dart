@@ -6,6 +6,7 @@ import 'package:step_detector/core/theme/theme_colors.dart';
 import 'package:step_detector/data/controller/activity_controller.dart';
 import 'package:step_detector/data/controller/motion_controller.dart';
 import 'package:step_detector/data/models/workout_session.dart';
+import 'package:step_detector/core/localization/app_translations.dart';
 
 class StepWorkoutPage extends StatefulWidget {
   const StepWorkoutPage({super.key});
@@ -43,9 +44,9 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
     if (!started) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text(
-              'ត្រូវការសិទ្ធិចលនាដើម្បីតាមដានជំហាន (Motion permission required)',
+              'motionPermissionRequired'.tr(context),
             ),
           ),
         );
@@ -75,7 +76,7 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
 
     final session = WorkoutSession(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
-      title: 'ការហាត់ប្រាណ',
+      title: 'workout'.tr(context),
       startTime: _workoutStartTime ?? DateTime.now().subtract(duration),
       duration: duration,
       steps: steps,
@@ -147,7 +148,7 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      isProud ? 'ធ្វើបានល្អណាស់!' : 'កុំបោះបង់!',
+                      isProud ? 'greatJob'.tr(context) : 'dontGiveUp'.tr(context),
                       style: TextStyle(
                         color: ThemeColors.getText(context),
                         fontSize: 28,
@@ -158,8 +159,8 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
                     SizedBox(height: 8),
                     Text(
                       isProud
-                          ? 'អ្នកបានសម្រេចគោលដៅថ្ងៃនេះ។'
-                          : 'ការចាប់ផ្តើមគឺជាភាពជោគជ័យមួយ។',
+                          ? 'goalReached'.tr(context)
+                          : 'startingIsSuccess'.tr(context),
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: ThemeColors.getMutedText(context),
@@ -238,7 +239,7 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
                   Icons.timer_rounded,
                   Colors.orange,
                   _formattedTime,
-                  'រយៈពេល',
+                  'duration'.tr(context),
                 ),
               ),
               Container(
@@ -251,7 +252,7 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
                   Icons.do_not_step_rounded,
                   ThemeColors.getBrandAccent(context),
                   steps.toString(),
-                  'ជំហាន',
+                  'steps'.tr(context),
                 ),
               ),
             ],
@@ -340,7 +341,7 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
           ),
         ),
         child: Text(
-          'បិទ (Close)',
+          'close'.tr(context),
           style: TextStyle(
             color: Colors.white,
             fontSize: 16,
@@ -369,7 +370,7 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
         ),
         SizedBox(width: 12),
         Text(
-          'ការហាត់ប្រាណ',
+          'workout'.tr(context),
           style: textTheme.titleLarge?.copyWith(
             color: ThemeColors.getText(context),
             fontWeight: FontWeight.w900,
@@ -458,7 +459,7 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
                   ),
                   SizedBox(width: 8),
                   Text(
-                    '$currentSteps ជំហាន',
+                    '$currentSteps ${'steps'.tr(context)}',
                     style: textTheme.titleMedium?.copyWith(
                       color: _isTracking
                           ? ThemeColors.getProgressChipText(context)
@@ -590,7 +591,7 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
             ),
             SizedBox(width: 8),
             Text(
-              _isTracking ? 'បញ្ឈប់ (Stop)' : 'ចាប់ផ្តើម (Start)',
+              _isTracking ? 'stop'.tr(context) : 'start'.tr(context),
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 20,
@@ -627,7 +628,7 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
                 children: [
                   Expanded(
                     child: _buildStatBox(
-                      'កាឡូរី',
+                      'calories'.tr(context),
                       calories.toStringAsFixed(1),
                       'KCAL',
                       Icons.local_fire_department_rounded,
@@ -637,7 +638,7 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
                   SizedBox(width: 16),
                   Expanded(
                     child: _buildStatBox(
-                      'ចម្ងាយ',
+                      'distance'.tr(context),
                       distance.toStringAsFixed(2),
                       'KM',
                       Icons.route_rounded,

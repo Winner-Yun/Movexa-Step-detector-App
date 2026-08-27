@@ -9,6 +9,7 @@ import 'package:step_detector/modules/dashboard/step_dashboard_page.dart';
 import 'package:step_detector/modules/history/step_history_page.dart';
 import 'package:step_detector/modules/settings/step_settings_page.dart';
 import 'package:step_detector/modules/workout/step_workout_page.dart';
+import 'package:step_detector/core/localization/app_translations.dart';
 
 class StepMainApp extends StatefulWidget {
   const StepMainApp({super.key});
@@ -80,7 +81,7 @@ class _StepMainAppState extends State<StepMainApp> {
                 index: 0,
                 selectedIndex: _selectedTab,
                 icon: Icons.dashboard_rounded,
-                label: 'Dashboard',
+                label: 'dashboard'.tr(context),
                 onSelected: _onSelected,
               ),
             ),
@@ -89,7 +90,7 @@ class _StepMainAppState extends State<StepMainApp> {
                 index: 1,
                 selectedIndex: _selectedTab,
                 icon: Icons.directions_run_rounded,
-                label: 'Workout',
+                label: 'workout'.tr(context),
                 onSelected: _onSelected,
               ),
             ),
@@ -98,7 +99,7 @@ class _StepMainAppState extends State<StepMainApp> {
                 index: 2,
                 selectedIndex: _selectedTab,
                 icon: Icons.history_toggle_off_rounded,
-                label: 'History',
+                label: 'history'.tr(context),
                 onSelected: _onSelected,
               ),
             ),
@@ -107,7 +108,7 @@ class _StepMainAppState extends State<StepMainApp> {
                 index: 3,
                 selectedIndex: _selectedTab,
                 icon: Icons.settings_rounded,
-                label: 'Settings',
+                label: 'settings'.tr(context),
                 onSelected: _onSelected,
               ),
             ),

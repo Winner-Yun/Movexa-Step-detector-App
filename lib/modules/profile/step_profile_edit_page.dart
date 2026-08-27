@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:step_detector/core/theme/theme_colors.dart';
 import 'package:step_detector/data/controller/profile_controller.dart';
+import 'package:step_detector/core/localization/app_translations.dart';
 
 class StepProfileEditPage extends StatefulWidget {
   const StepProfileEditPage({super.key});
@@ -59,7 +60,7 @@ class _StepProfileEditPageState extends State<StepProfileEditPage> {
     if (success && mounted) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('បានរក្សាទុកដោយជោគជ័យ!')));
+      ).showSnackBar(SnackBar(content: Text('savedSuccessfully'.tr(context))));
       Navigator.pop(context);
     }
   }
@@ -73,7 +74,7 @@ class _StepProfileEditPageState extends State<StepProfileEditPage> {
         backgroundColor: ThemeColors.getPrimaryGradientStart(context),
         elevation: 0,
         title: Text(
-          'កែប្រែប្រវត្តិរូប',
+          'editProfile'.tr(context),
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
         ),
         leading: IconButton(
@@ -86,13 +87,13 @@ class _StepProfileEditPageState extends State<StepProfileEditPage> {
         child: Column(
           children: [
             _buildPremiumInputField(
-              'ឈ្មោះ',
+              'name'.tr(context),
               Icons.person_rounded,
               _nameController,
             ),
             SizedBox(height: 16),
             _buildPremiumInputField(
-              'អំពីខ្ញុំ',
+              'aboutMe'.tr(context),
               Icons.info_rounded,
               _bioController,
             ),
@@ -101,7 +102,7 @@ class _StepProfileEditPageState extends State<StepProfileEditPage> {
               children: [
                 Expanded(
                   child: _buildPremiumInputField(
-                    'អាយុ',
+                    'age'.tr(context),
                     Icons.cake_rounded,
                     _ageController,
                     isNumber: true,
@@ -110,7 +111,7 @@ class _StepProfileEditPageState extends State<StepProfileEditPage> {
                 SizedBox(width: 16),
                 Expanded(
                   child: _buildPremiumInputField(
-                    'ទម្ងន់',
+                    'weight'.tr(context),
                     Icons.monitor_weight_rounded,
                     _weightController,
                     isNumber: true,
@@ -131,7 +132,7 @@ class _StepProfileEditPageState extends State<StepProfileEditPage> {
               child: isSaving
                   ? const CircularProgressIndicator(color: Colors.white)
                   : Text(
-                      'រក្សាទុក (Save)',
+                      'save'.tr(context),
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 16,

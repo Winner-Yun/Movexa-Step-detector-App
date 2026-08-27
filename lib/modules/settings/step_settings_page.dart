@@ -6,6 +6,7 @@ import 'package:step_detector/data/controller/motion_controller.dart';
 import 'package:step_detector/data/controller/profile_controller.dart';
 import 'package:step_detector/data/controller/settings_controller.dart';
 import 'package:step_detector/modules/profile/step_profile_edit_page.dart';
+import 'package:step_detector/core/localization/app_translations.dart';
 
 class StepSettingsPage extends StatefulWidget {
   const StepSettingsPage({super.key});
@@ -68,7 +69,7 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
         ),
         SizedBox(height: 16),
         Text(
-          'កំណត់គោលដៅថ្មី',
+          'setNewGoal'.tr(context),
           style: TextStyle(
             color: ThemeColors.getText(context),
             fontWeight: FontWeight.w800,
@@ -77,7 +78,7 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
         ),
         SizedBox(height: 6),
         Text(
-          'កំណត់គោលដៅជំហានប្រចាំថ្ងៃរបស់អ្នក',
+          'setDailyStepGoal'.tr(context),
           style: TextStyle(
             color: ThemeColors.getMutedText(context),
             fontWeight: FontWeight.w500,
@@ -156,7 +157,7 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
               ),
             ),
             child: Text(
-              'បោះបង់',
+              'cancel'.tr(context),
               style: TextStyle(
                 color: ThemeColors.getMutedText(context),
                 fontWeight: FontWeight.bold,
@@ -173,7 +174,7 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
               if (newGoal != null && newGoal > 0) {
                 settingsCtrl.updateStepGoal(newGoal);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('បានកំណត់គោលដៅថ្មី: $newGoal')),
+                  SnackBar(content: Text('${'newGoalSet'.tr(context)}$newGoal')),
                 );
                 Navigator.pop(context);
                 _goalInputController.clear();
@@ -189,7 +190,7 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
               ),
             ),
             child: Text(
-              'រក្សាទុក',
+              'save'.tr(context),
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
           ),
@@ -233,7 +234,7 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
                 ),
                 SizedBox(height: 16),
                 Text(
-                  'ចាកចេញពីគណនី?',
+                  'logoutAccount'.tr(context),
                   style: TextStyle(
                     color: ThemeColors.getText(context),
                     fontSize: 22,
@@ -242,7 +243,7 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'តើអ្នកពិតជាចង់ចាកចេញពីគណនីមែនទេ?',
+                  'confirmLogout'.tr(context),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: ThemeColors.getMutedText(context),
@@ -259,7 +260,7 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
                           padding: const EdgeInsets.symmetric(vertical: 16),
                         ),
                         child: Text(
-                          'បោះបង់',
+                          'cancel'.tr(context),
                           style: TextStyle(
                             color: ThemeColors.getMutedText(context),
                             fontWeight: FontWeight.bold,
@@ -287,7 +288,7 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
                           elevation: 0,
                         ),
                         child: Text(
-                          'ចាកចេញ',
+                          'logout'.tr(context),
                           style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -335,7 +336,7 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
             ),
             SizedBox(width: 12),
             Text(
-              'ការកំណត់',
+              'settings'.tr(context),
               style: textTheme.titleLarge?.copyWith(
                 color: ThemeColors.getText(context),
                 fontWeight: FontWeight.w900,
@@ -357,35 +358,47 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
               _buildProfileCard(textTheme, profileCtrl),
               SizedBox(height: 32),
 
-              _buildSectionTitle('គណនី (Account)', textTheme),
+              _buildSectionTitle('account'.tr(context), textTheme),
               _buildSettingsGroup([
                 _SettingsItemTile(
                   context: context,
                   icon: Icons.person_outline_rounded,
-                  title: 'ព័ត៌មានផ្ទាល់ខ្លួន',
+                  title: 'personalInfo'.tr(context),
                   onTap: _navigateToProfileEdit,
                 ),
                 _SettingsItemTile(
                   context: context,
                   icon: Icons.flag_outlined,
-                  title: 'គោលដៅជំហាន',
+                  title: 'stepGoal'.tr(context),
                   trailingText: '${settingsCtrl.settings.dailyStepGoal}',
                   onTap: () => _showSetGoalDialog(settingsCtrl),
                 ),
               ]),
               SizedBox(height: 24),
 
-              _buildSectionTitle('ចំណូលចិត្ត (Preferences)', textTheme),
+              _buildSectionTitle('preferences'.tr(context), textTheme),
               _buildSettingsGroup([
                 _SettingsItemTile(
                   context: context,
                   icon: Icons.dark_mode_outlined,
-                  title: 'ម៉ូដងងឹត (Dark Mode)',
+                  title: 'darkMode'.tr(context),
                   isSwitch: true,
                   switchValue: settingsCtrl.settings.darkModeEnabled,
                   onSwitchChanged: (val) => settingsCtrl.updateSettings(
                     settingsCtrl.settings.copyWith(darkModeEnabled: val),
                   ),
+                ),
+                _SettingsItemTile(
+                  context: context,
+                  icon: Icons.language_rounded,
+                  title: 'language'.tr(context),
+                  trailingText: settingsCtrl.settings.language == 'km' ? 'ខ្មែរ' : 'English',
+                  isSwitch: true,
+                  switchValue: settingsCtrl.settings.language == 'km',
+                  onSwitchChanged: (val) {
+                    final newLang = val ? 'km' : 'en';
+                    settingsCtrl.updateSettings(settingsCtrl.settings.copyWith(language: newLang));
+                  },
                 ),
               ]),
 
@@ -395,7 +408,7 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
                   onPressed: _showLogoutDialog,
                   icon: Icon(Icons.logout_rounded, color: Colors.redAccent),
                   label: Text(
-                    'ចាកចេញ (Log Out)',
+                    'logoutAction'.tr(context),
                     style: TextStyle(
                       color: Colors.redAccent,
                       fontWeight: FontWeight.bold,
