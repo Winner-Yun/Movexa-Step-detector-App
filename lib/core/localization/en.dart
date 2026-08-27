@@ -1,6 +1,6 @@
 const Map<String, String> enTranslations = {
   'loginTitle': 'Login',
-  'welcomeMessage': 'Welcome to Kinetic!',
+  'welcomeMessage': 'Welcome to Movexa!',
   'trackingSteps': 'Track your steps',
   'loginWithGoogle': 'Login with Google',
   'continueToApp': 'Continue to App',
@@ -66,4 +66,11 @@ const Map<String, String> enTranslations = {
   'hello': 'Hello!',
   'keepGoing': 'Keep going! You are doing great today.',
   'loginWithGoogleSubtitle': 'Sign in with your Google account',
+  'ofGoal': 'OF GOAL',
+  'motionPermissionDenied': 'Motion permission denied',
+  'runOnBackgroundApp': 'Run on background app',
+  'walkingNow': 'Walking now',
+  'trackingStopped': 'Tracking • stopped',
+  'trackingActive': 'Tracking active',
+  'dailyTrackRecord': 'Daily Track Record',
 };

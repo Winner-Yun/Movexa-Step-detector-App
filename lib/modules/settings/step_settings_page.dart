@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:step_detector/core/localization/app_translations.dart';
 import 'package:step_detector/core/theme/theme_colors.dart';
 import 'package:step_detector/data/controller/auth_controller.dart';
 import 'package:step_detector/data/controller/motion_controller.dart';
 import 'package:step_detector/data/controller/profile_controller.dart';
 import 'package:step_detector/data/controller/settings_controller.dart';
 import 'package:step_detector/modules/profile/step_profile_edit_page.dart';
-import 'package:step_detector/core/localization/app_translations.dart';
 
 class StepSettingsPage extends StatefulWidget {
   const StepSettingsPage({super.key});
@@ -174,7 +174,9 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
               if (newGoal != null && newGoal > 0) {
                 settingsCtrl.updateStepGoal(newGoal);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('${'newGoalSet'.tr(context)}$newGoal')),
+                  SnackBar(
+                    content: Text('${'newGoalSet'.tr(context)}$newGoal'),
+                  ),
                 );
                 Navigator.pop(context);
                 _goalInputController.clear();
@@ -340,7 +342,6 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
               style: textTheme.titleLarge?.copyWith(
                 color: ThemeColors.getText(context),
                 fontWeight: FontWeight.w900,
-                letterSpacing: 0.5,
               ),
             ),
           ],
@@ -392,12 +393,16 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
                   context: context,
                   icon: Icons.language_rounded,
                   title: 'language'.tr(context),
-                  trailingText: settingsCtrl.settings.language == 'km' ? 'ខ្មែរ' : 'English',
+                  trailingText: settingsCtrl.settings.language == 'km'
+                      ? 'ខ្មែរ'
+                      : 'English',
                   isSwitch: true,
                   switchValue: settingsCtrl.settings.language == 'km',
                   onSwitchChanged: (val) {
                     final newLang = val ? 'km' : 'en';
-                    settingsCtrl.updateSettings(settingsCtrl.settings.copyWith(language: newLang));
+                    settingsCtrl.updateSettings(
+                      settingsCtrl.settings.copyWith(language: newLang),
+                    );
                   },
                 ),
               ]),
@@ -517,7 +522,6 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
         style: textTheme.titleSmall?.copyWith(
           color: ThemeColors.getMutedText(context),
           fontWeight: FontWeight.w800,
-          letterSpacing: 0.5,
         ),
       ),
     );

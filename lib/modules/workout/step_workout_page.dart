@@ -153,7 +153,6 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
                         color: ThemeColors.getText(context),
                         fontSize: 28,
                         fontWeight: FontWeight.w900,
-                        letterSpacing: 0.5,
                       ),
                     ),
                     SizedBox(height: 8),
@@ -374,7 +373,6 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
           style: textTheme.titleLarge?.copyWith(
             color: ThemeColors.getText(context),
             fontWeight: FontWeight.w900,
-            letterSpacing: 0.5,
           ),
         ),
       ],
@@ -434,7 +432,6 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
                     ? ThemeColors.getBrandAccent(context)
                     : ThemeColors.getText(context),
                 fontWeight: FontWeight.w900,
-                letterSpacing: 2,
                 fontFeatures: const [FontFeature.tabularFigures()],
               ),
             ),
@@ -596,7 +593,6 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
                 color: Colors.white,
                 fontSize: 20,
                 fontWeight: FontWeight.w900,
-                letterSpacing: 1,
               ),
             ),
           ],

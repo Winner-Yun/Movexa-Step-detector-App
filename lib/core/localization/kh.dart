@@ -1,6 +1,6 @@
 const Map<String, String> khTranslations = {
   'loginTitle': 'ចូលគណនី',
-  'welcomeMessage': 'សូមស្វាគមន៍មកកាន់ Kinetic!',
+  'welcomeMessage': 'សូមស្វាគមន៍មកកាន់ Movexa!',
   'trackingSteps': 'តាមដានជំហានរបស់អ្នក',
   'loginWithGoogle': 'ចូលគណនីតាម Google',
   'continueToApp': 'បន្តទៅកាន់កម្មវិធី',
@@ -66,4 +66,11 @@ const Map<String, String> khTranslations = {
   'hello': 'សួស្តី!',
   'keepGoing': 'បន្តដំណើរ! ថ្ងៃនេះល្អណាស់',
   'loginWithGoogleSubtitle': 'ចូលគណនីតាមរយៈ Google របស់អ្នក',
+  'ofGoal': 'នៃគោលដៅ',
+  'motionPermissionDenied': 'មិនបានអនុញ្ញាតសិទ្ធិចលនា',
+  'runOnBackgroundApp': 'ដំណើរការនៅផ្ទៃខាងក្រោយកម្មវិធី',
+  'walkingNow': 'កំពុងដើរ',
+  'trackingStopped': 'ការតាមដាន • បានបញ្ឈប់',
+  'trackingActive': 'ការតាមដានកំពុងសកម្ម',
+  'dailyTrackRecord': 'កំណត់ត្រាតាមដានប្រចាំថ្ងៃ',
 };

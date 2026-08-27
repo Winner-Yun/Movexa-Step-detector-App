@@ -21,11 +21,11 @@ class StepMainApp extends StatefulWidget {
 class _StepMainAppState extends State<StepMainApp> {
   int _selectedTab = 0;
 
-  static const List<Widget> _pages = [
-    StepDashboardPage(),
-    StepWorkoutPage(),
-    StepHistoryPage(),
-    StepSettingsPage(),
+  late final List<Widget> _pages = [
+    StepDashboardPage(onSeeAll: () => _onSelected(2)),
+    const StepWorkoutPage(),
+    const StepHistoryPage(),
+    const StepSettingsPage(),
   ];
 
   @override

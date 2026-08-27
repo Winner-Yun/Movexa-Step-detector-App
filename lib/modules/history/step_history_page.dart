@@ -82,11 +82,9 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
         SizedBox(width: 12),
         Text(
           'activityHistory'.tr(context),
-
           style: textTheme.titleLarge?.copyWith(
             color: ThemeColors.getText(context),
             fontWeight: FontWeight.w900,
-            letterSpacing: 0.5,
           ),
         ),
       ],
@@ -200,7 +198,6 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                 SizedBox(width: 8),
                 Text(
                   '${'summaryFor'.tr(context)} $_selectedDay',
-
                   style: textTheme.titleMedium?.copyWith(
                     color: ThemeColors.getText(context),
                     fontWeight: FontWeight.w900,
@@ -251,7 +248,6 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                 children: [
                   Text(
                     'monthlyAvg'.tr(context),
-
                     style: textTheme.titleSmall?.copyWith(
                       color: ThemeColors.getMutedText(context),
                       fontWeight: FontWeight.w700,
@@ -488,7 +484,6 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                       record.isGoalReached(goal)
                           ? 'goalReachedShort'.tr(context)
                           : 'inProgress'.tr(context),
-
                       style: TextStyle(
                         color: record.isGoalReached(goal)
                             ? ThemeColors.getProgressChipText(context)
@@ -543,7 +538,6 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                     style: textTheme.headlineSmall?.copyWith(
                       color: ThemeColors.getText(context),
                       fontWeight: FontWeight.w900,
-                      letterSpacing: -0.5,
                     ),
                   ),
                 ],
