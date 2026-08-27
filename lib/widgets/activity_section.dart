@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:step_detector/widgets/activity_row.dart';
+import 'package:step_detector/core/localization/app_translations.dart';
 
 class ActivitySection extends StatelessWidget {
   const ActivitySection({super.key, required this.activities});
@@ -11,11 +12,11 @@ class ActivitySection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (activities.isEmpty) {
-      return const Padding(
-        padding: EdgeInsets.symmetric(vertical: 20),
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20),
         child: Center(
           child: Text(
-            'មិនទាន់មានសកម្មភាពថ្មីៗទេ (No recent activities)',
+            'noRecentActivities'.tr(context),
             style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w600),
           ),
         ),

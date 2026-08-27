@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:step_detector/core/theme/theme_colors.dart';
 import 'package:step_detector/widgets/format_number.dart';
+import 'package:step_detector/core/localization/app_translations.dart';
 
 class ProgressPanel extends StatelessWidget {
   const ProgressPanel({
@@ -76,7 +77,7 @@ class ProgressPanel extends StatelessWidget {
                   ),
                   SizedBox(height: 2),
                   Text(
-                    'ជំហាននៅថ្ងៃនេះ',
+                    'stepsToday'.tr(context),
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: subTextColor,
                       fontWeight: FontWeight.w700,

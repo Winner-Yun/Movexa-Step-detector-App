@@ -10,6 +10,7 @@ import 'package:step_detector/widgets/dashboard_widgets.dart';
 import 'package:step_detector/widgets/primary_button.dart';
 import 'package:step_detector/widgets/stat_card.dart';
 import 'package:step_detector/widgets/tracking_toggle_card.dart';
+import 'package:step_detector/core/localization/app_translations.dart';
 
 class StepDashboardPage extends StatefulWidget {
   const StepDashboardPage({super.key});
@@ -128,7 +129,7 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
                               ),
                             ),
                             child: Text(
-                              'បោះបង់',
+                              'cancel'.tr(context),
                               style: TextStyle(
                                 color: ThemeColors.getMutedText(context),
                                 fontWeight: FontWeight.bold,
@@ -146,13 +147,13 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
                               );
                               if (newGoal != null && newGoal > 0) {
                                 settingsCtrl.updateStepGoal(newGoal);
-                                _showSnack('បានកំណត់គោលដៅថ្មី: $newGoal');
+                                _showSnack('${'newGoalSet'.tr(context)}: $newGoal');
                                 Navigator.pop(context);
                                 _goalInputController.clear();
                               } else {
                                 setState(
                                   () => errorMessage =
-                                      'សូមបញ្ចូលចំនួនឲ្យបានត្រឹមត្រូវ',
+                                      'pleaseEnterValidNumber'.tr(context),
                                 );
                               }
                             },
@@ -168,7 +169,7 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
                               ),
                             ),
                             child: Text(
-                              'រក្សាទុក',
+                              'save'.tr(context),
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
@@ -205,7 +206,7 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
         ),
         SizedBox(height: 16),
         Text(
-          'កំណត់គោលដៅថ្មី',
+          'setNewGoal'.tr(context),
           style: TextStyle(
             color: ThemeColors.getText(context),
             fontWeight: FontWeight.w800,
@@ -214,7 +215,7 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
         ),
         SizedBox(height: 6),
         Text(
-          'កំណត់គោលដៅជំហានប្រចាំថ្ងៃរបស់អ្នក',
+          'setDailyStepGoal'.tr(context),
           style: TextStyle(
             color: ThemeColors.getMutedText(context),
             fontWeight: FontWeight.w500,
@@ -259,7 +260,7 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          name.isEmpty ? 'សួស្តី!' : 'សួស្តី $name!',
+          name.isEmpty ? 'hello'.tr(context) : '${'hello'.tr(context)} $name',
           style: textTheme.headlineSmall?.copyWith(
             color: ThemeColors.getText(context),
             fontWeight: FontWeight.w900,
@@ -268,7 +269,7 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
         ),
         SizedBox(height: 3),
         Text(
-          'បន្តដំណើរ! ថ្ងៃនេះល្អណាស់',
+          'keepGoing'.tr(context),
           style: textTheme.bodyMedium?.copyWith(
             color: ThemeColors.getMutedText(context),
             fontWeight: FontWeight.w600,
@@ -295,7 +296,8 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
         alreadyCountedToday: activityCtrl.todayRecord?.steps ?? 0,
       );
       if (motionCtrl.permissionDenied) {
-        _showSnack('Motion & Fitness permission is required to track steps.');
+        if (!mounted) return;
+        _showSnack('motionPermissionRequired'.tr(context));
       }
     } else {
       motionCtrl.stop();
@@ -309,7 +311,7 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
           child: StatCard(
             icon: Icons.pin_drop_rounded,
             iconColor: const Color(0xFFB57D1D),
-            title: 'ចម្ងាយ',
+            title: 'distance'.tr(context),
             value: (todayRecord?.distance ?? 0.0).toStringAsFixed(2),
             unit: 'KM',
           ),
@@ -319,7 +321,7 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
           child: StatCard(
             icon: Icons.local_fire_department_rounded,
             iconColor: const Color(0xFFD45529),
-            title: 'កាឡូរី',
+            title: 'calories'.tr(context),
             value: (todayRecord?.calories ?? 0.0).toStringAsFixed(0),
             unit: 'KCAL',
           ),
@@ -332,7 +334,7 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
     return Row(
       children: [
         Text(
-          'សកម្មភាពថ្មីៗ',
+          'recentActivities'.tr(context),
           style: textTheme.titleSmall?.copyWith(
             color: ThemeColors.getText(context),
             fontWeight: FontWeight.w800,
@@ -414,7 +416,7 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
 
                 PrimaryButton(
                   onTap: () => _showSetGoalDialog(context, settingsCtrl),
-                  text: 'កំណត់គោលដៅថ្មី',
+                  text: 'setNewGoal'.tr(context),
                 ),
                 SizedBox(height: 14),
 

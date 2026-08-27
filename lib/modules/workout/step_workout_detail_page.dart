@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:step_detector/core/theme/theme_colors.dart';
 import 'package:step_detector/data/models/workout_session.dart';
+import 'package:step_detector/core/localization/app_translations.dart';
 
 class StepWorkoutDetailPage extends StatelessWidget {
   final WorkoutSession session;
@@ -23,7 +24,7 @@ class StepWorkoutDetailPage extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'សេចក្តីលម្អិត',
+          'details'.tr(context),
           style: textTheme.titleMedium?.copyWith(
             color: ThemeColors.getText(context),
             fontWeight: FontWeight.w800,
@@ -103,7 +104,7 @@ class StepWorkoutDetailPage extends StatelessWidget {
             ),
           ),
           Text(
-            'សរុបជំហាន (Total Steps)',
+            'totalSteps'.tr(context),
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
           ),
         ],
@@ -120,7 +121,7 @@ class StepWorkoutDetailPage extends StatelessWidget {
               child: _buildSimpleStatBox(
                 context,
                 Icons.timer_rounded,
-                'រយៈពេល',
+                'duration'.tr(context),
                 session.formattedDuration,
                 'នាទី',
                 Colors.orange,
@@ -131,7 +132,7 @@ class StepWorkoutDetailPage extends StatelessWidget {
               child: _buildSimpleStatBox(
                 context,
                 Icons.route_rounded,
-                'ចម្ងាយ',
+                'distance'.tr(context),
                 session.distance.toStringAsFixed(2),
                 'KM',
                 const Color(0xFF2980B9),
@@ -146,7 +147,7 @@ class StepWorkoutDetailPage extends StatelessWidget {
               child: _buildSimpleStatBox(
                 context,
                 Icons.local_fire_department_rounded,
-                'កាឡូរី',
+                'calories'.tr(context),
                 session.calories.toStringAsFixed(0),
                 'KCAL',
                 const Color(0xFFD45529),
@@ -157,7 +158,7 @@ class StepWorkoutDetailPage extends StatelessWidget {
               child: _buildSimpleStatBox(
                 context,
                 Icons.speed_rounded,
-                'ល្បឿន',
+                'speed'.tr(context),
                 session.averagePace,
                 '/KM',
                 Colors.purple,
