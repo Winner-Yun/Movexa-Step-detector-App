@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import 'package:step_detector/core/constants/app_colors.dart';
+import 'package:step_detector/core/theme/theme_colors.dart';
 import 'package:step_detector/data/controller/activity_controller.dart';
 import 'package:step_detector/data/controller/motion_controller.dart';
 import 'package:step_detector/data/controller/profile_controller.dart';
@@ -40,11 +39,16 @@ class _StepMainAppState extends State<StepMainApp> {
     final activityCtrl = context.read<ActivityController>();
     final motionCtrl = context.read<MotionController>();
 
-    await Future.wait([profileCtrl.fetchProfile(), settingsCtrl.fetchSettings()]);
+    await Future.wait([
+      profileCtrl.fetchProfile(),
+      settingsCtrl.fetchSettings(),
+    ]);
 
     if (!mounted) return;
     await Future.wait([
-      activityCtrl.fetchTodayRecord(dailyGoal: settingsCtrl.settings.dailyStepGoal),
+      activityCtrl.fetchTodayRecord(
+        dailyGoal: settingsCtrl.settings.dailyStepGoal,
+      ),
       activityCtrl.fetchWorkoutHistory(),
       activityCtrl.fetchMonthlyStepHistory(),
     ]);
@@ -61,12 +65,11 @@ class _StepMainAppState extends State<StepMainApp> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.scaffold,
       body: IndexedStack(index: _selectedTab, children: _pages),
       bottomNavigationBar: Container(
         margin: const EdgeInsets.fromLTRB(14, 0, 14, 10),
         decoration: BoxDecoration(
-          color: AppColors.navBackground,
+          color: ThemeColors.getNavBackground(context),
           borderRadius: BorderRadius.circular(20),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 7),
@@ -144,7 +147,9 @@ class _NavItem extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.navSelected : Colors.transparent,
+          color: isSelected
+              ? ThemeColors.getNavSelected(context)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(14),
         ),
         child: Column(
@@ -153,13 +158,17 @@ class _NavItem extends StatelessWidget {
             Icon(
               icon,
               size: 20,
-              color: isSelected ? Colors.white : AppColors.navUnselected,
+              color: isSelected
+                  ? Colors.white
+                  : ThemeColors.getNavUnselected(context),
             ),
-            const SizedBox(height: 2),
+            SizedBox(height: 2),
             Text(
               label,
               style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: isSelected ? Colors.white : AppColors.navUnselected,
+                color: isSelected
+                    ? Colors.white
+                    : ThemeColors.getNavUnselected(context),
                 fontWeight: FontWeight.w800,
                 fontSize: 10,
               ),

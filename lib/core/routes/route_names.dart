@@ -3,3 +3,4 @@ class RouteNames {
   static const String onboarding = '/onboarding';
   static const String mainApp = '/mainApp';
 }
+

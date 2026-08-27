@@ -49,3 +49,4 @@ class DefaultFirebaseOptions {
     storageBucket: 'stepdetectionkhmer.firebasestorage.app',
   );
 }
+

@@ -6,3 +6,4 @@ const Map<String, String> khTranslations = {
   'continueToApp': 'បន្តទៅកាន់កម្មវិធី',
   'onboardingDesc': 'នេះគឺជាទំព័ររៀបចំគណនីរបស់អ្នក (Onboarding) ដែលនឹងត្រូវបានអភិវឌ្ឍន៍បន្ថែមនៅជំហានបន្ទាប់។',
 };
+

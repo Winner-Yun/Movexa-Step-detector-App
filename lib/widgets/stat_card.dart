@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:step_detector/core/constants/app_colors.dart';
+import 'package:step_detector/core/theme/theme_colors.dart';
 
 class StatCard extends StatelessWidget {
   const StatCard({
@@ -22,7 +22,7 @@ class StatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
       decoration: BoxDecoration(
-        color: AppColors.cardNeutral,
+        color: ThemeColors.getCardNeutral(context),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -37,7 +37,7 @@ class StatCard extends StatelessWidget {
             ),
             child: Icon(icon, size: 13, color: iconColor),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           Text(
             title,
             style: Theme.of(context).textTheme.labelMedium?.copyWith(
@@ -45,7 +45,7 @@ class StatCard extends StatelessWidget {
               fontWeight: FontWeight.w700,
             ),
           ),
-          const SizedBox(height: 2),
+          SizedBox(height: 2),
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
@@ -53,10 +53,10 @@ class StatCard extends StatelessWidget {
                 value,
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.w900,
-                  color: AppColors.darkText,
+                  color: ThemeColors.getText(context),
                 ),
               ),
-              const SizedBox(width: 4),
+              SizedBox(width: 4),
               Padding(
                 padding: const EdgeInsets.only(bottom: 2),
                 child: Text(

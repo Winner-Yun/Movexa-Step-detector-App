@@ -52,3 +52,4 @@ class UserSettings implements BaseModel {
     );
   }
 }
+

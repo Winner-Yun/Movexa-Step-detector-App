@@ -31,3 +31,4 @@ extension TranslationExtension on String {
     return context.watch<AppTranslations>().tr(this);
   }
 }
+

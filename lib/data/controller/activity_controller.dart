@@ -151,3 +151,4 @@ class ActivityController extends ChangeNotifier {
     }
   }
 }
+

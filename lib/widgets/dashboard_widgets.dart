@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:step_detector/core/constants/app_colors.dart';
-
+import 'package:step_detector/core/theme/theme_colors.dart';
 import 'package:step_detector/widgets/format_number.dart';
 
 class ProgressPanel extends StatelessWidget {
@@ -24,7 +23,7 @@ class ProgressPanel extends StatelessWidget {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: AppColors.scaffold,
+        color: ThemeColors.getScaffold(context),
         borderRadius: BorderRadius.circular(30),
       ),
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -41,8 +40,8 @@ class ProgressPanel extends StatelessWidget {
                 child: CircularProgressIndicator(
                   value: 1,
                   strokeWidth: 10,
-                  valueColor: const AlwaysStoppedAnimation(
-                    AppColors.progressTrack,
+                  valueColor: AlwaysStoppedAnimation(
+                    ThemeColors.getProgressTrack(context),
                   ),
                 ),
               ),
@@ -75,7 +74,7 @@ class ProgressPanel extends StatelessWidget {
                       fontSize: 40,
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  SizedBox(height: 2),
                   Text(
                     'ជំហាននៅថ្ងៃនេះ',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -83,21 +82,21 @@ class ProgressPanel extends StatelessWidget {
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 12,
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.progressChip,
+                      color: ThemeColors.getProgressChip(context),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
                       '${(progress * 100).round()}% OF GOAL',
                       style: Theme.of(context).textTheme.labelMedium?.copyWith(
                         fontWeight: FontWeight.w900,
-                        color: AppColors.progressChipText,
+                        color: ThemeColors.getProgressChipText(context),
                         letterSpacing: 0.4,
                       ),
                     ),

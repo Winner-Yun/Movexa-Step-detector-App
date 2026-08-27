@@ -61,3 +61,4 @@ class SettingsController extends ChangeNotifier {
     await updateSettings(updated);
   }
 }
+
