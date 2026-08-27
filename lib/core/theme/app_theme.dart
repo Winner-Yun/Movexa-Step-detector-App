@@ -25,7 +25,6 @@ class AppTheme {
         headlineSmall: GoogleFonts.nokora(
           fontSize: 27,
           fontWeight: FontWeight.w800,
-          letterSpacing: 0.2,
         ),
         displaySmall: GoogleFonts.nokora(
           fontSize: 46,
@@ -69,7 +68,6 @@ class AppTheme {
             headlineSmall: GoogleFonts.nokora(
               fontSize: 27,
               fontWeight: FontWeight.w800,
-              letterSpacing: 0.2,
               color: AppColors.textLight,
             ),
             displaySmall: GoogleFonts.nokora(

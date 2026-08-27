@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:step_detector/core/constants/app_img.dart';
+import 'package:step_detector/core/localization/app_translations.dart';
 import 'package:step_detector/core/theme/theme_colors.dart';
 import 'package:step_detector/data/controller/activity_controller.dart';
 import 'package:step_detector/data/controller/motion_controller.dart';
@@ -10,10 +12,10 @@ import 'package:step_detector/widgets/dashboard_widgets.dart';
 import 'package:step_detector/widgets/primary_button.dart';
 import 'package:step_detector/widgets/stat_card.dart';
 import 'package:step_detector/widgets/tracking_toggle_card.dart';
-import 'package:step_detector/core/localization/app_translations.dart';
 
 class StepDashboardPage extends StatefulWidget {
-  const StepDashboardPage({super.key});
+  const StepDashboardPage({super.key, this.onSeeAll});
+  final VoidCallback? onSeeAll;
 
   @override
   State<StepDashboardPage> createState() => _StepDashboardPageState();
@@ -147,13 +149,13 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
                               );
                               if (newGoal != null && newGoal > 0) {
                                 settingsCtrl.updateStepGoal(newGoal);
-                                _showSnack('${'newGoalSet'.tr(context)}: $newGoal');
                                 Navigator.pop(context);
+                                _showSuccessDialog(context, newGoal);
                                 _goalInputController.clear();
                               } else {
                                 setState(
-                                  () => errorMessage =
-                                      'pleaseEnterValidNumber'.tr(context),
+                                  () => errorMessage = 'pleaseEnterValidNumber'
+                                      .tr(context),
                                 );
                               }
                             },
@@ -229,14 +231,10 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
   Widget _buildTopHeader(TextTheme textTheme) {
     return Row(
       children: [
-        Icon(
-          Icons.fitness_center_rounded,
-          size: 17,
-          color: ThemeColors.getBrandAccent(context),
-        ),
+        Image.asset(AppImg.logo, width: 40, height: 40),
         SizedBox(width: 6),
         Text(
-          'Kinetic',
+          'Movexa',
           style: textTheme.labelLarge?.copyWith(
             color: ThemeColors.getBrandAccent(context),
             fontWeight: FontWeight.w700,
@@ -255,6 +253,84 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
     );
   }
 
+  void _showSuccessDialog(BuildContext context, int newGoal) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
+          backgroundColor: ThemeColors.getSurface(context),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: ThemeColors.getProgressValue(
+                      context,
+                    ).withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.check_circle_rounded,
+                    color: ThemeColors.getProgressValue(context),
+                    size: 48,
+                  ),
+                ),
+                SizedBox(height: 20),
+                Text(
+                  'savedSuccessfully'.tr(context),
+                  style: TextStyle(
+                    color: ThemeColors.getText(context),
+                    fontWeight: FontWeight.w800,
+                    fontSize: 22,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  '${'newGoalSet'.tr(context)}$newGoal',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: ThemeColors.getMutedText(context),
+                    fontWeight: FontWeight.w500,
+                    fontSize: 16,
+                  ),
+                ),
+                SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: ThemeColors.getBrandAccent(context),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: Text(
+                      'close'.tr(context),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildGreeting(TextTheme textTheme, String name) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -264,7 +340,6 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
           style: textTheme.headlineSmall?.copyWith(
             color: ThemeColors.getText(context),
             fontWeight: FontWeight.w900,
-            letterSpacing: 0.2,
           ),
         ),
         SizedBox(height: 3),
@@ -334,7 +409,7 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
     return Row(
       children: [
         Text(
-          'recentActivities'.tr(context),
+          'activityHistory'.tr(context),
           style: textTheme.titleSmall?.copyWith(
             color: ThemeColors.getText(context),
             fontWeight: FontWeight.w800,
@@ -342,14 +417,20 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
         ),
         const Spacer(),
         TextButton(
-          onPressed: () => _showSnack('See all tapped'),
+          onPressed: () {
+            if (widget.onSeeAll != null) {
+              widget.onSeeAll!();
+            } else {
+              _showSnack('${'seeAll'.tr(context)} tapped');
+            }
+          },
           style: TextButton.styleFrom(
             minimumSize: Size.zero,
             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
           ),
           child: Text(
-            'See all',
+            'seeAll'.tr(context),
             style: textTheme.labelMedium?.copyWith(
               color: ThemeColors.getBrandAccent(context),
               fontWeight: FontWeight.w800,
@@ -394,6 +475,7 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
                 ProgressPanel(
                   progress: progress,
                   steps: currentSteps,
+                  goal: goal,
                   progressGreen: ThemeColors.getProgressValue(context),
                   textColor: ThemeColors.getText(context),
                   subTextColor: ThemeColors.getMutedText(context),
@@ -426,7 +508,7 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
                 _buildRecentActivitiesHeader(textTheme),
                 SizedBox(height: 8),
 
-                ActivitySection(activities: activityCtrl.workoutHistory),
+                ActivitySection(activities: activityCtrl.monthlyStepHistory),
 
                 SizedBox(height: 8),
               ],

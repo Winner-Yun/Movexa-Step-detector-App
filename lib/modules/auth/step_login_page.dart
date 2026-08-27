@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:step_detector/core/localization/app_translations.dart';
 import 'package:step_detector/core/theme/theme_colors.dart';
+import 'package:step_detector/core/constants/app_img.dart';
 import 'package:step_detector/data/controller/auth_controller.dart';
 
 class StepLoginPage extends StatefulWidget {
@@ -72,15 +73,15 @@ class _StepLoginPageState extends State<StepLoginPage> {
                         color: Colors.white.withValues(alpha: 0.2),
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(
-                        Icons.directions_run_rounded,
-                        color: Colors.white,
-                        size: 50,
+                      child: Image.asset(
+                        AppImg.logo,
+                        width: 50,
+                        height: 50,
                       ),
                     ),
                     SizedBox(height: 16),
                     Text(
-                      'Kinetic',
+                      'Movexa',
                       style: textTheme.displaySmall?.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.w900,

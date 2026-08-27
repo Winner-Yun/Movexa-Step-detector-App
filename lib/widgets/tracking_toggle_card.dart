@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:step_detector/core/localization/app_translations.dart';
 import 'package:step_detector/core/theme/theme_colors.dart';
 import 'package:step_detector/data/controller/motion_controller.dart';
 
@@ -50,29 +51,9 @@ class _TrackingToggleCardState extends State<TrackingToggleCard> {
     });
   }
 
-  String _getSubtitle() {
-    if (widget.permissionDenied) return 'Motion permission denied';
-    if (!widget.isTracking) return 'Run on background app';
-    return switch (widget.motionStatus) {
-      MotionStatus.walking => 'Walking now',
-      MotionStatus.stopped => 'Tracking • stopped',
-      _ => 'Tracking active',
-    };
-  }
-
-  Color _getSubtitleColor(BuildContext context) {
-    if (widget.permissionDenied) return Colors.redAccent;
-    if (widget.isTracking && widget.motionStatus == MotionStatus.walking) {
-      return ThemeColors.getPositiveText(context);
-    }
-    return ThemeColors.getMutedText(context);
-  }
-
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final subtitle = _getSubtitle();
-    final subtitleColor = _getSubtitleColor(context);
 
     return Container(
       width: double.infinity,
@@ -95,18 +76,10 @@ class _TrackingToggleCardState extends State<TrackingToggleCard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Daily Track Record',
+                  'dailyTrackRecord'.tr(context),
                   style: textTheme.titleSmall?.copyWith(
                     color: ThemeColors.getText(context),
                     fontWeight: FontWeight.w800,
-                  ),
-                ),
-                SizedBox(height: 2),
-                Text(
-                  subtitle,
-                  style: textTheme.bodySmall?.copyWith(
-                    color: subtitleColor,
-                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],
@@ -129,7 +102,9 @@ class _TrackingToggleCardState extends State<TrackingToggleCard> {
               child: AnimatedAlign(
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.easeInOutBack,
-                alignment: _localEnabled ? Alignment.centerRight : Alignment.centerLeft,
+                alignment: _localEnabled
+                    ? Alignment.centerRight
+                    : Alignment.centerLeft,
                 child: Container(
                   width: 24,
                   height: 24,
