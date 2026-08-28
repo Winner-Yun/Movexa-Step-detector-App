@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:step_detector/core/localization/app_translations.dart';
 import 'package:step_detector/core/theme/theme_colors.dart';
 import 'package:step_detector/data/controller/activity_controller.dart';
 import 'package:step_detector/data/controller/settings_controller.dart';
 import 'package:step_detector/modules/workout/step_workout_detail_page.dart';
-import 'package:step_detector/core/localization/app_translations.dart';
+import 'package:step_detector/widgets/skeleton.dart';
 
 class StepHistoryPage extends StatefulWidget {
   const StepHistoryPage({super.key});
@@ -50,7 +51,12 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
             Expanded(
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 300),
-                child: _selectedTabIndex == 0
+                child: activityCtrl.isFetching
+                    ? const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 24),
+                        child: ListSkeleton(),
+                      )
+                    : _selectedTabIndex == 0
                     ? _buildDailyView(
                         textTheme,
                         activityCtrl.monthlyStepHistory,
@@ -734,6 +740,16 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                         Icons.local_fire_department_rounded,
                         session.calories.toStringAsFixed(0),
                         'KCAL',
+                      ),
+                      Container(
+                        width: 1,
+                        height: 24,
+                        color: ThemeColors.getScaffoldSoft(context),
+                      ),
+                      _buildSessionMiniStat(
+                        Icons.speed_rounded,
+                        session.speedKmh.toStringAsFixed(1),
+                        'KM/H',
                       ),
                     ],
                   ),

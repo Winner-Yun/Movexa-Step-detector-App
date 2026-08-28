@@ -60,7 +60,7 @@ class _StepProfileEditPageState extends State<StepProfileEditPage> {
     if (success && mounted) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('savedSuccessfully'.tr(context))));
+      ).showSnackBar(SnackBar(content: Text(context.read<AppTranslations>().tr('savedSuccessfully'))));
       Navigator.pop(context);
     }
   }

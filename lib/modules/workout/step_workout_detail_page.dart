@@ -166,6 +166,25 @@ class StepWorkoutDetailPage extends StatelessWidget {
             ),
           ],
         ),
+        SizedBox(height: 16),
+        Row(
+          children: [
+            Expanded(
+              child: _buildSimpleStatBox(
+                context,
+                Icons.speed_rounded,
+                'speed'.tr(context),
+                session.speedKmh.toStringAsFixed(1),
+                'KM/H',
+                const Color(0xFF8E44AD),
+              ),
+            ),
+            SizedBox(width: 16),
+            Expanded(
+              child: const SizedBox.shrink(),
+            ),
+          ],
+        ),
       ],
     );
   }

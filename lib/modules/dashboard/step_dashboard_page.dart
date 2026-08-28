@@ -10,8 +10,10 @@ import 'package:step_detector/data/controller/settings_controller.dart';
 import 'package:step_detector/widgets/activity_section.dart';
 import 'package:step_detector/widgets/dashboard_widgets.dart';
 import 'package:step_detector/widgets/primary_button.dart';
+import 'package:step_detector/widgets/skeleton.dart';
 import 'package:step_detector/widgets/stat_card.dart';
 import 'package:step_detector/widgets/tracking_toggle_card.dart';
+import 'package:step_detector/widgets/set_goal_dialog.dart';
 
 class StepDashboardPage extends StatefulWidget {
   const StepDashboardPage({super.key, this.onSeeAll});
@@ -22,11 +24,8 @@ class StepDashboardPage extends StatefulWidget {
 }
 
 class _StepDashboardPageState extends State<StepDashboardPage> {
-  final TextEditingController _goalInputController = TextEditingController();
-
   @override
   void dispose() {
-    _goalInputController.dispose();
     super.dispose();
   }
 
@@ -40,191 +39,17 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
     BuildContext context,
     SettingsController settingsCtrl,
   ) {
-    String? errorMessage;
-
     showDialog(
       context: context,
       builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return Dialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(24),
-              ),
-              backgroundColor: ThemeColors.getSurface(context),
-              elevation: 8,
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _buildDialogHeader(),
-                    SizedBox(height: 24),
-                    TextField(
-                      controller: _goalInputController,
-                      keyboardType: TextInputType.number,
-                      textAlign: TextAlign.center,
-                      cursorColor: ThemeColors.getBrandAccent(context),
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w900,
-                        color: ThemeColors.getBrandAccent(context),
-                      ),
-                      onChanged: (value) {
-                        if (errorMessage != null) {
-                          setState(() => errorMessage = null);
-                        }
-                      },
-                      decoration: InputDecoration(
-                        hintText: '${settingsCtrl.settings.dailyStepGoal}',
-                        hintStyle: TextStyle(
-                          color: ThemeColors.getBrandAccent(
-                            context,
-                          ).withValues(alpha: 0.3),
-                          fontSize: 24,
-                          fontWeight: FontWeight.w700,
-                        ),
-                        filled: true,
-                        fillColor: ThemeColors.getScaffoldSoft(context),
-                        contentPadding: const EdgeInsets.symmetric(
-                          vertical: 16,
-                        ),
-                        errorText: errorMessage,
-                        errorStyle: TextStyle(
-                          color: Colors.redAccent,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide.none,
-                        ),
-                        errorBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide(
-                            color: Colors.redAccent,
-                            width: 1.5,
-                          ),
-                        ),
-                        focusedErrorBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide(
-                            color: Colors.redAccent,
-                            width: 2,
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 28),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                              _goalInputController.clear();
-                            },
-                            style: TextButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14),
-                              ),
-                            ),
-                            child: Text(
-                              'cancel'.tr(context),
-                              style: TextStyle(
-                                color: ThemeColors.getMutedText(context),
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: 12),
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: () {
-                              final newGoal = int.tryParse(
-                                _goalInputController.text,
-                              );
-                              if (newGoal != null && newGoal > 0) {
-                                settingsCtrl.updateStepGoal(newGoal);
-                                Navigator.pop(context);
-                                _showSuccessDialog(context, newGoal);
-                                _goalInputController.clear();
-                              } else {
-                                setState(
-                                  () => errorMessage = 'pleaseEnterValidNumber'
-                                      .tr(context),
-                                );
-                              }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: ThemeColors.getBrandAccent(
-                                context,
-                              ),
-                              foregroundColor: Colors.white,
-                              elevation: 0,
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14),
-                              ),
-                            ),
-                            child: Text(
-                              'save'.tr(context),
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            );
+        return SetGoalDialog(
+          currentGoal: settingsCtrl.settings.dailyStepGoal,
+          onGoalChanged: (newGoal) {
+            settingsCtrl.updateStepGoal(newGoal);
+            _showSuccessDialog(context, newGoal);
           },
         );
       },
-    );
-  }
-
-  Widget _buildDialogHeader() {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: ThemeColors.getBrandAccent(context).withValues(alpha: 0.1),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            Icons.flag_rounded,
-            color: ThemeColors.getBrandAccent(context),
-            size: 36,
-          ),
-        ),
-        SizedBox(height: 16),
-        Text(
-          'setNewGoal'.tr(context),
-          style: TextStyle(
-            color: ThemeColors.getText(context),
-            fontWeight: FontWeight.w800,
-            fontSize: 22,
-          ),
-        ),
-        SizedBox(height: 6),
-        Text(
-          'setDailyStepGoal'.tr(context),
-          style: TextStyle(
-            color: ThemeColors.getMutedText(context),
-            fontWeight: FontWeight.w500,
-            fontSize: 14,
-          ),
-        ),
-      ],
     );
   }
 
@@ -372,10 +197,14 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
       );
       if (motionCtrl.permissionDenied) {
         if (!mounted) return;
-        _showSnack('motionPermissionRequired'.tr(context));
+        _showSnack(context.read<AppTranslations>().tr('motionPermissionRequired'));
       }
     } else {
       motionCtrl.stop();
+      final steps = motionCtrl.todaySteps;
+      final distance = steps * kmPerStep;
+      final calories = steps * kcalPerStep;
+      await activityCtrl.updateTodaySteps(steps, distance, calories);
     }
   }
 
@@ -454,6 +283,27 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
     final currentSteps = todayRecord?.steps ?? 0;
     final goal = settingsCtrl.settings.dailyStepGoal;
     final progress = (currentSteps / goal).clamp(0.0, 1.0);
+
+    if (activityCtrl.isFetching || profileCtrl.isLoading) {
+      return Scaffold(
+        body: SafeArea(
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(14, 10, 14, 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildTopHeader(textTheme),
+                  SizedBox(height: 14),
+                  const DashboardSkeleton(),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
 
     return Scaffold(
       body: SafeArea(

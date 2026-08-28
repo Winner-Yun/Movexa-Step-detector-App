@@ -2,11 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:step_detector/core/constants/app_img.dart';
+import 'package:step_detector/core/localization/app_translations.dart';
 import 'package:step_detector/core/theme/theme_colors.dart';
 import 'package:step_detector/data/controller/activity_controller.dart';
 import 'package:step_detector/data/controller/motion_controller.dart';
 import 'package:step_detector/data/models/workout_session.dart';
-import 'package:step_detector/core/localization/app_translations.dart';
 
 class StepWorkoutPage extends StatefulWidget {
   const StepWorkoutPage({super.key});
@@ -46,7 +47,7 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'motionPermissionRequired'.tr(context),
+              context.read<AppTranslations>().tr('motionPermissionRequired'),
             ),
           ),
         );
@@ -60,35 +61,58 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
       _workoutStartTime = DateTime.now();
     });
 
+    _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() => _secondsElapsed++);
     });
   }
 
   void _stopTracking() {
-    _timer?.cancel();
+    try {
+      _timer?.cancel();
+      _timer = null;
 
-    final motionCtrl = context.read<MotionController>();
-    final steps = motionCtrl.stopWorkout();
-    final duration = Duration(seconds: _secondsElapsed);
-    final distanceKm = steps * kmPerStep;
-    final calories = steps * kcalPerStep;
+      final motionCtrl = context.read<MotionController>();
+      final steps = motionCtrl.stopWorkout();
+      final duration = Duration(seconds: _secondsElapsed);
+      final distanceKm = steps * kmPerStep;
+      final calories = steps * kcalPerStep;
 
-    final session = WorkoutSession(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      title: 'workout'.tr(context),
-      startTime: _workoutStartTime ?? DateTime.now().subtract(duration),
-      duration: duration,
-      steps: steps,
-      calories: calories,
-      distance: distanceKm,
-      averagePace: _formatPace(duration, distanceKm),
-    );
+      final speedKmh = duration.inSeconds > 0
+          ? distanceKm / (duration.inSeconds / 3600.0)
+          : 0.0;
 
-    context.read<ActivityController>().saveWorkoutSession(session);
+      final session = WorkoutSession(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        title: 'workout',
+        startTime: _workoutStartTime ?? DateTime.now().subtract(duration),
+        duration: duration,
+        steps: steps,
+        calories: calories,
+        distance: distanceKm,
+        averagePace: _formatPace(duration, distanceKm),
+        speedKmh: speedKmh,
+      );
 
-    setState(() => _isTracking = false);
-    _showWorkoutSummaryDialog(steps, calories, distanceKm);
+      context.read<ActivityController>().saveWorkoutSession(session);
+
+      _showWorkoutSummaryDialog(
+        steps,
+        calories,
+        distanceKm,
+        speedKmh,
+        _formattedTime,
+      );
+    } catch (e, stack) {
+      debugPrint('Error stopping tracking: $e\n$stack');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isTracking = false;
+          _secondsElapsed = 0;
+        });
+      }
+    }
   }
 
   String _formatPace(Duration duration, double distanceKm) {
@@ -109,10 +133,13 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
     int steps,
     double calories,
     double distanceKm,
+    double speedKmh,
+    String formattedTime,
   ) {
     final bool isProud = steps >= _stepGoal;
     final caloriesLabel = calories.toStringAsFixed(1);
     final distanceLabel = distanceKm.toStringAsFixed(2);
+    final speedLabel = speedKmh.toStringAsFixed(1);
 
     showDialog(
       context: context,
@@ -122,57 +149,65 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
           backgroundColor: Colors.transparent,
           insetPadding: const EdgeInsets.symmetric(horizontal: 24),
           child: Container(
-            padding: const EdgeInsets.fromLTRB(24, 40, 24, 24),
+            padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
               color: ThemeColors.getSurface(context),
               borderRadius: BorderRadius.circular(32),
-              boxShadow: [
-                BoxShadow(
-                  color: isProud
-                      ? ThemeColors.getBrandAccent(
-                          context,
-                        ).withValues(alpha: 0.2)
-                      : ThemeColors.getProgressChipText(context),
-                  blurRadius: 40,
-                  spreadRadius: 10,
-                  offset: const Offset(0, 10),
-                ),
-              ],
             ),
-            child: Stack(
-              clipBehavior: Clip.none,
-              alignment: Alignment.topCenter,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                _buildSummaryFloatingIcon(isProud),
-                Column(
-                  mainAxisSize: MainAxisSize.min,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    Image.asset(
+                      AppImg.logo,
+                      width: 32,
+                      height: 32,
+                      fit: BoxFit.contain,
+                    ),
+                    const SizedBox(width: 8),
                     Text(
-                      isProud ? 'greatJob'.tr(context) : 'dontGiveUp'.tr(context),
+                      'Movexa',
                       style: TextStyle(
                         color: ThemeColors.getText(context),
-                        fontSize: 28,
+                        fontSize: 22,
                         fontWeight: FontWeight.w900,
                       ),
                     ),
-                    SizedBox(height: 8),
-                    Text(
-                      isProud
-                          ? 'goalReached'.tr(context)
-                          : 'startingIsSuccess'.tr(context),
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: ThemeColors.getMutedText(context),
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    SizedBox(height: 32),
-                    _buildSummaryStatsGrid(steps, caloriesLabel, distanceLabel),
-                    SizedBox(height: 32),
-                    _buildSummaryCloseButton(isProud, context),
                   ],
                 ),
+                const SizedBox(height: 24),
+                Text(
+                  isProud ? 'greatJob'.tr(context) : 'dontGiveUp'.tr(context),
+                  style: TextStyle(
+                    color: ThemeColors.getText(context),
+                    fontSize: 28,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  isProud
+                      ? 'goalReached'.tr(context)
+                      : 'startingIsSuccess'.tr(context),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: ThemeColors.getMutedText(context),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                SizedBox(height: 32),
+                _buildSummaryStatsGrid(
+                  steps,
+                  caloriesLabel,
+                  distanceLabel,
+                  speedLabel,
+                  formattedTime,
+                ),
+                SizedBox(height: 32),
+                _buildSummaryCloseButton(isProud, context),
               ],
             ),
           ),
@@ -181,115 +216,57 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
     );
   }
 
-  Widget _buildSummaryFloatingIcon(bool isProud) {
-    return Positioned(
-      top: -80,
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          gradient: LinearGradient(
-            colors: isProud
-                ? [
-                    ThemeColors.getPrimaryGradientStart(context),
-                    ThemeColors.getPrimaryGradientEnd(context),
-                  ]
-                : [
-                    ThemeColors.getProgressChipText(context),
-                    ThemeColors.getProgressChipText(context),
-                  ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: isProud
-                  ? ThemeColors.getBrandAccent(context).withValues(alpha: 0.4)
-                  : ThemeColors.getProgressChipText(
-                      context,
-                    ).withValues(alpha: 0.4),
-              blurRadius: 20,
-              offset: const Offset(0, 8),
+  Widget _buildSummaryStatsGrid(
+    int steps,
+    String calories,
+    String distance,
+    String speed,
+    String time,
+  ) {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _buildSummaryItem(
+              Icons.timer_rounded,
+              Colors.orange,
+              time,
+              context.read<AppTranslations>().tr('duration'),
+            ),
+            _buildSummaryItem(
+              Icons.directions_run_rounded,
+              ThemeColors.getBrandAccent(context),
+              steps.toString(),
+              context.read<AppTranslations>().tr('steps'),
             ),
           ],
         ),
-        child: Icon(
-          isProud ? Icons.emoji_events_rounded : Icons.directions_run_rounded,
-          color: Colors.white,
-          size: 48,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSummaryStatsGrid(int steps, String calories, String distance) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: ThemeColors.getScaffoldSoft(context),
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: _buildSummaryItem(
-                  Icons.timer_rounded,
-                  Colors.orange,
-                  _formattedTime,
-                  'duration'.tr(context),
-                ),
-              ),
-              Container(
-                width: 1,
-                height: 40,
-                color: ThemeColors.getProgressTrack(context),
-              ),
-              Expanded(
-                child: _buildSummaryItem(
-                  Icons.do_not_step_rounded,
-                  ThemeColors.getBrandAccent(context),
-                  steps.toString(),
-                  'steps'.tr(context),
-                ),
-              ),
-            ],
-          ),
-          Padding(
-            padding: EdgeInsets.symmetric(vertical: 16),
-            child: Divider(
-              color: ThemeColors.getProgressTrack(context),
-              height: 1,
+        const SizedBox(height: 24),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _buildSummaryItem(
+              Icons.local_fire_department_rounded,
+              const Color(0xFFD45529),
+              calories,
+              'KCAL',
             ),
-          ),
-          Row(
-            children: [
-              Expanded(
-                child: _buildSummaryItem(
-                  Icons.local_fire_department_rounded,
-                  const Color(0xFFD45529),
-                  calories,
-                  'KCAL',
-                ),
-              ),
-              Container(
-                width: 1,
-                height: 40,
-                color: ThemeColors.getProgressTrack(context),
-              ),
-              Expanded(
-                child: _buildSummaryItem(
-                  Icons.route_rounded,
-                  const Color(0xFF2980B9),
-                  distance,
-                  'KM',
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
+            _buildSummaryItem(
+              Icons.route_rounded,
+              const Color(0xFF2980B9),
+              distance,
+              'KM',
+            ),
+            _buildSummaryItem(
+              Icons.speed_rounded,
+              const Color(0xFF8E44AD),
+              speed,
+              'KM/H',
+            ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -330,9 +307,7 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
       child: ElevatedButton(
         onPressed: () => Navigator.pop(context),
         style: ElevatedButton.styleFrom(
-          backgroundColor: isProud
-              ? ThemeColors.getBrandAccent(context)
-              : ThemeColors.getProgressChipText(context),
+          backgroundColor: ThemeColors.getBrandAccent(context),
           padding: const EdgeInsets.symmetric(vertical: 16),
           elevation: 0,
           shape: RoundedRectangleBorder(
@@ -448,7 +423,7 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
-                    Icons.do_not_step_rounded,
+                    Icons.directions_run_rounded,
                     color: _isTracking
                         ? ThemeColors.getProgressChipText(context)
                         : ThemeColors.getMutedText(context),
