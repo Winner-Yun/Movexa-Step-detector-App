@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:step_detector/core/localization/app_translations.dart';
 import 'package:step_detector/core/theme/theme_colors.dart';
 import 'package:step_detector/data/controller/activity_controller.dart';
 import 'package:step_detector/data/controller/motion_controller.dart';
@@ -9,7 +10,6 @@ import 'package:step_detector/modules/dashboard/step_dashboard_page.dart';
 import 'package:step_detector/modules/history/step_history_page.dart';
 import 'package:step_detector/modules/settings/step_settings_page.dart';
 import 'package:step_detector/modules/workout/step_workout_page.dart';
-import 'package:step_detector/core/localization/app_translations.dart';
 
 class StepMainApp extends StatefulWidget {
   const StepMainApp({super.key});
@@ -40,6 +40,8 @@ class _StepMainAppState extends State<StepMainApp> {
     final activityCtrl = context.read<ActivityController>();
     final motionCtrl = context.read<MotionController>();
 
+    activityCtrl.setFetching(true);
+
     await Future.wait([
       profileCtrl.fetchProfile(),
       settingsCtrl.fetchSettings(),
@@ -53,6 +55,8 @@ class _StepMainAppState extends State<StepMainApp> {
       activityCtrl.fetchWorkoutHistory(),
       activityCtrl.fetchMonthlyStepHistory(),
     ]);
+
+    activityCtrl.setFetching(false);
 
     if (!mounted) return;
     if (settingsCtrl.settings.runTrackingInBackground) {

@@ -22,16 +22,16 @@ class DailyStepRecord implements BaseModel {
       'date': date.millisecondsSinceEpoch,
       'steps': steps,
       'calories': calories,
-      'distance': distance,
+      'distance': distance.toDouble(),
     };
   }
 
   factory DailyStepRecord.fromMap(Map<String, dynamic> map) {
     return DailyStepRecord(
       date: DateTime.fromMillisecondsSinceEpoch(map['date']),
-      steps: map['steps']?.toInt() ?? 0,
-      calories: map['calories']?.toDouble() ?? 0.0,
-      distance: map['distance']?.toDouble() ?? 0.0,
+      steps: (map['steps'] as num?)?.toInt() ?? 0,
+      calories: (map['calories'] as num?)?.toDouble() ?? 0.0,
+      distance: (map['distance'] as num?)?.toDouble() ?? 0.0,
     );
   }
 }

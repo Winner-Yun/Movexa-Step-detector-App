@@ -15,12 +15,20 @@ class ActivityController extends ChangeNotifier {
   List<DailyStepRecord> _monthlyStepHistory = [];
 
   DailyStepRecord? _todayRecord;
+  bool _isFetching = false;
 
   List<WorkoutSession> get workoutHistory => _workoutHistory;
   List<DailyStepRecord> get monthlyStepHistory => _monthlyStepHistory;
   DailyStepRecord? get todayRecord => _todayRecord;
+  bool get isFetching => _isFetching;
 
   String get _todayDocId => DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+  void setFetching(bool val) {
+    _isFetching = val;
+    notifyListeners();
+  }
+
 
 
   Future<void> saveWorkoutSession(WorkoutSession session) async {

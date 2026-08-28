@@ -7,6 +7,8 @@ import 'package:step_detector/data/controller/motion_controller.dart';
 import 'package:step_detector/data/controller/profile_controller.dart';
 import 'package:step_detector/data/controller/settings_controller.dart';
 import 'package:step_detector/modules/profile/step_profile_edit_page.dart';
+import 'package:step_detector/widgets/skeleton.dart';
+import 'package:step_detector/widgets/set_goal_dialog.dart';
 
 class StepSettingsPage extends StatefulWidget {
   const StepSettingsPage({super.key});
@@ -16,188 +18,22 @@ class StepSettingsPage extends StatefulWidget {
 }
 
 class _StepSettingsPageState extends State<StepSettingsPage> {
-  final TextEditingController _goalInputController = TextEditingController();
-
   void _showSetGoalDialog(SettingsController settingsCtrl) {
-    String? errorMessage;
-
     showDialog(
       context: context,
       builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return Dialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(24),
-              ),
-              backgroundColor: ThemeColors.getSurface(context),
-              elevation: 8,
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _buildGoalDialogHeader(),
-                    SizedBox(height: 24),
-                    _buildGoalInput(errorMessage, setState),
-                    SizedBox(height: 28),
-                    _buildGoalDialogActions(context, setState, settingsCtrl),
-                  ],
-                ),
+        return SetGoalDialog(
+          currentGoal: settingsCtrl.settings.dailyStepGoal,
+          onGoalChanged: (newGoal) {
+            settingsCtrl.updateStepGoal(newGoal);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('${context.read<AppTranslations>().tr('newGoalSet')}$newGoal'),
               ),
             );
           },
         );
       },
-    );
-  }
-
-  Widget _buildGoalDialogHeader() {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: ThemeColors.getBrandAccent(context).withValues(alpha: 0.1),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            Icons.flag_rounded,
-            color: ThemeColors.getBrandAccent(context),
-            size: 36,
-          ),
-        ),
-        SizedBox(height: 16),
-        Text(
-          'setNewGoal'.tr(context),
-          style: TextStyle(
-            color: ThemeColors.getText(context),
-            fontWeight: FontWeight.w800,
-            fontSize: 22,
-          ),
-        ),
-        SizedBox(height: 6),
-        Text(
-          'setDailyStepGoal'.tr(context),
-          style: TextStyle(
-            color: ThemeColors.getMutedText(context),
-            fontWeight: FontWeight.w500,
-            fontSize: 14,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildGoalInput(String? errorMessage, StateSetter setState) {
-    return TextField(
-      controller: _goalInputController,
-      keyboardType: TextInputType.number,
-      textAlign: TextAlign.center,
-      cursorColor: ThemeColors.getBrandAccent(context),
-      style: TextStyle(
-        fontSize: 28,
-        fontWeight: FontWeight.w900,
-        color: ThemeColors.getBrandAccent(context),
-      ),
-      onChanged: (value) {
-        if (errorMessage != null) {
-          setState(() => errorMessage = null);
-        }
-      },
-      decoration: InputDecoration(
-        hintText: '10000',
-        hintStyle: TextStyle(
-          color: ThemeColors.getBrandAccent(context).withValues(alpha: 0.3),
-          fontSize: 24,
-          fontWeight: FontWeight.w700,
-        ),
-        filled: true,
-        fillColor: ThemeColors.getScaffoldSoft(context),
-        contentPadding: const EdgeInsets.symmetric(vertical: 16),
-        errorText: errorMessage,
-        errorStyle: TextStyle(
-          color: Colors.redAccent,
-          fontWeight: FontWeight.w600,
-          fontSize: 13,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide.none,
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Colors.redAccent, width: 1.5),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Colors.redAccent, width: 2),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildGoalDialogActions(
-    BuildContext context,
-    StateSetter setState,
-    SettingsController settingsCtrl,
-  ) {
-    return Row(
-      children: [
-        Expanded(
-          child: TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _goalInputController.clear();
-            },
-            style: TextButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-              ),
-            ),
-            child: Text(
-              'cancel'.tr(context),
-              style: TextStyle(
-                color: ThemeColors.getMutedText(context),
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-            ),
-          ),
-        ),
-        SizedBox(width: 12),
-        Expanded(
-          child: ElevatedButton(
-            onPressed: () {
-              final newGoal = int.tryParse(_goalInputController.text);
-              if (newGoal != null && newGoal > 0) {
-                settingsCtrl.updateStepGoal(newGoal);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('${'newGoalSet'.tr(context)}$newGoal'),
-                  ),
-                );
-                Navigator.pop(context);
-                _goalInputController.clear();
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: ThemeColors.getBrandAccent(context),
-              foregroundColor: Colors.white,
-              elevation: 0,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-              ),
-            ),
-            child: Text(
-              'save'.tr(context),
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
-          ),
-        ),
-      ],
     );
   }
 
@@ -352,29 +188,32 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(24, 0, 24, 40),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: 24),
-              _buildProfileCard(textTheme, profileCtrl),
-              SizedBox(height: 32),
+          child: profileCtrl.isLoading 
+              ? const ProfileSkeleton()
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 24),
+                    _buildProfileCard(textTheme, profileCtrl),
+                    SizedBox(height: 32),
 
-              _buildSectionTitle('account'.tr(context), textTheme),
-              _buildSettingsGroup([
-                _SettingsItemTile(
-                  context: context,
-                  icon: Icons.person_outline_rounded,
-                  title: 'personalInfo'.tr(context),
-                  onTap: _navigateToProfileEdit,
-                ),
-                _SettingsItemTile(
-                  context: context,
-                  icon: Icons.flag_outlined,
-                  title: 'stepGoal'.tr(context),
-                  trailingText: '${settingsCtrl.settings.dailyStepGoal}',
-                  onTap: () => _showSetGoalDialog(settingsCtrl),
-                ),
-              ]),
+                    _buildSectionTitle('account'.tr(context), textTheme),
+                    _buildSettingsGroup([
+                      _SettingsItemTile(
+                        context: context,
+                        icon: Icons.person_outline_rounded,
+                        title: 'personalInfo'.tr(context),
+                        onTap: _navigateToProfileEdit,
+                      ),
+                      _SettingsItemTile(
+                        context: context,
+                        icon: Icons.flag_outlined,
+                        title: 'stepGoal'.tr(context),
+                        trailingText: '${settingsCtrl.settings.dailyStepGoal}',
+                        onTap: () => _showSetGoalDialog(settingsCtrl),
+                      ),
+                    ]),
+
               SizedBox(height: 24),
 
               _buildSectionTitle('preferences'.tr(context), textTheme),
