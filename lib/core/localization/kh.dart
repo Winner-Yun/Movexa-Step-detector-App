@@ -4,7 +4,8 @@ const Map<String, String> khTranslations = {
   'trackingSteps': 'តាមដានជំហានរបស់អ្នក',
   'loginWithGoogle': 'ចូលគណនីតាម Google',
   'continueToApp': 'បន្តទៅកាន់កម្មវិធី',
-  'onboardingDesc': 'នេះគឺជាទំព័ររៀបចំគណនីរបស់អ្នក ដែលនឹងត្រូវបានអភិវឌ្ឍន៍បន្ថែមនៅជំហានបន្ទាប់។',
+  'onboardingDesc':
+      'នេះគឺជាទំព័ររៀបចំគណនីរបស់អ្នក ដែលនឹងត្រូវបានអភិវឌ្ឍន៍បន្ថែមនៅជំហានបន្ទាប់។',
   'setNewGoal': 'កំណត់គោលដៅថ្មី',
   'setDailyStepGoal': 'កំណត់គោលដៅជំហានប្រចាំថ្ងៃរបស់អ្នក',
   'cancel': 'បោះបង់',
@@ -75,4 +76,10 @@ const Map<String, String> khTranslations = {
   'trackingActive': 'ការតាមដានកំពុងសកម្ម',
   'dailyTrackRecord': 'កំណត់ត្រាតាមដានប្រចាំថ្ងៃ',
   'aboutUs': 'អំពីយើង',
+  'deleteWorkout': 'លុបការហាត់ប្រាណ',
+  'confirmDeleteWorkout': 'តើអ្នកពិតជាចង់លុបការហាត់ប្រាណនេះមែនទេ?',
+  'delete': 'លុប',
+  'saveImage': 'រក្សាទុករូបភាព',
+  'imageSaved': 'បានរក្សាទុករូបភាពក្នុងវិចិត្រសាល!',
+  'download': 'រក្សាទុក',
 };

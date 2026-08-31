@@ -7,6 +7,7 @@ import 'package:step_detector/data/controller/settings_controller.dart';
 import 'package:step_detector/data/models/daily_step_record.dart';
 import 'package:step_detector/data/models/workout_session.dart';
 import 'package:step_detector/modules/workout/step_workout_detail_page.dart';
+import 'package:step_detector/widgets/share_image_dialog.dart';
 import 'package:step_detector/widgets/skeleton.dart';
 
 class StepHistoryPage extends StatefulWidget {
@@ -28,6 +29,67 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
     final ampm = date.hour >= 12 ? 'PM' : 'AM';
     final min = date.minute.toString().padLeft(2, '0');
     return '${date.day}/${date.month}/${date.year}, $hour:$min $ampm';
+  }
+
+  void _showDeleteConfirmationDialog(
+    BuildContext context,
+    WorkoutSession session,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: ThemeColors.getSurface(context),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Text(
+            'deleteWorkout'.tr(context),
+            style: TextStyle(
+              color: ThemeColors.getText(context),
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: Text(
+            'confirmDeleteWorkout'.tr(context),
+            style: TextStyle(color: ThemeColors.getMutedText(context)),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                'cancel'.tr(context),
+                style: TextStyle(
+                  color: ThemeColors.getMutedText(context),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                context.read<ActivityController>().deleteWorkoutSession(
+                  session.id,
+                );
+                Navigator.pop(context);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.redAccent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: Text(
+                'delete'.tr(context),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -197,21 +259,50 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(
-                  width: 4,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    color: ThemeColors.getBrandAccent(context),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
+                Row(
+                  children: [
+                    Container(
+                      width: 4,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        color: ThemeColors.getBrandAccent(context),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      '${'summaryFor'.tr(context)} $_selectedDay',
+                      style: textTheme.titleMedium?.copyWith(
+                        color: ThemeColors.getText(context),
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox(width: 8),
-                Text(
-                  '${'summaryFor'.tr(context)} $_selectedDay',
-                  style: textTheme.titleMedium?.copyWith(
-                    color: ThemeColors.getText(context),
-                    fontWeight: FontWeight.w900,
+                IconButton(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => ShareDailySummaryDialog(
+                        record: selectedDayData,
+                        stepGoal: context
+                            .read<SettingsController>()
+                            .settings
+                            .dailyStepGoal,
+                      ),
+                    );
+                  },
+                  icon: Icon(
+                    Icons.download_rounded,
+                    color: ThemeColors.getBrandAccent(context),
+                  ),
+                  tooltip: 'saveImage'.tr(context),
+                  style: IconButton.styleFrom(
+                    backgroundColor: ThemeColors.getBrandAccent(
+                      context,
+                    ).withValues(alpha: 0.1),
                   ),
                 ),
               ],
@@ -439,7 +530,8 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
   Widget _buildDailySummaryCard(DailyStepRecord record, TextTheme textTheme) {
     final goal = context.read<SettingsController>().settings.dailyStepGoal;
     final now = DateTime.now();
-    final isToday = record.date.year == now.year &&
+    final isToday =
+        record.date.year == now.year &&
         record.date.month == now.month &&
         record.date.day == now.day;
     return Container(
@@ -489,13 +581,13 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                       record.isGoalReached(goal)
                           ? Icons.emoji_events_rounded
                           : isToday
-                              ? Icons.directions_walk_rounded
-                              : Icons.close_rounded,
+                          ? Icons.directions_walk_rounded
+                          : Icons.close_rounded,
                       color: record.isGoalReached(goal)
                           ? ThemeColors.getProgressChipText(context)
                           : isToday
-                              ? ThemeColors.getMutedText(context)
-                              : Colors.redAccent,
+                          ? ThemeColors.getMutedText(context)
+                          : Colors.redAccent,
                       size: 16,
                     ),
                     SizedBox(width: 6),
@@ -503,14 +595,14 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                       record.isGoalReached(goal)
                           ? 'goalReachedShort'.tr(context)
                           : isToday
-                              ? 'inProgress'.tr(context)
-                              : 'failed'.tr(context),
+                          ? 'inProgress'.tr(context)
+                          : 'failed'.tr(context),
                       style: TextStyle(
                         color: record.isGoalReached(goal)
                             ? ThemeColors.getProgressChipText(context)
                             : isToday
-                                ? ThemeColors.getMutedText(context)
-                                : Colors.redAccent,
+                            ? ThemeColors.getMutedText(context)
+                            : Colors.redAccent,
                         fontWeight: FontWeight.w800,
                         fontSize: 12,
                       ),
@@ -600,6 +692,23 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                 ),
               ],
             ),
+          ),
+
+          SizedBox(height: 24),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset('assets/Movexa.png', width: 20, height: 20),
+              SizedBox(width: 8),
+              Text(
+                'Movexa',
+                style: TextStyle(
+                  color: ThemeColors.getText(context),
+                  fontWeight: FontWeight.w800,
+                  fontSize: 14,
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -698,13 +807,13 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                       Row(
                         children: [
                           Icon(
-                            Icons.timer_outlined,
+                            Icons.route_rounded,
                             color: ThemeColors.getBrandAccent(context),
                             size: 20,
                           ),
                           SizedBox(width: 8),
                           Text(
-                            session.title,
+                            '${session.distance.toStringAsFixed(2)} KM',
                             style: TextStyle(
                               color: ThemeColors.getText(context),
                               fontWeight: FontWeight.w800,
@@ -713,13 +822,31 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                           ),
                         ],
                       ),
-                      Text(
-                        '${session.steps}',
-                        style: TextStyle(
-                          color: ThemeColors.getBrandAccent(context),
-                          fontWeight: FontWeight.w900,
-                          fontSize: 18,
-                        ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            '${session.steps}',
+                            style: TextStyle(
+                              color: ThemeColors.getBrandAccent(context),
+                              fontWeight: FontWeight.w900,
+                              fontSize: 18,
+                            ),
+                          ),
+                          SizedBox(width: 8),
+                          IconButton(
+                            icon: Icon(
+                              Icons.delete_outline_rounded,
+                              color: Colors.redAccent,
+                              size: 22,
+                            ),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                            onPressed: () {
+                              _showDeleteConfirmationDialog(context, session);
+                            },
+                          ),
+                        ],
                       ),
                     ],
                   ),

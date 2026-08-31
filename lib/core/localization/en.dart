@@ -75,4 +75,11 @@ const Map<String, String> enTranslations = {
   'trackingActive': 'Tracking active',
   'dailyTrackRecord': 'Daily Track Record',
   'aboutUs': 'About Us',
+  'deleteWorkout': 'Delete Workout',
+  'confirmDeleteWorkout':
+      'Are you sure you want to delete this workout session?',
+  'delete': 'Delete',
+  'saveImage': 'Save Image',
+  'imageSaved': 'Image saved to gallery!',
+  'download': 'Download',
 };

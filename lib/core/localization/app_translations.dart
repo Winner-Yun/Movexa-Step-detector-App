@@ -27,8 +27,12 @@ class AppTranslations extends ChangeNotifier {
 }
 
 extension TranslationExtension on String {
-  String tr(BuildContext context) {
-    return context.watch<AppTranslations>().tr(this);
+  String tr(BuildContext context, {bool listen = true}) {
+    if (listen) {
+      return context.watch<AppTranslations>().tr(this);
+    } else {
+      return context.read<AppTranslations>().tr(this);
+    }
   }
 }
 

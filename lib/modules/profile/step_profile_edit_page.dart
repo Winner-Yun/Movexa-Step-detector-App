@@ -173,13 +173,13 @@ class _StepProfileEditPageState extends State<StepProfileEditPage> {
       keyboardType: isNumber ? TextInputType.number : TextInputType.text,
       validator: (value) {
         if (value == null || value.trim().isEmpty) {
-          if (!isNumber) return 'requiredField'.tr(context);
+          if (!isNumber) return 'requiredField'.tr(context, listen: false);
           return null;
         }
         if (isNumber) {
           final parsed = double.tryParse(value);
           if (parsed == null || parsed <= 0) {
-            return 'invalidNumber'.tr(context);
+            return 'invalidNumber'.tr(context, listen: false);
           }
         }
         return null;
