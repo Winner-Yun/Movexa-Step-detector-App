@@ -62,6 +62,7 @@ const Map<String, String> khTranslations = {
   'monthlyAvg': 'មធ្យមប្រចាំខែ',
   'goalReachedShort': 'សម្រេចគោលដៅ',
   'inProgress': 'កំពុងដំណើរការ',
+  'failed': 'បរាជ័យ',
   'pleaseEnterValidNumber': 'សូមបញ្ចូលចំនួនឲ្យបានត្រឹមត្រូវ',
   'hello': 'សួស្តី!',
   'keepGoing': 'បន្តដំណើរ! ថ្ងៃនេះល្អណាស់',

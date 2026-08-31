@@ -118,6 +118,18 @@ class ActivityController extends ChangeNotifier {
     );
 
     _todayRecord = record;
+
+    final index = _monthlyStepHistory.indexWhere((r) =>
+        r.date.year == record.date.year &&
+        r.date.month == record.date.month &&
+        r.date.day == record.date.day);
+
+    if (index != -1) {
+      _monthlyStepHistory[index] = record;
+    } else {
+      _monthlyStepHistory.insert(0, record);
+    }
+
     notifyListeners();
 
     try {

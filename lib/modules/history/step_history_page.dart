@@ -4,6 +4,8 @@ import 'package:step_detector/core/localization/app_translations.dart';
 import 'package:step_detector/core/theme/theme_colors.dart';
 import 'package:step_detector/data/controller/activity_controller.dart';
 import 'package:step_detector/data/controller/settings_controller.dart';
+import 'package:step_detector/data/models/daily_step_record.dart';
+import 'package:step_detector/data/models/workout_session.dart';
 import 'package:step_detector/modules/workout/step_workout_detail_page.dart';
 import 'package:step_detector/widgets/skeleton.dart';
 
@@ -160,7 +162,10 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
     );
   }
 
-  Widget _buildDailyView(TextTheme textTheme, List<dynamic> monthlyData) {
+  Widget _buildDailyView(
+    TextTheme textTheme,
+    List<DailyStepRecord> monthlyData,
+  ) {
     if (monthlyData.isEmpty) {
       return Center(
         child: Text(
@@ -222,7 +227,7 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
     );
   }
 
-  Widget _buildMonthChart(TextTheme textTheme, List<dynamic> data) {
+  Widget _buildMonthChart(TextTheme textTheme, List<DailyStepRecord> data) {
     final goal = context.read<SettingsController>().settings.dailyStepGoal;
     final avgSteps =
         data.fold<num>(0, (sum, record) => sum + record.steps) ~/ data.length;
@@ -431,8 +436,12 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
     );
   }
 
-  Widget _buildDailySummaryCard(dynamic record, TextTheme textTheme) {
+  Widget _buildDailySummaryCard(DailyStepRecord record, TextTheme textTheme) {
     final goal = context.read<SettingsController>().settings.dailyStepGoal;
+    final now = DateTime.now();
+    final isToday = record.date.year == now.year &&
+        record.date.month == now.month &&
+        record.date.day == now.day;
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -479,21 +488,29 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                     Icon(
                       record.isGoalReached(goal)
                           ? Icons.emoji_events_rounded
-                          : Icons.directions_walk_rounded,
+                          : isToday
+                              ? Icons.directions_walk_rounded
+                              : Icons.close_rounded,
                       color: record.isGoalReached(goal)
                           ? ThemeColors.getProgressChipText(context)
-                          : ThemeColors.getMutedText(context),
+                          : isToday
+                              ? ThemeColors.getMutedText(context)
+                              : Colors.redAccent,
                       size: 16,
                     ),
                     SizedBox(width: 6),
                     Text(
                       record.isGoalReached(goal)
                           ? 'goalReachedShort'.tr(context)
-                          : 'inProgress'.tr(context),
+                          : isToday
+                              ? 'inProgress'.tr(context)
+                              : 'failed'.tr(context),
                       style: TextStyle(
                         color: record.isGoalReached(goal)
                             ? ThemeColors.getProgressChipText(context)
-                            : ThemeColors.getMutedText(context),
+                            : isToday
+                                ? ThemeColors.getMutedText(context)
+                                : Colors.redAccent,
                         fontWeight: FontWeight.w800,
                         fontSize: 12,
                       ),
@@ -502,7 +519,7 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                 ),
               ),
               Text(
-                '${'stepGoal'.tr(context)}: ${record.target}',
+                '${'stepGoal'.tr(context)}: $goal',
                 style: TextStyle(
                   color: ThemeColors.getMutedText(context),
                   fontWeight: FontWeight.w700,
@@ -532,7 +549,7 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
               Column(
                 children: [
                   Icon(
-                    Icons.do_not_step_rounded,
+                    Icons.directions_run_rounded,
                     color: record.isGoalReached(goal)
                         ? ThemeColors.getProgressValue(context)
                         : ThemeColors.getBrandAccent(context),
@@ -631,7 +648,7 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
     );
   }
 
-  Widget _buildSessionView(TextTheme textTheme, List<dynamic> sessions) {
+  Widget _buildSessionView(TextTheme textTheme, List<WorkoutSession> sessions) {
     if (sessions.isEmpty) {
       return Center(
         child: Text(

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:step_detector/core/localization/app_translations.dart';
 import 'package:step_detector/core/theme/theme_colors.dart';
 import 'package:step_detector/data/controller/profile_controller.dart';
-import 'package:step_detector/core/localization/app_translations.dart';
 
 class StepProfileEditPage extends StatefulWidget {
   const StepProfileEditPage({super.key});
@@ -11,6 +11,7 @@ class StepProfileEditPage extends StatefulWidget {
 }
 
 class _StepProfileEditPageState extends State<StepProfileEditPage> {
+  final _formKey = GlobalKey<FormState>();
   late TextEditingController _nameController;
   late TextEditingController _bioController;
   late TextEditingController _ageController;
@@ -46,6 +47,7 @@ class _StepProfileEditPageState extends State<StepProfileEditPage> {
     final profileCtrl = context.read<ProfileController>();
     final currentProfile = profileCtrl.currentProfile;
     if (currentProfile == null) return;
+    if (!_formKey.currentState!.validate()) return;
 
     final updatedProfile = currentProfile.copyWith(
       name: _nameController.text,
@@ -58,9 +60,13 @@ class _StepProfileEditPageState extends State<StepProfileEditPage> {
     final success = await profileCtrl.saveProfile(updatedProfile);
 
     if (success && mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(context.read<AppTranslations>().tr('savedSuccessfully'))));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            context.read<AppTranslations>().tr('savedSuccessfully'),
+          ),
+        ),
+      );
       Navigator.pop(context);
     }
   }
@@ -84,63 +90,73 @@ class _StepProfileEditPageState extends State<StepProfileEditPage> {
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
-        child: Column(
-          children: [
-            _buildPremiumInputField(
-              'name'.tr(context),
-              Icons.person_rounded,
-              _nameController,
-            ),
-            SizedBox(height: 16),
-            _buildPremiumInputField(
-              'aboutMe'.tr(context),
-              Icons.info_rounded,
-              _bioController,
-            ),
-            SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildPremiumInputField(
-                    'age'.tr(context),
-                    Icons.cake_rounded,
-                    _ageController,
-                    isNumber: true,
-                  ),
-                ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: _buildPremiumInputField(
-                    'weight'.tr(context),
-                    Icons.monitor_weight_rounded,
-                    _weightController,
-                    isNumber: true,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 40),
-            ElevatedButton(
-              onPressed: isSaving ? null : _handleSave,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: ThemeColors.getBrandAccent(context),
-                minimumSize: const Size(double.infinity, 56),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              _buildPremiumInputField(
+                'name'.tr(context),
+                Icons.person_rounded,
+                _nameController,
               ),
-              child: isSaving
-                  ? const CircularProgressIndicator(color: Colors.white)
-                  : Text(
-                      'save'.tr(context),
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+              SizedBox(height: 16),
+              _buildPremiumInputField(
+                'aboutMe'.tr(context),
+                Icons.info_rounded,
+                _bioController,
+              ),
+              SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildPremiumInputField(
+                      'age'.tr(context),
+                      Icons.cake_rounded,
+                      _ageController,
+                      isNumber: true,
                     ),
-            ),
-          ],
+                  ),
+                  SizedBox(width: 16),
+                  Expanded(
+                    child: _buildPremiumInputField(
+                      '${'weight'.tr(context)} (kg)',
+                      Icons.monitor_weight_rounded,
+                      _weightController,
+                      isNumber: true,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 16),
+              _buildPremiumInputField(
+                '${'height'.tr(context)} (cm)',
+                Icons.height_rounded,
+                _heightController,
+                isNumber: true,
+              ),
+              SizedBox(height: 40),
+              ElevatedButton(
+                onPressed: isSaving ? null : _handleSave,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: ThemeColors.getBrandAccent(context),
+                  minimumSize: const Size(double.infinity, 56),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                child: isSaving
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : Text(
+                        'save'.tr(context),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -152,9 +168,22 @@ class _StepProfileEditPageState extends State<StepProfileEditPage> {
     TextEditingController controller, {
     bool isNumber = false,
   }) {
-    return TextField(
+    return TextFormField(
       controller: controller,
       keyboardType: isNumber ? TextInputType.number : TextInputType.text,
+      validator: (value) {
+        if (value == null || value.trim().isEmpty) {
+          if (!isNumber) return 'requiredField'.tr(context);
+          return null;
+        }
+        if (isNumber) {
+          final parsed = double.tryParse(value);
+          if (parsed == null || parsed <= 0) {
+            return 'invalidNumber'.tr(context);
+          }
+        }
+        return null;
+      },
       decoration: InputDecoration(
         prefixIcon: Icon(icon, color: ThemeColors.getBrandAccent(context)),
         labelText: hint,
@@ -163,6 +192,25 @@ class _StepProfileEditPageState extends State<StepProfileEditPage> {
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
           borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
+          borderSide: BorderSide(
+            color: ThemeColors.getPrimaryGradientStart(context),
+            width: 2,
+          ),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
+          borderSide: const BorderSide(color: Colors.redAccent, width: 2),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
+          borderSide: const BorderSide(color: Colors.redAccent, width: 2),
         ),
       ),
     );

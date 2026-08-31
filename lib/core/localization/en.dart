@@ -62,6 +62,7 @@ const Map<String, String> enTranslations = {
   'monthlyAvg': 'Monthly Avg',
   'goalReachedShort': 'Goal Reached',
   'inProgress': 'In Progress',
+  'failed': 'Failed',
   'pleaseEnterValidNumber': 'Please enter a valid number',
   'hello': 'Hello!',
   'keepGoing': 'Keep going! You are doing great today.',

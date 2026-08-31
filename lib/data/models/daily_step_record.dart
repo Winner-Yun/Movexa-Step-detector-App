@@ -14,7 +14,8 @@ class DailyStepRecord implements BaseModel {
 
   bool isGoalReached(int goal) => steps >= goal;
 
-  double getProgress(int goal) => (steps / goal).clamp(0.0, 1.0);
+  double getProgress(int goal) =>
+      goal > 0 ? (steps / goal).clamp(0.0, 1.0) : (steps > 0 ? 1.0 : 0.0);
 
   @override
   Map<String, dynamic> toMap() {
