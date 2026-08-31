@@ -29,4 +29,32 @@ class AppColors {
   static const Color iconChip = Color(0xFFFFEDB8);
 
   static const Color positiveText = Color(0xFFB67918);
+
+  // --- Dark Mode Colors ---
+  static const Color textLight = Color(0xFFF2EFE9);
+  static const Color mutedTextLight = Color(0xFFA39E93);
+
+  static const Color scaffoldDark = Color(0xFF161513);
+  static const Color scaffoldSoftDark = Color(0xFF1E1C1A);
+  static const Color surfaceDark = Color(0xFF252320);
+
+  static const Color navBackgroundDark = Color(0xFF1E1C1A);
+  static const Color navSelectedDark = Color(0xFFBF8923); 
+  static const Color navUnselectedDark = Color(0xFF8A8478);
+
+  static const Color brandAccentDark = Color(0xFFC58D20); 
+  static const Color primaryGradientStartDark = Color(0xFFB27A17); 
+  static const Color primaryGradientEndDark = Color(0xFFD9A334); 
+
+  static const Color progressTrackDark = Color(0xFF36332E);
+  static const Color progressValueDark = Color(0xFF94D24C); 
+  static const Color progressChipDark = Color(0xFF384B22);
+  static const Color progressChipTextDark = Color(0xFFD1F596);
+
+  static const Color cardNeutralDark = Color(0xFF2B2925);
+  static const Color activityCardDark = Color(0xFF272521);
+  static const Color iconChipDark = Color(0xFF4C4229);
+
+  static const Color positiveTextDark = Color(0xFFB67918); 
 }
+

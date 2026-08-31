@@ -47,5 +47,9 @@
 	<true/>
 	<key>NSMotionUsageKey</key>
 	<string>Step Detector reads your step count to track your daily activity.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Step Detector needs access to save history images to your photo library.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Step Detector needs access to save history images to your photo library.</string>
 </dict>
 </plist>
