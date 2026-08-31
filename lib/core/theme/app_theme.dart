@@ -14,11 +14,21 @@ class AppTheme {
         elevation: 0,
       ),
       colorScheme: ColorScheme.fromSeed(
-        seedColor: AppColors.primaryYellow,
-        primary: AppColors.primaryYellow,
+        seedColor: AppColors.primaryGradientEnd,
+        primary: AppColors.primaryGradientEnd,
         onPrimary: AppColors.darkText,
         surface: AppColors.surface,
         onSurface: AppColors.darkText,
+      ),
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: AppColors.primaryGradientEnd,
+        contentTextStyle: GoogleFonts.nokora(
+          color: AppColors.darkText,
+          fontWeight: FontWeight.w700,
+        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        elevation: 8,
       ),
       extensions: const [AppThemeExtension.light],
       textTheme: GoogleFonts.kantumruyProTextTheme().copyWith(
@@ -59,6 +69,16 @@ class AppTheme {
         onPrimary: AppColors.textLight,
         surface: AppColors.surfaceDark,
         onSurface: AppColors.textLight,
+      ),
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: AppColors.primaryGradientEnd,
+        contentTextStyle: GoogleFonts.nokora(
+          color: AppColors.darkText, // Keep text dark on yellow bg
+          fontWeight: FontWeight.w700,
+        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        elevation: 8,
       ),
       extensions: const [AppThemeExtension.dark],
       textTheme:

@@ -26,7 +26,7 @@ Movexa is a Flutter-based fitness application designed to track your daily steps
 
 1. **Clone the repository**
    ```bash
-   git clone <your-repo-url>
+   git clone <repo-url>
    cd step_detector
    ```
 

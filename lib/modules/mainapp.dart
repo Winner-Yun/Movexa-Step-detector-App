@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:step_detector/core/localization/app_translations.dart';
 import 'package:step_detector/core/theme/theme_colors.dart';
@@ -20,6 +21,7 @@ class StepMainApp extends StatefulWidget {
 
 class _StepMainAppState extends State<StepMainApp> {
   int _selectedTab = 0;
+  static const _channel = MethodChannel('com.example.step_detector/widget');
 
   late final List<Widget> _pages = [
     StepDashboardPage(onSeeAll: () => _onSelected(2)),
@@ -31,7 +33,29 @@ class _StepMainAppState extends State<StepMainApp> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _bootstrap());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _bootstrap();
+      _setupWidgetChannel();
+    });
+  }
+
+  Future<void> _setupWidgetChannel() async {
+    _channel.setMethodCallHandler((call) async {
+      if (call.method == 'switchToWorkoutMode') {
+        if (mounted) {
+          _onSelected(1);
+        }
+      }
+    });
+
+    try {
+      final bool? pendingLaunch = await _channel.invokeMethod('checkWidgetLaunch');
+      if (pendingLaunch == true && mounted) {
+        _onSelected(1);
+      }
+    } catch (e) {
+      // ignore errors
+    }
   }
 
   Future<void> _bootstrap() async {

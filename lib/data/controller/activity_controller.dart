@@ -50,6 +50,25 @@ class ActivityController extends ChangeNotifier {
     }
   }
 
+  Future<void> deleteWorkoutSession(String sessionId) async {
+    final user = _auth.currentUser;
+    if (user == null) return;
+
+    try {
+      await _firestore
+          .collection('users')
+          .doc(user.uid)
+          .collection('workouts')
+          .doc(sessionId)
+          .delete();
+
+      _workoutHistory.removeWhere((session) => session.id == sessionId);
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error deleting workout: $e');
+    }
+  }
+
   Future<void> fetchWorkoutHistory() async {
     final user = _auth.currentUser;
     if (user == null) return;
@@ -118,6 +137,18 @@ class ActivityController extends ChangeNotifier {
     );
 
     _todayRecord = record;
+
+    final index = _monthlyStepHistory.indexWhere((r) =>
+        r.date.year == record.date.year &&
+        r.date.month == record.date.month &&
+        r.date.day == record.date.day);
+
+    if (index != -1) {
+      _monthlyStepHistory[index] = record;
+    } else {
+      _monthlyStepHistory.insert(0, record);
+    }
+
     notifyListeners();
 
     try {

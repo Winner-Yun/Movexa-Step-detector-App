@@ -62,6 +62,7 @@ const Map<String, String> enTranslations = {
   'monthlyAvg': 'Monthly Avg',
   'goalReachedShort': 'Goal Reached',
   'inProgress': 'In Progress',
+  'failed': 'Failed',
   'pleaseEnterValidNumber': 'Please enter a valid number',
   'hello': 'Hello!',
   'keepGoing': 'Keep going! You are doing great today.',
@@ -73,4 +74,12 @@ const Map<String, String> enTranslations = {
   'trackingStopped': 'Tracking • stopped',
   'trackingActive': 'Tracking active',
   'dailyTrackRecord': 'Daily Track Record',
+  'aboutUs': 'About Us',
+  'deleteWorkout': 'Delete Workout',
+  'confirmDeleteWorkout':
+      'Are you sure you want to delete this workout session?',
+  'delete': 'Delete',
+  'saveImage': 'Save Image',
+  'imageSaved': 'Image saved to gallery!',
+  'download': 'Download',
 };

@@ -7,6 +7,7 @@ import 'package:step_detector/data/controller/motion_controller.dart';
 import 'package:step_detector/data/controller/profile_controller.dart';
 import 'package:step_detector/data/controller/settings_controller.dart';
 import 'package:step_detector/modules/profile/step_profile_edit_page.dart';
+import 'package:step_detector/modules/settings/about_us_page.dart';
 import 'package:step_detector/widgets/skeleton.dart';
 import 'package:step_detector/widgets/set_goal_dialog.dart';
 
@@ -244,6 +245,19 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
                     );
                   },
                 ),
+                _SettingsItemTile(
+                  context: context,
+                  icon: Icons.info_outline_rounded,
+                  title: 'aboutUs'.tr(context),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AboutUsPage(),
+                      ),
+                    );
+                  },
+                ),
               ]),
 
               SizedBox(height: 40),
@@ -338,6 +352,34 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
+
+                if (profile != null && (profile.age > 0 || profile.weight > 0 || profile.height > 0)) ...[
+                  SizedBox(height: 12),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      if (profile.age > 0)
+                        _buildProfileStatBadge(
+                          context,
+                          Icons.cake_rounded,
+                          '${profile.age}',
+                        ),
+                      if (profile.weight > 0)
+                        _buildProfileStatBadge(
+                          context,
+                          Icons.monitor_weight_rounded,
+                          '${profile.weight} kg',
+                        ),
+                      if (profile.height > 0)
+                        _buildProfileStatBadge(
+                          context,
+                          Icons.height_rounded,
+                          '${profile.height} cm',
+                        ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ),
@@ -346,6 +388,31 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
             icon: Icon(Icons.edit_rounded, color: Colors.white),
             style: IconButton.styleFrom(
               backgroundColor: Colors.white.withValues(alpha: 0.2),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProfileStatBadge(BuildContext context, IconData icon, String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: Colors.white, size: 14),
+          SizedBox(width: 4),
+          Text(
+            text,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
             ),
           ),
         ],
@@ -512,7 +579,7 @@ class _SettingsItemTileState extends State<_SettingsItemTile> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
                   color: _localSwitchValue
-                      ? ThemeColors.getBrandAccent(context)
+                      ? ThemeColors.getPrimaryGradientStart(context)
                       : ThemeColors.getMutedText(
                           context,
                         ).withValues(alpha: 0.2),

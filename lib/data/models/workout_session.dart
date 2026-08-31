@@ -61,7 +61,10 @@ class WorkoutSession implements BaseModel {
       distance: (map['distance'] as num?)?.toDouble() ?? 0.0,
       averagePace: map['averagePace'] ?? '0:00',
       speedKmh: (map['speedKmh'] as num?)?.toDouble() ?? 0.0,
-      paceChartData: List<double>.from(map['paceChartData'] ?? []),
+      paceChartData: (map['paceChartData'] as List<dynamic>?)
+              ?.map((e) => (e as num).toDouble())
+              .toList() ??
+          [],
     );
   }
 }
