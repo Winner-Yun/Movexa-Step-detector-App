@@ -7,6 +7,7 @@ import 'package:step_detector/data/controller/motion_controller.dart';
 import 'package:step_detector/data/controller/profile_controller.dart';
 import 'package:step_detector/data/controller/settings_controller.dart';
 import 'package:step_detector/modules/profile/step_profile_edit_page.dart';
+import 'package:step_detector/modules/settings/about_us_page.dart';
 import 'package:step_detector/widgets/skeleton.dart';
 import 'package:step_detector/widgets/set_goal_dialog.dart';
 
@@ -241,6 +242,19 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
                     final newLang = val ? 'km' : 'en';
                     settingsCtrl.updateSettings(
                       settingsCtrl.settings.copyWith(language: newLang),
+                    );
+                  },
+                ),
+                _SettingsItemTile(
+                  context: context,
+                  icon: Icons.info_outline_rounded,
+                  title: 'aboutUs'.tr(context),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AboutUsPage(),
+                      ),
                     );
                   },
                 ),

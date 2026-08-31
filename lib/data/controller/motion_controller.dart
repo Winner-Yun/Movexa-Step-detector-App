@@ -4,6 +4,7 @@ import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:step_detector/core/utils/widget_updater.dart';
 import 'package:step_detector/data/controller/activity_controller.dart';
 
 enum MotionStatus { idle, walking, stopped, unknown }
@@ -27,6 +28,8 @@ class MotionController extends ChangeNotifier {
   int _liveSteps = 0;
 
   StreamSubscription<StepCount>? _workoutStepSub;
+  Timer? _workoutTimer;
+  int _workoutDurationSeconds = 0;
   bool _isWorkoutActive = false;
   int? _workoutBaselineSteps;
   int _workoutSteps = 0;
@@ -39,7 +42,14 @@ class MotionController extends ChangeNotifier {
 
   bool get isWorkoutActive => _isWorkoutActive;
   int get workoutSteps => _workoutSteps;
+  int get workoutDurationSeconds => _workoutDurationSeconds;
   bool get workoutPermissionDenied => _workoutPermissionDenied;
+
+  String get formattedWorkoutTime {
+    final m = (_workoutDurationSeconds ~/ 60).toString().padLeft(2, '0');
+    final s = (_workoutDurationSeconds % 60).toString().padLeft(2, '0');
+    return '$m:$s';
+  }
 
   void attach(ActivityController activityCtrl) {
     _activityCtrl = activityCtrl;
@@ -80,6 +90,7 @@ class MotionController extends ChangeNotifier {
 
     _isTracking = true;
     notifyListeners();
+    _updateDailyWidget();
   }
 
   void stop() {
@@ -111,14 +122,22 @@ class MotionController extends ChangeNotifier {
     _workoutPermissionDenied = false;
     _workoutBaselineSteps = null;
     _workoutSteps = 0;
+    _workoutDurationSeconds = 0;
 
     _workoutStepSub = Pedometer.stepCountStream.listen(
       _onWorkoutStepCount,
       onError: (Object e) => debugPrint('Workout step stream error: $e'),
     );
 
+    _workoutTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      _workoutDurationSeconds++;
+      notifyListeners();
+      _updateWorkoutWidget();
+    });
+
     _isWorkoutActive = true;
     notifyListeners();
+    _updateWorkoutWidget();
     return true;
   }
 
@@ -127,11 +146,15 @@ class MotionController extends ChangeNotifier {
 
     _workoutStepSub?.cancel();
     _workoutStepSub = null;
+    _workoutTimer?.cancel();
+    _workoutTimer = null;
     _workoutBaselineSteps = null;
     _workoutSteps = 0;
+    _workoutDurationSeconds = 0;
     _isWorkoutActive = false;
     notifyListeners();
 
+    _updateDailyWidget();
     return finalSteps;
   }
 
@@ -139,6 +162,7 @@ class MotionController extends ChangeNotifier {
     _workoutBaselineSteps ??= event.steps;
     _workoutSteps = event.steps - _workoutBaselineSteps!;
     notifyListeners();
+    _updateWorkoutWidget();
   }
 
   void _onStepCount(StepCount event) {
@@ -161,6 +185,9 @@ class MotionController extends ChangeNotifier {
     );
 
     notifyListeners();
+    if (!_isWorkoutActive) {
+      _updateDailyWidget();
+    }
   }
 
   void _onPedestrianStatus(PedestrianStatus event) {
@@ -172,12 +199,35 @@ class MotionController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void _updateDailyWidget() {
+    final totalSteps = todaySteps;
+    WidgetUpdater.updateDailyStats(
+      steps: totalSteps,
+      cal: totalSteps * kcalPerStep,
+      km: totalSteps * kmPerStep,
+    );
+  }
+
+  void _updateWorkoutWidget() {
+    final speed = _workoutDurationSeconds > 0 
+      ? ((_workoutSteps * kmPerStep) / (_workoutDurationSeconds / 3600))
+      : 0.0;
+
+    WidgetUpdater.updateWorkoutStats(
+      time: formattedWorkoutTime,
+      steps: _workoutSteps,
+      cal: _workoutSteps * kcalPerStep,
+      km: _workoutSteps * kmPerStep,
+      speed: speed,
+    );
+  }
+
   @override
   void dispose() {
     _stepCountSub?.cancel();
     _statusSub?.cancel();
     _workoutStepSub?.cancel();
+    _workoutTimer?.cancel();
     super.dispose();
   }
 }
-

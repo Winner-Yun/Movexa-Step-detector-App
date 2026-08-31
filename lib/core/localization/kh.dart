@@ -74,4 +74,5 @@ const Map<String, String> khTranslations = {
   'trackingStopped': 'ការតាមដាន • បានបញ្ឈប់',
   'trackingActive': 'ការតាមដានកំពុងសកម្ម',
   'dailyTrackRecord': 'កំណត់ត្រាតាមដានប្រចាំថ្ងៃ',
+  'aboutUs': 'អំពីយើង',
 };

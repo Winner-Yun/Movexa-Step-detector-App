@@ -74,4 +74,5 @@ const Map<String, String> enTranslations = {
   'trackingStopped': 'Tracking • stopped',
   'trackingActive': 'Tracking active',
   'dailyTrackRecord': 'Daily Track Record',
+  'aboutUs': 'About Us',
 };
