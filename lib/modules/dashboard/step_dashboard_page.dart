@@ -46,7 +46,11 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
           currentGoal: settingsCtrl.settings.dailyStepGoal,
           onGoalChanged: (newGoal) {
             settingsCtrl.updateStepGoal(newGoal);
-            _showSuccessDialog(context, newGoal);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('${context.read<AppTranslations>().tr('newGoalSet')}$newGoal'),
+              ),
+            );
           },
         );
       },
@@ -78,83 +82,7 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
     );
   }
 
-  void _showSuccessDialog(BuildContext context, int newGoal) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
-          ),
-          backgroundColor: ThemeColors.getSurface(context),
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: ThemeColors.getProgressValue(
-                      context,
-                    ).withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.check_circle_rounded,
-                    color: ThemeColors.getProgressValue(context),
-                    size: 48,
-                  ),
-                ),
-                SizedBox(height: 20),
-                Text(
-                  'savedSuccessfully'.tr(context),
-                  style: TextStyle(
-                    color: ThemeColors.getText(context),
-                    fontWeight: FontWeight.w800,
-                    fontSize: 22,
-                  ),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  '${'newGoalSet'.tr(context)}$newGoal',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: ThemeColors.getMutedText(context),
-                    fontWeight: FontWeight.w500,
-                    fontSize: 16,
-                  ),
-                ),
-                SizedBox(height: 24),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () => Navigator.pop(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ThemeColors.getBrandAccent(context),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      elevation: 0,
-                    ),
-                    child: Text(
-                      'close'.tr(context),
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
+
 
   Widget _buildGreeting(TextTheme textTheme, String name) {
     return Column(
@@ -188,12 +116,14 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
     final newSettings = settingsCtrl.settings.copyWith(
       runTrackingInBackground: val,
     );
+    // Fire and forget update to avoid blocking UI on firestore save
     settingsCtrl.updateSettings(newSettings);
 
     if (val) {
       await motionCtrl.start(
         dailyGoal: settingsCtrl.settings.dailyStepGoal,
         alreadyCountedToday: activityCtrl.todayRecord?.steps ?? 0,
+        runInBackground: val,
       );
       if (motionCtrl.permissionDenied) {
         if (!mounted) return;
@@ -202,8 +132,8 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
     } else {
       motionCtrl.stop();
       final steps = motionCtrl.todaySteps;
-      final distance = steps * kmPerStep;
-      final calories = steps * kcalPerStep;
+      final distance = (steps * MotionController.kmPerStep).toDouble();
+      final calories = (steps * MotionController.kcalPerStep).toDouble();
       await activityCtrl.updateTodaySteps(steps, distance, calories);
     }
   }
@@ -270,6 +200,26 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
     );
   }
 
+  Future<void> _onRefresh(BuildContext context) async {
+    final activityCtrl = context.read<ActivityController>();
+    final profileCtrl = context.read<ProfileController>();
+    final settingsCtrl = context.read<SettingsController>();
+
+    if (activityCtrl.isFetching) return;
+
+    activityCtrl.setFetching(true);
+    
+    await Future.wait([
+      profileCtrl.fetchProfile(),
+      settingsCtrl.fetchSettings(),
+      activityCtrl.fetchTodayRecord(dailyGoal: settingsCtrl.settings.dailyStepGoal),
+      activityCtrl.fetchWorkoutHistory(),
+      activityCtrl.fetchMonthlyStepHistory(),
+    ]);
+
+    activityCtrl.setFetching(false);
+  }
+
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
@@ -284,43 +234,37 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
     final goal = settingsCtrl.settings.dailyStepGoal;
     final progress = (currentSteps / goal).clamp(0.0, 1.0);
 
-    if (activityCtrl.isFetching || profileCtrl.isLoading) {
-      return Scaffold(
-        body: SafeArea(
-          child: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(14, 10, 14, 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildTopHeader(textTheme),
-                  SizedBox(height: 14),
-                  const DashboardSkeleton(),
-                ],
-              ),
-            ),
-          ),
-        ),
-      );
-    }
-
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(14, 10, 14, 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildTopHeader(textTheme),
-                SizedBox(height: 14),
-                _buildGreeting(
-                  textTheme,
-                  profileCtrl.currentProfile?.name ?? "",
-                ),
-                SizedBox(height: 12),
+        child: RefreshIndicator(
+          onRefresh: () => _onRefresh(context),
+          color: ThemeColors.getBrandAccent(context),
+          backgroundColor: ThemeColors.getSurface(context),
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            child: activityCtrl.isFetching || profileCtrl.isLoading
+                ? ListView(
+                    physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                    padding: const EdgeInsets.fromLTRB(14, 10, 14, 20),
+                    children: [
+                      _buildTopHeader(textTheme),
+                      const SizedBox(height: 14),
+                      const DashboardSkeleton(),
+                    ],
+                  )
+                : SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                    padding: const EdgeInsets.fromLTRB(14, 10, 14, 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildTopHeader(textTheme),
+                        SizedBox(height: 14),
+                        _buildGreeting(
+                                textTheme,
+                                profileCtrl.currentProfile?.name ?? "",
+                              ),
+                              SizedBox(height: 12),
 
                 ProgressPanel(
                   progress: progress,
@@ -359,10 +303,9 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
                 SizedBox(height: 8),
 
                 ActivitySection(activities: activityCtrl.monthlyStepHistory),
-
-                SizedBox(height: 8),
-              ],
-            ),
+                      ],
+                    ),
+                  ),
           ),
         ),
       ),

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:step_detector/core/localization/app_translations.dart';
 import 'package:step_detector/core/theme/theme_colors.dart';
 import 'package:step_detector/data/controller/activity_controller.dart';
+import 'package:step_detector/data/controller/profile_controller.dart';
 import 'package:step_detector/data/controller/settings_controller.dart';
 import 'package:step_detector/data/models/daily_step_record.dart';
 import 'package:step_detector/data/models/workout_session.dart';
@@ -92,6 +93,26 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
     );
   }
 
+  Future<void> _onRefresh(BuildContext context) async {
+    final activityCtrl = context.read<ActivityController>();
+    final profileCtrl = context.read<ProfileController>();
+    final settingsCtrl = context.read<SettingsController>();
+
+    if (activityCtrl.isFetching) return;
+
+    activityCtrl.setFetching(true);
+    
+    await Future.wait([
+      profileCtrl.fetchProfile(),
+      settingsCtrl.fetchSettings(),
+      activityCtrl.fetchTodayRecord(dailyGoal: settingsCtrl.settings.dailyStepGoal),
+      activityCtrl.fetchWorkoutHistory(),
+      activityCtrl.fetchMonthlyStepHistory(),
+    ]);
+
+    activityCtrl.setFetching(false);
+  }
+
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
@@ -113,19 +134,31 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
             ),
             SizedBox(height: 24),
             Expanded(
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 300),
-                child: activityCtrl.isFetching
-                    ? const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 24),
-                        child: ListSkeleton(),
-                      )
-                    : _selectedTabIndex == 0
-                    ? _buildDailyView(
-                        textTheme,
-                        activityCtrl.monthlyStepHistory,
-                      )
-                    : _buildSessionView(textTheme, activityCtrl.workoutHistory),
+              child: RefreshIndicator(
+                onRefresh: () => _onRefresh(context),
+                color: ThemeColors.getBrandAccent(context),
+                backgroundColor: ThemeColors.getSurface(context),
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  child: activityCtrl.isFetching
+                      ? ListView(
+                          physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 24),
+                              child: _selectedTabIndex == 0 
+                                  ? const HistoryDailySkeleton()
+                                  : const ListSkeleton(),
+                            ),
+                          ],
+                        )
+                      : _selectedTabIndex == 0
+                      ? _buildDailyView(
+                          textTheme,
+                          activityCtrl.monthlyStepHistory,
+                        )
+                      : _buildSessionView(textTheme, activityCtrl.workoutHistory),
+                ),
               ),
             ),
           ],
@@ -229,11 +262,17 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
     List<DailyStepRecord> monthlyData,
   ) {
     if (monthlyData.isEmpty) {
-      return Center(
-        child: Text(
-          'noDataYet'.tr(context),
-          style: TextStyle(color: ThemeColors.getMutedText(context)),
-        ),
+      return ListView(
+        physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+        children: [
+          SizedBox(height: 100),
+          Center(
+            child: Text(
+              'noDataYet'.tr(context),
+              style: TextStyle(color: ThemeColors.getMutedText(context)),
+            ),
+          ),
+        ],
       );
     }
 
@@ -249,7 +288,7 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
     });
 
     return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
+      physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
       padding: const EdgeInsets.fromLTRB(0, 0, 0, 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -759,16 +798,22 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
 
   Widget _buildSessionView(TextTheme textTheme, List<WorkoutSession> sessions) {
     if (sessions.isEmpty) {
-      return Center(
-        child: Text(
-          'noDataYet'.tr(context),
-          style: TextStyle(color: ThemeColors.getMutedText(context)),
-        ),
+      return ListView(
+        physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+        children: [
+          SizedBox(height: 100),
+          Center(
+            child: Text(
+              'noDataYet'.tr(context),
+              style: TextStyle(color: ThemeColors.getMutedText(context)),
+            ),
+          ),
+        ],
       );
     }
 
     return ListView.builder(
-      physics: const BouncingScrollPhysics(),
+      physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
       padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
       itemCount: sessions.length,
       itemBuilder: (context, index) {
