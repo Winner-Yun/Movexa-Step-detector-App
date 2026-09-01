@@ -53,8 +53,8 @@ class _SetGoalDialogState extends State<SetGoalDialog>
   void _submit() {
     final newGoal = int.tryParse(_controller.text);
     if (newGoal != null && newGoal > 0) {
-      widget.onGoalChanged(newGoal);
       Navigator.pop(context);
+      widget.onGoalChanged(newGoal);
     } else {
       setState(() {
         _errorMessage = context.read<AppTranslations>().tr(

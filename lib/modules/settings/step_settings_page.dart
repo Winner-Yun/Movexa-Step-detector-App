@@ -146,6 +146,26 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
     );
   }
 
+  Future<void> _onRefresh(BuildContext context) async {
+    final activityCtrl = context.read<ActivityController>();
+    final profileCtrl = context.read<ProfileController>();
+    final settingsCtrl = context.read<SettingsController>();
+
+    if (activityCtrl.isFetching) return;
+
+    activityCtrl.setFetching(true);
+    
+    await Future.wait([
+      profileCtrl.fetchProfile(),
+      settingsCtrl.fetchSettings(),
+      activityCtrl.fetchTodayRecord(dailyGoal: settingsCtrl.settings.dailyStepGoal),
+      activityCtrl.fetchWorkoutHistory(),
+      activityCtrl.fetchMonthlyStepHistory(),
+    ]);
+
+    activityCtrl.setFetching(false);
+  }
+
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
@@ -188,11 +208,22 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
         toolbarHeight: 64,
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(24, 0, 24, 40),
-          child: profileCtrl.isLoading 
-              ? const ProfileSkeleton()
-              : Column(
+        child: RefreshIndicator(
+          onRefresh: () => _onRefresh(context),
+          color: ThemeColors.getBrandAccent(context),
+          backgroundColor: ThemeColors.getSurface(context),
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            child: profileCtrl.isLoading || context.watch<ActivityController>().isFetching
+                ? ListView(
+                    physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                    padding: const EdgeInsets.fromLTRB(24, 0, 24, 40),
+                    children: const [ProfileSkeleton()],
+                  )
+                : SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                    padding: const EdgeInsets.fromLTRB(24, 0, 24, 40),
+                    child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: 24),
@@ -314,7 +345,9 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
               ),
             ],
           ),
+          ),
         ),
+      ),
       ),
     );
   }
