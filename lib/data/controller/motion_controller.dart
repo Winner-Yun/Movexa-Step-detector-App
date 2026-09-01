@@ -114,7 +114,8 @@ class MotionController extends ChangeNotifier {
       final bgSetting = await DatabaseHelper.instance.getSetting(
         'runTrackingInBackground',
       );
-      _runInBackground = bgSetting == 'true' || bgSetting == null; // Default true
+      _runInBackground =
+          bgSetting == 'true' || bgSetting == null; // Default true
     }
 
     _permissionDenied = false;
@@ -242,7 +243,9 @@ class MotionController extends ChangeNotifier {
       final startTimeStr = prefs.getString('workoutStartTime');
       if (startTimeStr != null) {
         final startTime = DateTime.parse(startTimeStr);
-        _workoutDurationSeconds = DateTime.now().difference(startTime).inSeconds;
+        _workoutDurationSeconds = DateTime.now()
+            .difference(startTime)
+            .inSeconds;
         _workoutBaselineSteps = prefs.getInt('workoutBaselineSteps');
         _workoutSteps = 0;
 

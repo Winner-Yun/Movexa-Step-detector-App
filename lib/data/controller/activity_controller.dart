@@ -5,8 +5,6 @@ import 'package:intl/intl.dart';
 import 'package:step_detector/data/models/daily_step_record.dart';
 import 'package:step_detector/data/models/workout_session.dart';
 
-
-
 class ActivityController extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -28,8 +26,6 @@ class ActivityController extends ChangeNotifier {
     _isFetching = val;
     notifyListeners();
   }
-
-
 
   Future<void> saveWorkoutSession(WorkoutSession session) async {
     final user = _auth.currentUser;
@@ -91,7 +87,6 @@ class ActivityController extends ChangeNotifier {
     }
   }
 
-
   Future<void> fetchTodayRecord({int dailyGoal = 10000}) async {
     final user = _auth.currentUser;
     if (user == null) return;
@@ -138,10 +133,12 @@ class ActivityController extends ChangeNotifier {
 
     _todayRecord = record;
 
-    final index = _monthlyStepHistory.indexWhere((r) =>
-        r.date.year == record.date.year &&
-        r.date.month == record.date.month &&
-        r.date.day == record.date.day);
+    final index = _monthlyStepHistory.indexWhere(
+      (r) =>
+          r.date.year == record.date.year &&
+          r.date.month == record.date.month &&
+          r.date.day == record.date.day,
+    );
 
     if (index != -1) {
       _monthlyStepHistory[index] = record;
@@ -190,4 +187,3 @@ class ActivityController extends ChangeNotifier {
     }
   }
 }
-

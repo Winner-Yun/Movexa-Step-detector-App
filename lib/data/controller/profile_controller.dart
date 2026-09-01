@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:step_detector/data/models/user_profile.dart';
 
-
 class ProfileController extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -71,4 +70,3 @@ class ProfileController extends ChangeNotifier {
     }
   }
 }
-
