@@ -35,4 +35,3 @@ extension TranslationExtension on String {
     }
   }
 }
-

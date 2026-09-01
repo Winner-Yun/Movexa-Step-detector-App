@@ -48,7 +48,9 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
             settingsCtrl.updateStepGoal(newGoal);
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('${context.read<AppTranslations>().tr('newGoalSet')}$newGoal'),
+                content: Text(
+                  '${context.read<AppTranslations>().tr('newGoalSet')}$newGoal',
+                ),
               ),
             );
           },
@@ -81,8 +83,6 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
       ],
     );
   }
-
-
 
   Widget _buildGreeting(TextTheme textTheme, String name) {
     return Column(
@@ -127,7 +127,9 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
       );
       if (motionCtrl.permissionDenied) {
         if (!mounted) return;
-        _showSnack(context.read<AppTranslations>().tr('motionPermissionRequired'));
+        _showSnack(
+          context.read<AppTranslations>().tr('motionPermissionRequired'),
+        );
       }
     } else {
       motionCtrl.stop();
@@ -208,11 +210,13 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
     if (activityCtrl.isFetching) return;
 
     activityCtrl.setFetching(true);
-    
+
     await Future.wait([
       profileCtrl.fetchProfile(),
       settingsCtrl.fetchSettings(),
-      activityCtrl.fetchTodayRecord(dailyGoal: settingsCtrl.settings.dailyStepGoal),
+      activityCtrl.fetchTodayRecord(
+        dailyGoal: settingsCtrl.settings.dailyStepGoal,
+      ),
       activityCtrl.fetchWorkoutHistory(),
       activityCtrl.fetchMonthlyStepHistory(),
     ]);
@@ -244,7 +248,9 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
             duration: const Duration(milliseconds: 300),
             child: activityCtrl.isFetching || profileCtrl.isLoading
                 ? ListView(
-                    physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                    physics: const AlwaysScrollableScrollPhysics(
+                      parent: BouncingScrollPhysics(),
+                    ),
                     padding: const EdgeInsets.fromLTRB(14, 10, 14, 20),
                     children: [
                       _buildTopHeader(textTheme),
@@ -253,7 +259,9 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
                     ],
                   )
                 : SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                    physics: const AlwaysScrollableScrollPhysics(
+                      parent: BouncingScrollPhysics(),
+                    ),
                     padding: const EdgeInsets.fromLTRB(14, 10, 14, 20),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -261,48 +269,52 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
                         _buildTopHeader(textTheme),
                         SizedBox(height: 14),
                         _buildGreeting(
-                                textTheme,
-                                profileCtrl.currentProfile?.name ?? "",
-                              ),
-                              SizedBox(height: 12),
+                          textTheme,
+                          profileCtrl.currentProfile?.name ?? "",
+                        ),
+                        SizedBox(height: 12),
 
-                ProgressPanel(
-                  progress: progress,
-                  steps: currentSteps,
-                  goal: goal,
-                  progressGreen: ThemeColors.getProgressValue(context),
-                  textColor: ThemeColors.getText(context),
-                  subTextColor: ThemeColors.getMutedText(context),
-                ),
-                SizedBox(height: 12),
+                        ProgressPanel(
+                          progress: progress,
+                          steps: currentSteps,
+                          goal: goal,
+                          progressGreen: ThemeColors.getProgressValue(context),
+                          textColor: ThemeColors.getText(context),
+                          subTextColor: ThemeColors.getMutedText(context),
+                        ),
+                        SizedBox(height: 12),
 
-                TrackingToggleCard(
-                  enabled: settingsCtrl.settings.runTrackingInBackground,
-                  motionStatus: motionCtrl.status,
-                  isTracking: motionCtrl.isTracking,
-                  permissionDenied: motionCtrl.permissionDenied,
-                  onChanged: (val) => _onTrackingToggled(
-                    val,
-                    settingsCtrl,
-                    motionCtrl,
-                    activityCtrl,
-                  ),
-                ),
-                SizedBox(height: 12),
+                        TrackingToggleCard(
+                          enabled:
+                              settingsCtrl.settings.runTrackingInBackground,
+                          motionStatus: motionCtrl.status,
+                          isTracking: motionCtrl.isTracking,
+                          permissionDenied: motionCtrl.permissionDenied,
+                          onChanged: (val) => _onTrackingToggled(
+                            val,
+                            settingsCtrl,
+                            motionCtrl,
+                            activityCtrl,
+                          ),
+                        ),
+                        SizedBox(height: 12),
 
-                PrimaryButton(
-                  onTap: () => _showSetGoalDialog(context, settingsCtrl),
-                  text: 'setNewGoal'.tr(context),
-                ),
-                SizedBox(height: 14),
+                        PrimaryButton(
+                          onTap: () =>
+                              _showSetGoalDialog(context, settingsCtrl),
+                          text: 'setNewGoal'.tr(context),
+                        ),
+                        SizedBox(height: 14),
 
-                _buildStatsGrid(todayRecord),
-                SizedBox(height: 14),
+                        _buildStatsGrid(todayRecord),
+                        SizedBox(height: 14),
 
-                _buildRecentActivitiesHeader(textTheme),
-                SizedBox(height: 8),
+                        _buildRecentActivitiesHeader(textTheme),
+                        SizedBox(height: 8),
 
-                ActivitySection(activities: activityCtrl.monthlyStepHistory),
+                        ActivitySection(
+                          activities: activityCtrl.monthlyStepHistory,
+                        ),
                       ],
                     ),
                   ),

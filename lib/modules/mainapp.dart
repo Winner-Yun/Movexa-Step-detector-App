@@ -115,7 +115,7 @@ class _StepMainAppState extends State<StepMainApp> {
         alreadyCountedToday: activityCtrl.todayRecord?.steps ?? 0,
       );
     }
-    
+
     await motionCtrl.restoreWorkout();
   }
 

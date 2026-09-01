@@ -12,4 +12,3 @@ String formatNumber(int value) {
 
   return buffer.toString();
 }
-
