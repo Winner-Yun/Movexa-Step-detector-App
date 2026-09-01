@@ -31,7 +31,9 @@ class MainApp extends StatelessWidget {
                 return AnnotatedRegion<SystemUiOverlayStyle>(
                   value: SystemUiOverlayStyle(
                     statusBarColor: Colors.transparent,
-                    statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+                    statusBarIconBrightness: isDark
+                        ? Brightness.light
+                        : Brightness.dark,
                     systemNavigationBarColor: Colors.transparent,
                   ),
                   child: child!,
@@ -44,4 +46,3 @@ class MainApp extends StatelessWidget {
     );
   }
 }
-

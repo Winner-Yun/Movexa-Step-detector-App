@@ -101,11 +101,13 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
     if (activityCtrl.isFetching) return;
 
     activityCtrl.setFetching(true);
-    
+
     await Future.wait([
       profileCtrl.fetchProfile(),
       settingsCtrl.fetchSettings(),
-      activityCtrl.fetchTodayRecord(dailyGoal: settingsCtrl.settings.dailyStepGoal),
+      activityCtrl.fetchTodayRecord(
+        dailyGoal: settingsCtrl.settings.dailyStepGoal,
+      ),
       activityCtrl.fetchWorkoutHistory(),
       activityCtrl.fetchMonthlyStepHistory(),
     ]);
@@ -142,11 +144,15 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                   duration: const Duration(milliseconds: 300),
                   child: activityCtrl.isFetching
                       ? ListView(
-                          physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                          physics: const AlwaysScrollableScrollPhysics(
+                            parent: BouncingScrollPhysics(),
+                          ),
                           children: [
                             Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 24),
-                              child: _selectedTabIndex == 0 
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                              ),
+                              child: _selectedTabIndex == 0
                                   ? const HistoryDailySkeleton()
                                   : const ListSkeleton(),
                             ),
@@ -157,7 +163,10 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                           textTheme,
                           activityCtrl.monthlyStepHistory,
                         )
-                      : _buildSessionView(textTheme, activityCtrl.workoutHistory),
+                      : _buildSessionView(
+                          textTheme,
+                          activityCtrl.workoutHistory,
+                        ),
                 ),
               ),
             ),
@@ -263,7 +272,9 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
   ) {
     if (monthlyData.isEmpty) {
       return ListView(
-        physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+        physics: const AlwaysScrollableScrollPhysics(
+          parent: BouncingScrollPhysics(),
+        ),
         children: [
           SizedBox(height: 100),
           Center(
@@ -288,7 +299,9 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
     });
 
     return SingleChildScrollView(
-      physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+      physics: const AlwaysScrollableScrollPhysics(
+        parent: BouncingScrollPhysics(),
+      ),
       padding: const EdgeInsets.fromLTRB(0, 0, 0, 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -799,7 +812,9 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
   Widget _buildSessionView(TextTheme textTheme, List<WorkoutSession> sessions) {
     if (sessions.isEmpty) {
       return ListView(
-        physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+        physics: const AlwaysScrollableScrollPhysics(
+          parent: BouncingScrollPhysics(),
+        ),
         children: [
           SizedBox(height: 100),
           Center(
@@ -813,7 +828,9 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
     }
 
     return ListView.builder(
-      physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+      physics: const AlwaysScrollableScrollPhysics(
+        parent: BouncingScrollPhysics(),
+      ),
       padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
       itemCount: sessions.length,
       itemBuilder: (context, index) {

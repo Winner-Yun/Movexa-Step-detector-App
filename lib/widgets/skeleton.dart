@@ -168,7 +168,7 @@ class HistoryDailySkeleton extends StatelessWidget {
           // Month chart
           const Skeleton(width: double.infinity, height: 250, borderRadius: 24),
           const SizedBox(height: 32),
-          
+
           // "Summary for X" header
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -178,15 +178,15 @@ class HistoryDailySkeleton extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          
+
           // Summary Card
           const Skeleton(width: double.infinity, height: 160, borderRadius: 28),
           const SizedBox(height: 24),
-          
+
           // Activity Breakdown Header
           const Skeleton(width: 140, height: 20),
           const SizedBox(height: 16),
-          
+
           // Activity breakdown list
           const Skeleton(width: double.infinity, height: 70, borderRadius: 16),
           const SizedBox(height: 12),

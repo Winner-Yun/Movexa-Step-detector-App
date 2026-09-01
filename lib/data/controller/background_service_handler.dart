@@ -56,11 +56,13 @@ class BackgroundStepHandler extends TaskHandler {
         if (isWorkoutActive) {
           final startTimeStr = prefs.getString('workoutStartTime');
           final baselineSteps = prefs.getInt('workoutBaselineSteps');
-          
+
           if (startTimeStr != null && baselineSteps != null) {
             final startTime = DateTime.parse(startTimeStr);
-            final durationSeconds = DateTime.now().difference(startTime).inSeconds;
-            
+            final durationSeconds = DateTime.now()
+                .difference(startTime)
+                .inSeconds;
+
             var workoutSteps = deviceSteps - baselineSteps;
             if (workoutSteps < 0) workoutSteps = 0; // fallback if rebooted
 
@@ -84,7 +86,10 @@ class BackgroundStepHandler extends TaskHandler {
               notificationTitle: 'Workout Active',
               notificationText: 'Time: $formattedTime | Steps: $workoutSteps',
               notificationButtons: [
-                const NotificationButton(id: 'close_app', text: 'Stop Tracking'),
+                const NotificationButton(
+                  id: 'close_app',
+                  text: 'Stop Tracking',
+                ),
               ],
             );
           }
@@ -123,13 +128,15 @@ class BackgroundStepHandler extends TaskHandler {
     if (isWorkoutActive) {
       final startTimeStr = prefs.getString('workoutStartTime');
       final baselineSteps = prefs.getInt('workoutBaselineSteps');
-      
+
       if (startTimeStr != null && baselineSteps != null) {
         final startTime = DateTime.parse(startTimeStr);
         final durationSeconds = DateTime.now().difference(startTime).inSeconds;
-        
+
         // If pedometer hasn't fired yet, fallback to 0
-        final currentDeviceSteps = _lastDeviceSteps > 0 ? _lastDeviceSteps : baselineSteps;
+        final currentDeviceSteps = _lastDeviceSteps > 0
+            ? _lastDeviceSteps
+            : baselineSteps;
         var workoutSteps = currentDeviceSteps - baselineSteps;
         if (workoutSteps < 0) workoutSteps = 0;
 

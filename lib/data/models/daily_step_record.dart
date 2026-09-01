@@ -1,4 +1,5 @@
 import 'package:step_detector/core/model/base_model.dart';
+
 class DailyStepRecord implements BaseModel {
   final DateTime date;
   final int steps;
@@ -36,4 +37,3 @@ class DailyStepRecord implements BaseModel {
     );
   }
 }
-

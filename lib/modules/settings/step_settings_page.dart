@@ -30,7 +30,9 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
             settingsCtrl.updateStepGoal(newGoal);
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('${context.read<AppTranslations>().tr('newGoalSet')}$newGoal'),
+                content: Text(
+                  '${context.read<AppTranslations>().tr('newGoalSet')}$newGoal',
+                ),
               ),
             );
           },
@@ -154,11 +156,13 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
     if (activityCtrl.isFetching) return;
 
     activityCtrl.setFetching(true);
-    
+
     await Future.wait([
       profileCtrl.fetchProfile(),
       settingsCtrl.fetchSettings(),
-      activityCtrl.fetchTodayRecord(dailyGoal: settingsCtrl.settings.dailyStepGoal),
+      activityCtrl.fetchTodayRecord(
+        dailyGoal: settingsCtrl.settings.dailyStepGoal,
+      ),
       activityCtrl.fetchWorkoutHistory(),
       activityCtrl.fetchMonthlyStepHistory(),
     ]);
@@ -214,140 +218,176 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
           backgroundColor: ThemeColors.getSurface(context),
           child: AnimatedSwitcher(
             duration: const Duration(milliseconds: 300),
-            child: profileCtrl.isLoading || context.watch<ActivityController>().isFetching
+            child:
+                profileCtrl.isLoading ||
+                    context.watch<ActivityController>().isFetching
                 ? ListView(
-                    physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                    physics: const AlwaysScrollableScrollPhysics(
+                      parent: BouncingScrollPhysics(),
+                    ),
                     padding: const EdgeInsets.fromLTRB(24, 0, 24, 40),
                     children: const [ProfileSkeleton()],
                   )
                 : SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                    physics: const AlwaysScrollableScrollPhysics(
+                      parent: BouncingScrollPhysics(),
+                    ),
                     padding: const EdgeInsets.fromLTRB(24, 0, 24, 40),
                     child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: 24),
-                    _buildProfileCard(textTheme, profileCtrl),
-                    SizedBox(height: 32),
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 24),
+                        _buildProfileCard(textTheme, profileCtrl),
+                        SizedBox(height: 32),
 
-                    _buildSectionTitle('account'.tr(context), textTheme),
-                    _buildSettingsGroup([
-                      _SettingsItemTile(
-                        context: context,
-                        icon: Icons.person_outline_rounded,
-                        title: 'personalInfo'.tr(context),
-                        onTap: _navigateToProfileEdit,
-                      ),
-                      _SettingsItemTile(
-                        context: context,
-                        icon: Icons.flag_outlined,
-                        title: 'stepGoal'.tr(context),
-                        trailingText: '${settingsCtrl.settings.dailyStepGoal}',
-                        onTap: () => _showSetGoalDialog(settingsCtrl),
-                      ),
-                    ]),
+                        _buildSectionTitle('account'.tr(context), textTheme),
+                        _buildSettingsGroup([
+                          _SettingsItemTile(
+                            context: context,
+                            icon: Icons.person_outline_rounded,
+                            title: 'personalInfo'.tr(context),
+                            onTap: _navigateToProfileEdit,
+                          ),
+                          _SettingsItemTile(
+                            context: context,
+                            icon: Icons.flag_outlined,
+                            title: 'stepGoal'.tr(context),
+                            trailingText:
+                                '${settingsCtrl.settings.dailyStepGoal}',
+                            onTap: () => _showSetGoalDialog(settingsCtrl),
+                          ),
+                        ]),
 
-              SizedBox(height: 24),
+                        SizedBox(height: 24),
 
-              _buildSectionTitle('preferences'.tr(context), textTheme),
-              _buildSettingsGroup([
-                _SettingsItemTile(
-                  context: context,
-                  icon: Icons.dark_mode_outlined,
-                  title: 'darkMode'.tr(context),
-                  isSwitch: true,
-                  switchValue: settingsCtrl.settings.darkModeEnabled,
-                  onSwitchChanged: (val) => settingsCtrl.updateSettings(
-                    settingsCtrl.settings.copyWith(darkModeEnabled: val),
-                  ),
-                ),
-                _SettingsItemTile(
-                  context: context,
-                  icon: Icons.language_rounded,
-                  title: 'language'.tr(context),
-                  trailingText: settingsCtrl.settings.language == 'km'
-                      ? 'ខ្មែរ'
-                      : 'English',
-                  isSwitch: true,
-                  switchValue: settingsCtrl.settings.language == 'km',
-                  onSwitchChanged: (val) {
-                    final newLang = val ? 'km' : 'en';
-                    settingsCtrl.updateSettings(
-                      settingsCtrl.settings.copyWith(language: newLang),
-                    );
-                  },
-                ),
-                _SettingsItemTile(
-                  context: context,
-                  icon: Icons.track_changes_rounded,
-                  title: 'dailyTrackRecord'.tr(context),
-                  isSwitch: true,
-                  switchValue: settingsCtrl.settings.runTrackingInBackground,
-                  onSwitchChanged: (val) async {
-                    final activityCtrl = context.read<ActivityController>();
-                    final motionCtrl = context.read<MotionController>();
-                    
-                    final newSettings = settingsCtrl.settings.copyWith(
-                      runTrackingInBackground: val,
-                    );
-                    settingsCtrl.updateSettings(newSettings);
+                        _buildSectionTitle(
+                          'preferences'.tr(context),
+                          textTheme,
+                        ),
+                        _buildSettingsGroup([
+                          _SettingsItemTile(
+                            context: context,
+                            icon: Icons.dark_mode_outlined,
+                            title: 'darkMode'.tr(context),
+                            isSwitch: true,
+                            switchValue: settingsCtrl.settings.darkModeEnabled,
+                            onSwitchChanged: (val) =>
+                                settingsCtrl.updateSettings(
+                                  settingsCtrl.settings.copyWith(
+                                    darkModeEnabled: val,
+                                  ),
+                                ),
+                          ),
+                          _SettingsItemTile(
+                            context: context,
+                            icon: Icons.language_rounded,
+                            title: 'language'.tr(context),
+                            trailingText: settingsCtrl.settings.language == 'km'
+                                ? 'ខ្មែរ'
+                                : 'English',
+                            isSwitch: true,
+                            switchValue: settingsCtrl.settings.language == 'km',
+                            onSwitchChanged: (val) {
+                              final newLang = val ? 'km' : 'en';
+                              settingsCtrl.updateSettings(
+                                settingsCtrl.settings.copyWith(
+                                  language: newLang,
+                                ),
+                              );
+                            },
+                          ),
+                          _SettingsItemTile(
+                            context: context,
+                            icon: Icons.track_changes_rounded,
+                            title: 'dailyTrackRecord'.tr(context),
+                            isSwitch: true,
+                            switchValue:
+                                settingsCtrl.settings.runTrackingInBackground,
+                            onSwitchChanged: (val) async {
+                              final activityCtrl = context
+                                  .read<ActivityController>();
+                              final motionCtrl = context
+                                  .read<MotionController>();
 
-                    if (val) {
-                      await motionCtrl.start(
-                        dailyGoal: settingsCtrl.settings.dailyStepGoal,
-                        alreadyCountedToday: activityCtrl.todayRecord?.steps ?? 0,
-                        runInBackground: val,
-                      );
-                      if (motionCtrl.permissionDenied) {
-                        if (!context.mounted) return;
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(context.read<AppTranslations>().tr('motionPermissionRequired'))),
-                        );
-                      }
-                    } else {
-                      motionCtrl.stop();
-                      final steps = motionCtrl.todaySteps;
-                      final distance = (steps * MotionController.kmPerStep).toDouble();
-                      final calories = (steps * MotionController.kcalPerStep).toDouble();
-                      await activityCtrl.updateTodaySteps(steps, distance, calories);
-                    }
-                  },
-                ),
-                _SettingsItemTile(
-                  context: context,
-                  icon: Icons.info_outline_rounded,
-                  title: 'aboutUs'.tr(context),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const AboutUsPage(),
-                      ),
-                    );
-                  },
-                ),
-              ]),
+                              final newSettings = settingsCtrl.settings
+                                  .copyWith(runTrackingInBackground: val);
+                              settingsCtrl.updateSettings(newSettings);
 
-              SizedBox(height: 40),
-              Center(
-                child: TextButton.icon(
-                  onPressed: _showLogoutDialog,
-                  icon: Icon(Icons.logout_rounded, color: Colors.redAccent),
-                  label: Text(
-                    'logoutAction'.tr(context),
-                    style: TextStyle(
-                      color: Colors.redAccent,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                              if (val) {
+                                await motionCtrl.start(
+                                  dailyGoal:
+                                      settingsCtrl.settings.dailyStepGoal,
+                                  alreadyCountedToday:
+                                      activityCtrl.todayRecord?.steps ?? 0,
+                                  runInBackground: val,
+                                );
+                                if (motionCtrl.permissionDenied) {
+                                  if (!context.mounted) return;
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        context.read<AppTranslations>().tr(
+                                          'motionPermissionRequired',
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }
+                              } else {
+                                motionCtrl.stop();
+                                final steps = motionCtrl.todaySteps;
+                                final distance =
+                                    (steps * MotionController.kmPerStep)
+                                        .toDouble();
+                                final calories =
+                                    (steps * MotionController.kcalPerStep)
+                                        .toDouble();
+                                await activityCtrl.updateTodaySteps(
+                                  steps,
+                                  distance,
+                                  calories,
+                                );
+                              }
+                            },
+                          ),
+                          _SettingsItemTile(
+                            context: context,
+                            icon: Icons.info_outline_rounded,
+                            title: 'aboutUs'.tr(context),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const AboutUsPage(),
+                                ),
+                              );
+                            },
+                          ),
+                        ]),
+
+                        SizedBox(height: 40),
+                        Center(
+                          child: TextButton.icon(
+                            onPressed: _showLogoutDialog,
+                            icon: Icon(
+                              Icons.logout_rounded,
+                              color: Colors.redAccent,
+                            ),
+                            label: Text(
+                              'logoutAction'.tr(context),
+                              style: TextStyle(
+                                color: Colors.redAccent,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ),
-              ),
-            ],
-          ),
           ),
         ),
-      ),
       ),
     );
   }
@@ -390,7 +430,8 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
                 color: Colors.white.withValues(alpha: 0.5),
                 width: 3,
               ),
-              image: (profile?.avatarUrl != null && profile!.avatarUrl!.isNotEmpty)
+              image:
+                  (profile?.avatarUrl != null && profile!.avatarUrl!.isNotEmpty)
                   ? DecorationImage(
                       image: NetworkImage(profile.avatarUrl!),
                       fit: BoxFit.cover,
@@ -431,7 +472,10 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
                   ),
                 ),
 
-                if (profile != null && (profile.age > 0 || profile.weight > 0 || profile.height > 0)) ...[
+                if (profile != null &&
+                    (profile.age > 0 ||
+                        profile.weight > 0 ||
+                        profile.height > 0)) ...[
                   SizedBox(height: 12),
                   Wrap(
                     spacing: 8,
@@ -473,7 +517,11 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
     );
   }
 
-  Widget _buildProfileStatBadge(BuildContext context, IconData icon, String text) {
+  Widget _buildProfileStatBadge(
+    BuildContext context,
+    IconData icon,
+    String text,
+  ) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(

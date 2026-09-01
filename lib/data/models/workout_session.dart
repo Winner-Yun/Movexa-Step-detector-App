@@ -1,4 +1,5 @@
 import 'package:step_detector/core/model/base_model.dart';
+
 class WorkoutSession implements BaseModel {
   final String id;
   final String title;
@@ -55,17 +56,19 @@ class WorkoutSession implements BaseModel {
       id: map['id'] ?? '',
       title: map['title'] ?? 'Workout',
       startTime: DateTime.fromMillisecondsSinceEpoch(map['startTime']),
-      duration: Duration(seconds: (map['durationSeconds'] as num?)?.toInt() ?? 0),
+      duration: Duration(
+        seconds: (map['durationSeconds'] as num?)?.toInt() ?? 0,
+      ),
       steps: (map['steps'] as num?)?.toInt() ?? 0,
       calories: (map['calories'] as num?)?.toDouble() ?? 0.0,
       distance: (map['distance'] as num?)?.toDouble() ?? 0.0,
       averagePace: map['averagePace'] ?? '0:00',
       speedKmh: (map['speedKmh'] as num?)?.toDouble() ?? 0.0,
-      paceChartData: (map['paceChartData'] as List<dynamic>?)
+      paceChartData:
+          (map['paceChartData'] as List<dynamic>?)
               ?.map((e) => (e as num).toDouble())
               .toList() ??
           [],
     );
   }
 }
-

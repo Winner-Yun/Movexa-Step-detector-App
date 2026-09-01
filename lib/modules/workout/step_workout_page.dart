@@ -330,7 +330,12 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
     );
   }
 
-  Widget _buildMainTimer(TextTheme textTheme, int currentSteps, bool isTracking, String formattedTime) {
+  Widget _buildMainTimer(
+    TextTheme textTheme,
+    int currentSteps,
+    bool isTracking,
+    String formattedTime,
+  ) {
     return Stack(
       alignment: Alignment.center,
       children: [
@@ -556,7 +561,7 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final motionCtrl = context.watch<MotionController>();
-    
+
     final isTracking = motionCtrl.isWorkoutActive;
     final currentSteps = isTracking ? motionCtrl.workoutSteps : 0;
     final calories = (currentSteps * MotionController.kcalPerStep).toDouble();
@@ -572,7 +577,12 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
             children: [
               _buildPageHeader(textTheme),
               const Spacer(flex: 1),
-              _buildMainTimer(textTheme, currentSteps, isTracking, formattedTime),
+              _buildMainTimer(
+                textTheme,
+                currentSteps,
+                isTracking,
+                formattedTime,
+              ),
               const Spacer(flex: 1),
               Row(
                 children: [

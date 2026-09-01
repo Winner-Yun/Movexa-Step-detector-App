@@ -1,4 +1,5 @@
 import 'package:step_detector/core/model/base_model.dart';
+
 class UserProfile implements BaseModel {
   final String id;
   final String email;
@@ -68,4 +69,3 @@ class UserProfile implements BaseModel {
     );
   }
 }
-
