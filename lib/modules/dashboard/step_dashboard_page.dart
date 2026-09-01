@@ -12,6 +12,7 @@ import 'package:step_detector/widgets/dashboard_widgets.dart';
 import 'package:step_detector/widgets/primary_button.dart';
 import 'package:step_detector/widgets/skeleton.dart';
 import 'package:step_detector/widgets/stat_card.dart';
+import 'package:step_detector/widgets/map_path_viewer.dart';
 import 'package:step_detector/widgets/tracking_toggle_card.dart';
 import 'package:step_detector/widgets/set_goal_dialog.dart';
 
@@ -311,6 +312,13 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
 
                         _buildRecentActivitiesHeader(textTheme),
                         SizedBox(height: 8),
+
+                        MapPathViewer(
+                          path: motionCtrl.isTracking ? motionCtrl.dailyPath : todayRecord?.path,
+                          height: 250,
+                          interactive: false,
+                        ),
+                        SizedBox(height: 14),
 
                         ActivitySection(
                           activities: activityCtrl.monthlyStepHistory,

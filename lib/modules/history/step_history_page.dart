@@ -10,6 +10,7 @@ import 'package:step_detector/data/models/workout_session.dart';
 import 'package:step_detector/modules/workout/step_workout_detail_page.dart';
 import 'package:step_detector/widgets/share_image_dialog.dart';
 import 'package:step_detector/widgets/skeleton.dart';
+import 'package:step_detector/widgets/map_path_viewer.dart';
 
 class StepHistoryPage extends StatefulWidget {
   const StepHistoryPage({super.key});
@@ -713,6 +714,13 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
           ),
 
           SizedBox(height: 40),
+
+          MapPathViewer(
+            path: record.path,
+            height: 200,
+            interactive: false,
+          ),
+          SizedBox(height: 24),
 
           Container(
             padding: const EdgeInsets.all(16),

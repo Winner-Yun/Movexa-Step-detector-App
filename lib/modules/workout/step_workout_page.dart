@@ -55,6 +55,7 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
     try {
       final motionCtrl = context.read<MotionController>();
       final durationSeconds = motionCtrl.workoutDurationSeconds;
+      final path = List<Map<String, dynamic>>.from(motionCtrl.workoutPath);
       final steps = await motionCtrl.stopWorkout();
       final duration = Duration(seconds: durationSeconds);
       final distanceKm = (steps * MotionController.kmPerStep).toDouble();
@@ -74,6 +75,7 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
         distance: distanceKm,
         averagePace: _formatPace(duration, distanceKm),
         speedKmh: speedKmh,
+        path: path,
       );
 
       if (!mounted) return;

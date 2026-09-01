@@ -119,16 +119,20 @@ class ActivityController extends ChangeNotifier {
   Future<void> updateTodaySteps(
     int steps,
     double distance,
-    double calories,
-  ) async {
+    double calories, {
+    List<Map<String, dynamic>>? path,
+  }) async {
     final user = _auth.currentUser;
     if (user == null) return;
+
+    final currentPath = path ?? _todayRecord?.path;
 
     final record = DailyStepRecord(
       date: DateTime.now(),
       steps: steps,
       distance: distance,
       calories: calories,
+      path: currentPath,
     );
 
     _todayRecord = record;
