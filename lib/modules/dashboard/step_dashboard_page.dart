@@ -188,12 +188,14 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
     final newSettings = settingsCtrl.settings.copyWith(
       runTrackingInBackground: val,
     );
+    // Fire and forget update to avoid blocking UI on firestore save
     settingsCtrl.updateSettings(newSettings);
 
     if (val) {
       await motionCtrl.start(
         dailyGoal: settingsCtrl.settings.dailyStepGoal,
         alreadyCountedToday: activityCtrl.todayRecord?.steps ?? 0,
+        runInBackground: val,
       );
       if (motionCtrl.permissionDenied) {
         if (!mounted) return;
@@ -202,8 +204,8 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
     } else {
       motionCtrl.stop();
       final steps = motionCtrl.todaySteps;
-      final distance = steps * kmPerStep;
-      final calories = steps * kcalPerStep;
+      final distance = (steps * MotionController.kmPerStep).toDouble();
+      final calories = (steps * MotionController.kcalPerStep).toDouble();
       await activityCtrl.updateTodaySteps(steps, distance, calories);
     }
   }

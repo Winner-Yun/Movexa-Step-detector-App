@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:step_detector/core/localization/app_translations.dart';
 import 'package:step_detector/core/theme/theme_colors.dart';
+import 'package:step_detector/data/controller/activity_controller.dart';
 import 'package:step_detector/data/controller/auth_controller.dart';
 import 'package:step_detector/data/controller/motion_controller.dart';
 import 'package:step_detector/data/controller/profile_controller.dart';
@@ -247,6 +248,42 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
                 ),
                 _SettingsItemTile(
                   context: context,
+                  icon: Icons.track_changes_rounded,
+                  title: 'dailyTrackRecord'.tr(context),
+                  isSwitch: true,
+                  switchValue: settingsCtrl.settings.runTrackingInBackground,
+                  onSwitchChanged: (val) async {
+                    final activityCtrl = context.read<ActivityController>();
+                    final motionCtrl = context.read<MotionController>();
+                    
+                    final newSettings = settingsCtrl.settings.copyWith(
+                      runTrackingInBackground: val,
+                    );
+                    settingsCtrl.updateSettings(newSettings);
+
+                    if (val) {
+                      await motionCtrl.start(
+                        dailyGoal: settingsCtrl.settings.dailyStepGoal,
+                        alreadyCountedToday: activityCtrl.todayRecord?.steps ?? 0,
+                        runInBackground: val,
+                      );
+                      if (motionCtrl.permissionDenied) {
+                        if (!context.mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(context.read<AppTranslations>().tr('motionPermissionRequired'))),
+                        );
+                      }
+                    } else {
+                      motionCtrl.stop();
+                      final steps = motionCtrl.todaySteps;
+                      final distance = (steps * MotionController.kmPerStep).toDouble();
+                      final calories = (steps * MotionController.kcalPerStep).toDouble();
+                      await activityCtrl.updateTodaySteps(steps, distance, calories);
+                    }
+                  },
+                ),
+                _SettingsItemTile(
+                  context: context,
                   icon: Icons.info_outline_rounded,
                   title: 'aboutUs'.tr(context),
                   onTap: () {
@@ -320,17 +357,25 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
                 color: Colors.white.withValues(alpha: 0.5),
                 width: 3,
               ),
+              image: (profile?.avatarUrl != null && profile!.avatarUrl!.isNotEmpty)
+                  ? DecorationImage(
+                      image: NetworkImage(profile.avatarUrl!),
+                      fit: BoxFit.cover,
+                    )
+                  : null,
             ),
-            child: Center(
-              child: Text(
-                initial,
-                style: TextStyle(
-                  color: ThemeColors.getBrandAccent(context),
-                  fontSize: 32,
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
-            ),
+            child: (profile?.avatarUrl == null || profile!.avatarUrl!.isEmpty)
+                ? Center(
+                    child: Text(
+                      initial,
+                      style: TextStyle(
+                        color: ThemeColors.getBrandAccent(context),
+                        fontSize: 32,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  )
+                : null,
           ),
           SizedBox(width: 16),
           Expanded(

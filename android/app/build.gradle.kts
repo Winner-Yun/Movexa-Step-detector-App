@@ -9,7 +9,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.step_detector"
+    namespace = "com.khansha.movexa"
     compileSdk = 37
     ndkVersion = flutter.ndkVersion
 
@@ -24,7 +24,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.step_detector"
+        applicationId = "com.khansha.movexa"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion

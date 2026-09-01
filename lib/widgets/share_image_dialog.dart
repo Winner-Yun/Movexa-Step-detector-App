@@ -46,7 +46,8 @@ class ShareDailySummaryDialog extends StatefulWidget {
   });
 
   @override
-  State<ShareDailySummaryDialog> createState() => _ShareDailySummaryDialogState();
+  State<ShareDailySummaryDialog> createState() =>
+      _ShareDailySummaryDialogState();
 }
 
 class _ShareDailySummaryDialogState extends State<ShareDailySummaryDialog> {
@@ -69,7 +70,9 @@ class _ShareDailySummaryDialogState extends State<ShareDailySummaryDialog> {
 
       await Future.delayed(const Duration(milliseconds: 100));
 
-      final boundary = _repaintKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+      final boundary =
+          _repaintKey.currentContext?.findRenderObject()
+              as RenderRepaintBoundary?;
       if (boundary == null) {
         setState(() => _isSaving = false);
         return;
@@ -81,7 +84,8 @@ class _ShareDailySummaryDialogState extends State<ShareDailySummaryDialog> {
 
       if (pngBytes != null) {
         final directory = await getTemporaryDirectory();
-        final path = '${directory.path}/movexa_daily_${DateTime.now().millisecondsSinceEpoch}.png';
+        final path =
+            '${directory.path}/movexa_daily_${DateTime.now().millisecondsSinceEpoch}.png';
         final file = File(path);
         await file.writeAsBytes(pngBytes);
         await Gal.putImage(path);
@@ -122,14 +126,11 @@ class _ShareDailySummaryDialogState extends State<ShareDailySummaryDialog> {
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [
-                    Color(0xFF2A2D34),
-                    Color(0xFF13151A),
-                  ],
+                  colors: [Color(0xFF2A2D34), Color(0xFF13151A)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
-                borderRadius: BorderRadius.circular(24),
+
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.5),
@@ -337,10 +338,7 @@ class _ShareWorkoutSessionDialogState extends State<ShareWorkoutSessionDialog> {
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [
-                    Color(0xFF2A2D34),
-                    Color(0xFF13151A),
-                  ],
+                  colors: [Color(0xFF2A2D34), Color(0xFF13151A)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),

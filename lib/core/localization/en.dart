@@ -82,4 +82,6 @@ const Map<String, String> enTranslations = {
   'saveImage': 'Save Image',
   'imageSaved': 'Image saved to gallery!',
   'download': 'Download',
+  'appSlogan': 'The App\nthat Lets You\nMove',
+  'continueWithGoogle': 'Continue with Google',
 };
