@@ -82,4 +82,6 @@ const Map<String, String> khTranslations = {
   'saveImage': 'រក្សាទុករូបភាព',
   'imageSaved': 'បានរក្សាទុករូបភាពក្នុងវិចិត្រសាល!',
   'download': 'រក្សាទុក',
+  'appSlogan': 'កម្មវិធី\nដែលឲ្យអ្នក\nធ្វើចលនា',
+  'continueWithGoogle': 'បន្តជាមួយ Google',
 };

@@ -3,11 +3,17 @@ import 'package:home_widget/home_widget.dart';
 class WidgetUpdater {
   static const String _androidWidgetName = 'WorkoutWidgetProvider';
 
+  static Future<void> updateLoggedOutState() async {
+    await HomeWidget.saveWidgetData<bool>('is_logged_in', false);
+    await HomeWidget.updateWidget(androidName: _androidWidgetName);
+  }
+
   static Future<void> updateDailyStats({
     required int steps,
     required double cal,
     required double km,
   }) async {
+    await HomeWidget.saveWidgetData<bool>('is_logged_in', true);
     await HomeWidget.saveWidgetData<bool>('is_workout_mode', false);
     await HomeWidget.saveWidgetData<String>('daily_steps', steps.toString());
     await HomeWidget.saveWidgetData<String>(
@@ -26,6 +32,7 @@ class WidgetUpdater {
     required double km,
     required double speed,
   }) async {
+    await HomeWidget.saveWidgetData<bool>('is_logged_in', true);
     await HomeWidget.saveWidgetData<bool>('is_workout_mode', true);
     await HomeWidget.saveWidgetData<String>('workout_time', time);
     await HomeWidget.saveWidgetData<String>('workout_steps', steps.toString());
