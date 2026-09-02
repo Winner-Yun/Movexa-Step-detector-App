@@ -7,6 +7,8 @@ import 'package:step_detector/core/theme/app_theme.dart';
 import 'package:step_detector/data/controller/settings_controller.dart';
 import 'package:step_detector/modules/auth/auth_wrapper.dart';
 
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
+
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
 
@@ -17,27 +19,30 @@ class MainApp extends StatelessWidget {
       child: Consumer<SettingsController>(
         builder: (context, settingsCtrl, child) {
           final isDark = settingsCtrl.settings.darkModeEnabled;
-          return MaterialApp(
-            debugShowCheckedModeBanner: false,
-            theme: AppTheme.lightTheme,
-            darkTheme: AppTheme.darkTheme,
-            themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
-            onGenerateRoute: AppRoutes.onGenerateRoute,
-            home: const AuthWrapper(),
-            builder: (context, child) {
-              return AnnotatedRegion<SystemUiOverlayStyle>(
-                value: SystemUiOverlayStyle(
-                  statusBarColor: Colors.transparent,
-                  statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
-                  systemNavigationBarColor: Colors.transparent,
-                ),
-                child: child!,
-              );
-            },
+          return WithForegroundTask(
+            child: MaterialApp(
+              debugShowCheckedModeBanner: false,
+              theme: AppTheme.lightTheme,
+              darkTheme: AppTheme.darkTheme,
+              themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
+              onGenerateRoute: AppRoutes.onGenerateRoute,
+              home: const AuthWrapper(),
+              builder: (context, child) {
+                return AnnotatedRegion<SystemUiOverlayStyle>(
+                  value: SystemUiOverlayStyle(
+                    statusBarColor: Colors.transparent,
+                    statusBarIconBrightness: isDark
+                        ? Brightness.light
+                        : Brightness.dark,
+                    systemNavigationBarColor: Colors.transparent,
+                  ),
+                  child: child!,
+                );
+              },
+            ),
           );
         },
       ),
     );
   }
 }
-

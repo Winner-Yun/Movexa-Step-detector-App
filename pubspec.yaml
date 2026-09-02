@@ -28,6 +28,11 @@ dependencies:
   home_widget: ^0.9.3
   flutter_launcher_icons: ^0.13.1
   gal: ^2.3.3
+  flutter_foreground_task: ^11.0.1
+  shared_preferences: ^2.5.5
+  google_maps_flutter: ^2.18.0
+  flutter_native_splash: ^2.4.7
+  geolocator: ^14.0.3
 
 dev_dependencies:
   flutter_test:
@@ -37,7 +42,7 @@ dev_dependencies:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/Movexa.png"
+  image_path: "assets/Movexa_appicon.png"
 
 flutter:
   
@@ -45,3 +50,24 @@ flutter:
   assets:
     - assets/
     - .env
+
+
+flutter_native_splash:
+  color: "#ffffff"
+  image: assets/Movexa_appicon.png
+  branding: assets/splash_branding.png
+  branding_mode: bottom
+
+  android: true
+  ios: true
+  fullscreen: true
+
+  android_gravity: center
+  ios_content_mode: center
+
+  android_12:
+    color: "#ffffff"
+    image: assets/Movexa_appicon.png
+    branding: assets/splash_branding.png
+    icon_background_color: "#ffffff"
+    fullscreen: true

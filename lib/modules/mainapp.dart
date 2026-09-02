@@ -21,7 +21,7 @@ class StepMainApp extends StatefulWidget {
 
 class _StepMainAppState extends State<StepMainApp> {
   int _selectedTab = 0;
-  static const _channel = MethodChannel('com.example.step_detector/widget');
+  static const _channel = MethodChannel('com.khansha.movexa/widget');
 
   late final List<Widget> _pages = [
     StepDashboardPage(onSeeAll: () => _onSelected(2)),
@@ -41,17 +41,31 @@ class _StepMainAppState extends State<StepMainApp> {
 
   Future<void> _setupWidgetChannel() async {
     _channel.setMethodCallHandler((call) async {
-      if (call.method == 'switchToWorkoutMode') {
-        if (mounted) {
+      if (mounted) {
+        if (call.method == 'SWITCH_TO_WORKOUT_MODE' ||
+            call.method == 'switchToWorkoutMode' ||
+            call.method == 'OPEN_WORKOUT_PAGE') {
           _onSelected(1);
+        } else if (call.method == 'OPEN_DASHBOARD') {
+          _onSelected(0);
         }
       }
     });
 
     try {
-      final bool? pendingLaunch = await _channel.invokeMethod('checkWidgetLaunch');
-      if (pendingLaunch == true && mounted) {
-        _onSelected(1);
+      final dynamic pendingLaunch = await _channel.invokeMethod(
+        'checkWidgetLaunch',
+      );
+      if (pendingLaunch is String && mounted) {
+        if (pendingLaunch == 'SWITCH_TO_WORKOUT_MODE' ||
+            pendingLaunch == 'switchToWorkoutMode' ||
+            pendingLaunch == 'OPEN_WORKOUT_PAGE') {
+          _onSelected(1);
+        } else if (pendingLaunch == 'OPEN_DASHBOARD') {
+          _onSelected(0);
+        }
+      } else if (pendingLaunch == true && mounted) {
+        _onSelected(1); // Fallback for old boolean just in case
       }
     } catch (e) {
       // ignore errors
@@ -83,12 +97,26 @@ class _StepMainAppState extends State<StepMainApp> {
     activityCtrl.setFetching(false);
 
     if (!mounted) return;
+    motionCtrl.onServiceStoppedExternally = () async {
+      final newSettings = settingsCtrl.settings.copyWith(
+        runTrackingInBackground: false,
+      );
+      settingsCtrl.updateSettings(newSettings);
+
+      final steps = motionCtrl.todaySteps;
+      final distance = (steps * MotionController.kmPerStep).toDouble();
+      final calories = (steps * MotionController.kcalPerStep).toDouble();
+      await activityCtrl.updateTodaySteps(steps, distance, calories);
+    };
+
     if (settingsCtrl.settings.runTrackingInBackground) {
       motionCtrl.start(
         dailyGoal: settingsCtrl.settings.dailyStepGoal,
         alreadyCountedToday: activityCtrl.todayRecord?.steps ?? 0,
       );
     }
+
+    await motionCtrl.restoreWorkout();
   }
 
   @override

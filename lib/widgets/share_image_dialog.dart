@@ -4,11 +4,14 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:gal/gal.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:step_detector/core/localization/app_translations.dart';
 import 'package:step_detector/core/theme/theme_colors.dart';
 import 'package:step_detector/data/models/daily_step_record.dart';
 import 'package:step_detector/data/models/workout_session.dart';
+import 'package:step_detector/widgets/map_path_viewer.dart';
 
 Widget _buildImageStatItem(String label, String value) {
   return Column(
@@ -46,12 +49,37 @@ class ShareDailySummaryDialog extends StatefulWidget {
   });
 
   @override
-  State<ShareDailySummaryDialog> createState() => _ShareDailySummaryDialogState();
+  State<ShareDailySummaryDialog> createState() =>
+      _ShareDailySummaryDialogState();
 }
 
 class _ShareDailySummaryDialogState extends State<ShareDailySummaryDialog> {
   final GlobalKey _repaintKey = GlobalKey();
   bool _isSaving = false;
+  bool _mapIsDark = true;
+  double _markerSize = 20.0;
+  GoogleMapController? _mapController;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMapPreference();
+  }
+
+  Future<void> _loadMapPreference() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (mounted) {
+      setState(() {
+        _mapIsDark = prefs.getBool('map_is_dark_export') ?? true;
+      });
+    }
+  }
+
+  Future<void> _setMapPreference(bool value) async {
+    setState(() => _mapIsDark = value);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('map_is_dark_export', value);
+  }
 
   Future<void> _captureAndSave() async {
     if (_isSaving) return;
@@ -69,7 +97,9 @@ class _ShareDailySummaryDialogState extends State<ShareDailySummaryDialog> {
 
       await Future.delayed(const Duration(milliseconds: 100));
 
-      final boundary = _repaintKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+      final boundary =
+          _repaintKey.currentContext?.findRenderObject()
+              as RenderRepaintBoundary?;
       if (boundary == null) {
         setState(() => _isSaving = false);
         return;
@@ -81,7 +111,8 @@ class _ShareDailySummaryDialogState extends State<ShareDailySummaryDialog> {
 
       if (pngBytes != null) {
         final directory = await getTemporaryDirectory();
-        final path = '${directory.path}/movexa_daily_${DateTime.now().millisecondsSinceEpoch}.png';
+        final path =
+            '${directory.path}/movexa_daily_${DateTime.now().millisecondsSinceEpoch}.png';
         final file = File(path);
         await file.writeAsBytes(pngBytes);
         await Gal.putImage(path);
@@ -113,139 +144,251 @@ class _ShareDailySummaryDialogState extends State<ShareDailySummaryDialog> {
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          RepaintBoundary(
-            key: _repaintKey,
-            child: Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [
-                    Color(0xFF2A2D34),
-                    Color(0xFF13151A),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(24),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.5),
-                    blurRadius: 30,
-                    offset: const Offset(0, 15),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            RepaintBoundary(
+              key: _repaintKey,
+              child: Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF2A2D34), Color(0xFF13151A)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   ),
-                ],
+
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.5),
+                      blurRadius: 30,
+                      offset: const Offset(0, 15),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Movexa | Daily Summary',
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 12,
+                          ),
+                        ),
+                        Image.asset(
+                          'assets/Movexa.png',
+                          width: 24,
+                          height: 24,
+                          color: Colors.white70,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      '${record.steps} ${'steps'.tr(context)}',
+                      style: textTheme.headlineMedium?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${record.date.day.toString().padLeft(2, '0')}/${record.date.month.toString().padLeft(2, '0')}/${record.date.year}',
+                      style: const TextStyle(
+                        color: Colors.white60,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    MapPathViewer(
+                      path: record.path,
+                      height: 140,
+                      interactive: true,
+                      isDarkStyle: _mapIsDark,
+                      hideMapControls: true,
+                      markerSize: _markerSize,
+                      onMapCreated: (c) => _mapController = c,
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildImageStatItem(
+                            'distance'.tr(context),
+                            '${record.distance.toStringAsFixed(2)}km',
+                          ),
+                        ),
+                        Expanded(
+                          child: _buildImageStatItem(
+                            'calories'.tr(context),
+                            '${record.calories.toStringAsFixed(0)}kcal',
+                          ),
+                        ),
+                        Expanded(
+                          child: _buildImageStatItem(
+                            'stepGoal'.tr(context),
+                            '${widget.stepGoal}',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: ThemeColors.getSurface(context),
+                borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
-                mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  const Text(
+                    'Edit Map',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SwitchListTile(
+                    title: const Text(
+                      'Dark Map Style',
+                      style: TextStyle(color: Colors.white70, fontSize: 14),
+                    ),
+                    value: _mapIsDark,
+                    onChanged: _setMapPreference,
+                    activeColor: ThemeColors.getBrandAccent(context),
+                    contentPadding: EdgeInsets.zero,
+                    visualDensity: VisualDensity.compact,
+                  ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(
-                        'Movexa | Daily Summary',
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 12,
-                        ),
+                        'Zoom Level',
+                        style: TextStyle(color: Colors.white70, fontSize: 14),
                       ),
-                      Image.asset(
-                        'assets/Movexa.png',
-                        width: 24,
-                        height: 24,
-                        color: Colors.white70,
+                      Row(
+                        children: [
+                          IconButton(
+                            icon: const Icon(
+                              Icons.remove_circle_outline,
+                              color: Colors.white,
+                            ),
+                            onPressed: () => _mapController?.animateCamera(
+                              CameraUpdate.zoomOut(),
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(
+                              Icons.add_circle_outline,
+                              color: Colors.white,
+                            ),
+                            onPressed: () => _mapController?.animateCamera(
+                              CameraUpdate.zoomIn(),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
-                  Text(
-                    '${record.steps} ${'steps'.tr(context)}',
-                    style: textTheme.headlineMedium?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${record.date.day.toString().padLeft(2, '0')}/${record.date.month.toString().padLeft(2, '0')}/${record.date.year}',
-                    style: const TextStyle(
-                      color: Colors.white60,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 14,
-                    ),
-                  ),
-                  const SizedBox(height: 140),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Expanded(
-                        child: _buildImageStatItem(
-                          'distance'.tr(context),
-                          '${record.distance.toStringAsFixed(2)}km',
-                        ),
+                      const Text(
+                        'Marker Size',
+                        style: TextStyle(color: Colors.white70, fontSize: 14),
                       ),
-                      Expanded(
-                        child: _buildImageStatItem(
-                          'calories'.tr(context),
-                          '${record.calories.toStringAsFixed(0)}kcal',
-                        ),
-                      ),
-                      Expanded(
-                        child: _buildImageStatItem(
-                          'stepGoal'.tr(context),
-                          '${widget.stepGoal}',
-                        ),
+                      Row(
+                        children: [
+                          IconButton(
+                            icon: const Icon(
+                              Icons.remove_circle_outline,
+                              color: Colors.white,
+                            ),
+                            onPressed: () {
+                              if (_markerSize > 10)
+                                setState(() => _markerSize -= 5);
+                            },
+                          ),
+                          SizedBox(
+                            width: 24,
+                            child: Text(
+                              '${_markerSize.toInt()}',
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(
+                              Icons.add_circle_outline,
+                              color: Colors.white,
+                            ),
+                            onPressed: () {
+                              if (_markerSize < 50)
+                                setState(() => _markerSize += 5);
+                            },
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ],
               ),
             ),
-          ),
-          const SizedBox(height: 24),
-          ElevatedButton.icon(
-            onPressed: _isSaving ? null : _captureAndSave,
-            icon: _isSaving
-                ? const SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 2,
-                    ),
-                  )
-                : const Icon(Icons.download_rounded, color: Colors.white),
-            label: Text(
-              _isSaving ? '...' : 'download'.tr(context),
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
+            const SizedBox(height: 8),
+            ElevatedButton.icon(
+              onPressed: _isSaving ? null : _captureAndSave,
+              icon: _isSaving
+                  ? const SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : const Icon(Icons.download_rounded, color: Colors.white),
+              label: Text(
+                _isSaving ? '...' : 'download'.tr(context),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: ThemeColors.getBrandAccent(context),
+                minimumSize: const Size(double.infinity, 56),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
               ),
             ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: ThemeColors.getBrandAccent(context),
-              minimumSize: const Size(double.infinity, 56),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+            const SizedBox(height: 12),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                'cancel'.tr(context),
+                style: const TextStyle(
+                  color: Colors.white70,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 12),
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'cancel'.tr(context),
-              style: const TextStyle(
-                color: Colors.white70,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -264,6 +407,30 @@ class ShareWorkoutSessionDialog extends StatefulWidget {
 class _ShareWorkoutSessionDialogState extends State<ShareWorkoutSessionDialog> {
   final GlobalKey _repaintKey = GlobalKey();
   bool _isSaving = false;
+  bool _mapIsDark = true;
+  double _markerSize = 20.0;
+  GoogleMapController? _mapController;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMapPreference();
+  }
+
+  Future<void> _loadMapPreference() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (mounted) {
+      setState(() {
+        _mapIsDark = prefs.getBool('map_is_dark_export') ?? true;
+      });
+    }
+  }
+
+  Future<void> _setMapPreference(bool value) async {
+    setState(() => _mapIsDark = value);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('map_is_dark_export', value);
+  }
 
   Future<void> _captureAndSave() async {
     if (_isSaving) return;
@@ -328,162 +495,274 @@ class _ShareWorkoutSessionDialogState extends State<ShareWorkoutSessionDialog> {
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          RepaintBoundary(
-            key: _repaintKey,
-            child: Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [
-                    Color(0xFF2A2D34),
-                    Color(0xFF13151A),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(24),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.5),
-                    blurRadius: 30,
-                    offset: const Offset(0, 15),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            RepaintBoundary(
+              key: _repaintKey,
+              child: Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF2A2D34), Color(0xFF13151A)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   ),
-                ],
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.5),
+                      blurRadius: 30,
+                      offset: const Offset(0, 15),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Movexa | Workout',
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 12,
+                          ),
+                        ),
+                        Image.asset(
+                          'assets/Movexa.png',
+                          width: 24,
+                          height: 24,
+                          color: Colors.white70,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      '${session.distance.toStringAsFixed(2)} KM',
+                      style: textTheme.headlineMedium?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${session.startTime.day.toString().padLeft(2, '0')}/${session.startTime.month.toString().padLeft(2, '0')}/${session.startTime.year}',
+                      style: const TextStyle(
+                        color: Colors.white60,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    MapPathViewer(
+                      path: session.path,
+                      height: 140,
+                      interactive: true,
+                      isDarkStyle: _mapIsDark,
+                      hideMapControls: true,
+                      markerSize: _markerSize,
+                      onMapCreated: (c) => _mapController = c,
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildImageStatItem(
+                            'distance'.tr(context),
+                            '${session.distance.toStringAsFixed(2)}km',
+                          ),
+                        ),
+                        Expanded(
+                          child: _buildImageStatItem(
+                            'duration'.tr(context),
+                            session.formattedDuration,
+                          ),
+                        ),
+                        Expanded(
+                          child: _buildImageStatItem(
+                            'calories'.tr(context),
+                            '${session.calories.toStringAsFixed(0)}kcal',
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildImageStatItem(
+                            'speed'.tr(context),
+                            '${session.speedKmh.toStringAsFixed(1)}km/h',
+                          ),
+                        ),
+                        Expanded(
+                          child: _buildImageStatItem(
+                            'pace'.tr(context),
+                            session.averagePace,
+                          ),
+                        ),
+                        Expanded(
+                          child: _buildImageStatItem(
+                            'steps'.tr(context),
+                            '${session.steps}',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: ThemeColors.getSurface(context),
+                borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
-                mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  const Text(
+                    'Edit Map',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SwitchListTile(
+                    title: const Text(
+                      'Dark Map Style',
+                      style: TextStyle(color: Colors.white70, fontSize: 14),
+                    ),
+                    value: _mapIsDark,
+                    onChanged: _setMapPreference,
+                    activeColor: ThemeColors.getBrandAccent(context),
+                    contentPadding: EdgeInsets.zero,
+                    visualDensity: VisualDensity.compact,
+                  ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(
-                        'Movexa | Workout',
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 12,
-                        ),
+                        'Zoom Level',
+                        style: TextStyle(color: Colors.white70, fontSize: 14),
                       ),
-                      Image.asset(
-                        'assets/Movexa.png',
-                        width: 24,
-                        height: 24,
-                        color: Colors.white70,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    '${session.distance.toStringAsFixed(2)} KM',
-                    style: textTheme.headlineMedium?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${session.startTime.day.toString().padLeft(2, '0')}/${session.startTime.month.toString().padLeft(2, '0')}/${session.startTime.year}',
-                    style: const TextStyle(
-                      color: Colors.white60,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 14,
-                    ),
-                  ),
-                  const SizedBox(height: 140),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildImageStatItem(
-                          'distance'.tr(context),
-                          '${session.distance.toStringAsFixed(2)}km',
-                        ),
-                      ),
-                      Expanded(
-                        child: _buildImageStatItem(
-                          'duration'.tr(context),
-                          session.formattedDuration,
-                        ),
-                      ),
-                      Expanded(
-                        child: _buildImageStatItem(
-                          'calories'.tr(context),
-                          '${session.calories.toStringAsFixed(0)}kcal',
-                        ),
+                      Row(
+                        children: [
+                          IconButton(
+                            icon: const Icon(
+                              Icons.remove_circle_outline,
+                              color: Colors.white,
+                            ),
+                            onPressed: () => _mapController?.animateCamera(
+                              CameraUpdate.zoomOut(),
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(
+                              Icons.add_circle_outline,
+                              color: Colors.white,
+                            ),
+                            onPressed: () => _mapController?.animateCamera(
+                              CameraUpdate.zoomIn(),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                  const SizedBox(height: 24),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Expanded(
-                        child: _buildImageStatItem(
-                          'speed'.tr(context),
-                          '${session.speedKmh.toStringAsFixed(1)}km/h',
-                        ),
+                      const Text(
+                        'Marker Size',
+                        style: TextStyle(color: Colors.white70, fontSize: 14),
                       ),
-                      Expanded(
-                        child: _buildImageStatItem(
-                          'pace'.tr(context),
-                          session.averagePace,
-                        ),
-                      ),
-                      Expanded(
-                        child: _buildImageStatItem(
-                          'steps'.tr(context),
-                          '${session.steps}',
-                        ),
+                      Row(
+                        children: [
+                          IconButton(
+                            icon: const Icon(
+                              Icons.remove_circle_outline,
+                              color: Colors.white,
+                            ),
+                            onPressed: () {
+                              if (_markerSize > 10)
+                                setState(() => _markerSize -= 5);
+                            },
+                          ),
+                          SizedBox(
+                            width: 24,
+                            child: Text(
+                              '${_markerSize.toInt()}',
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(
+                              Icons.add_circle_outline,
+                              color: Colors.white,
+                            ),
+                            onPressed: () {
+                              if (_markerSize < 50)
+                                setState(() => _markerSize += 5);
+                            },
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ],
               ),
             ),
-          ),
-          const SizedBox(height: 24),
-          ElevatedButton.icon(
-            onPressed: _isSaving ? null : _captureAndSave,
-            icon: _isSaving
-                ? const SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 2,
-                    ),
-                  )
-                : const Icon(Icons.download_rounded, color: Colors.white),
-            label: Text(
-              _isSaving ? '...' : 'download'.tr(context),
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
+            const SizedBox(height: 8),
+            ElevatedButton.icon(
+              onPressed: _isSaving ? null : _captureAndSave,
+              icon: _isSaving
+                  ? const SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : const Icon(Icons.download_rounded, color: Colors.white),
+              label: Text(
+                _isSaving ? '...' : 'download'.tr(context),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: ThemeColors.getBrandAccent(context),
+                minimumSize: const Size(double.infinity, 56),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
               ),
             ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: ThemeColors.getBrandAccent(context),
-              minimumSize: const Size(double.infinity, 56),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+            const SizedBox(height: 12),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                'cancel'.tr(context),
+                style: const TextStyle(
+                  color: Colors.white70,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 12),
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'cancel'.tr(context),
-              style: const TextStyle(
-                color: Colors.white70,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

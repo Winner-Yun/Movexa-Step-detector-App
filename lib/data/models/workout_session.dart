@@ -1,4 +1,5 @@
 import 'package:step_detector/core/model/base_model.dart';
+
 class WorkoutSession implements BaseModel {
   final String id;
   final String title;
@@ -10,6 +11,7 @@ class WorkoutSession implements BaseModel {
   final String averagePace;
   final double speedKmh;
   final List<double>? paceChartData;
+  final List<Map<String, dynamic>>? path;
 
   const WorkoutSession({
     required this.id,
@@ -22,6 +24,7 @@ class WorkoutSession implements BaseModel {
     required this.averagePace,
     required this.speedKmh,
     this.paceChartData,
+    this.path,
   });
 
   String get formattedDuration {
@@ -47,6 +50,7 @@ class WorkoutSession implements BaseModel {
       'averagePace': averagePace,
       'speedKmh': speedKmh,
       'paceChartData': paceChartData,
+      'path': path,
     };
   }
 
@@ -55,17 +59,22 @@ class WorkoutSession implements BaseModel {
       id: map['id'] ?? '',
       title: map['title'] ?? 'Workout',
       startTime: DateTime.fromMillisecondsSinceEpoch(map['startTime']),
-      duration: Duration(seconds: (map['durationSeconds'] as num?)?.toInt() ?? 0),
+      duration: Duration(
+        seconds: (map['durationSeconds'] as num?)?.toInt() ?? 0,
+      ),
       steps: (map['steps'] as num?)?.toInt() ?? 0,
       calories: (map['calories'] as num?)?.toDouble() ?? 0.0,
       distance: (map['distance'] as num?)?.toDouble() ?? 0.0,
       averagePace: map['averagePace'] ?? '0:00',
       speedKmh: (map['speedKmh'] as num?)?.toDouble() ?? 0.0,
-      paceChartData: (map['paceChartData'] as List<dynamic>?)
+      paceChartData:
+          (map['paceChartData'] as List<dynamic>?)
               ?.map((e) => (e as num).toDouble())
               .toList() ??
           [],
+      path: (map['path'] as List<dynamic>?)
+          ?.map((e) => Map<String, dynamic>.from(e as Map))
+          .toList(),
     );
   }
 }
-

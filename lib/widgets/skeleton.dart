@@ -129,26 +129,70 @@ class ProfileSkeleton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ShimmerWrapper(
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 20),
-          // Avatar
-          const Skeleton(width: 100, height: 100, shape: BoxShape.circle),
-          const SizedBox(height: 16),
-          // Name
-          const Skeleton(width: 150, height: 24),
-          const SizedBox(height: 8),
-          // Email
-          const Skeleton(width: 200, height: 16),
-          const SizedBox(height: 32),
-          // Info Cards
-          const Skeleton(width: double.infinity, height: 100, borderRadius: 16),
           const SizedBox(height: 24),
-          // List tiles
-          const Skeleton(width: double.infinity, height: 60, borderRadius: 12),
+          // Profile Card
+          const Skeleton(width: double.infinity, height: 110, borderRadius: 24),
+          const SizedBox(height: 32),
+
+          // Account section
+          const Skeleton(width: 100, height: 24),
           const SizedBox(height: 12),
-          const Skeleton(width: double.infinity, height: 60, borderRadius: 12),
+          const Skeleton(width: double.infinity, height: 110, borderRadius: 24),
+
+          const SizedBox(height: 24),
+
+          // Preferences section
+          const Skeleton(width: 120, height: 24),
           const SizedBox(height: 12),
-          const Skeleton(width: double.infinity, height: 60, borderRadius: 12),
+          const Skeleton(width: double.infinity, height: 220, borderRadius: 24),
+
+          const SizedBox(height: 40),
+          const Center(child: Skeleton(width: 100, height: 24)),
+        ],
+      ),
+    );
+  }
+}
+
+class HistoryDailySkeleton extends StatelessWidget {
+  const HistoryDailySkeleton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ShimmerWrapper(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Month chart
+          const Skeleton(width: double.infinity, height: 250, borderRadius: 24),
+          const SizedBox(height: 32),
+
+          // "Summary for X" header
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: const [
+              Skeleton(width: 150, height: 24),
+              Skeleton(width: 24, height: 24, shape: BoxShape.circle),
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          // Summary Card
+          const Skeleton(width: double.infinity, height: 160, borderRadius: 28),
+          const SizedBox(height: 24),
+
+          // Activity Breakdown Header
+          const Skeleton(width: 140, height: 20),
+          const SizedBox(height: 16),
+
+          // Activity breakdown list
+          const Skeleton(width: double.infinity, height: 70, borderRadius: 16),
+          const SizedBox(height: 12),
+          const Skeleton(width: double.infinity, height: 70, borderRadius: 16),
+          const SizedBox(height: 12),
+          const Skeleton(width: double.infinity, height: 70, borderRadius: 16),
         ],
       ),
     );

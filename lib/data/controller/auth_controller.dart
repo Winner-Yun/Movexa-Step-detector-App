@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:step_detector/core/utils/widget_updater.dart';
 
 class AuthController extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -53,6 +54,7 @@ class AuthController extends ChangeNotifier {
     await Future.wait([
       _auth.signOut(),
       _googleSignIn.signOut(),
+      WidgetUpdater.updateLoggedOutState(),
     ]);
   }
 
@@ -61,4 +63,3 @@ class AuthController extends ChangeNotifier {
     notifyListeners();
   }
 }
-

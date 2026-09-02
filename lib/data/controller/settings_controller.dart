@@ -22,12 +22,14 @@ class SettingsController extends ChangeNotifier {
     final stepGoalStr = await db.getSetting('dailyStepGoal');
     final bgTrackingStr = await db.getSetting('runTrackingInBackground');
     final notifsStr = await db.getSetting('notificationsEnabled');
-    
+
     _settings = _settings.copyWith(
       darkModeEnabled: isDarkStr == 'true',
       language: lang ?? 'km',
       dailyStepGoal: stepGoalStr != null ? int.tryParse(stepGoalStr) : null,
-      runTrackingInBackground: bgTrackingStr != null ? bgTrackingStr == 'true' : null,
+      runTrackingInBackground: bgTrackingStr != null
+          ? bgTrackingStr == 'true'
+          : null,
       notificationsEnabled: notifsStr != null ? notifsStr == 'true' : null,
     );
     notifyListeners();
@@ -56,11 +58,23 @@ class SettingsController extends ChangeNotifier {
         notifyListeners();
         // Sync fetched firestore settings to local db
         final db = DatabaseHelper.instance;
-        await db.saveSetting('darkModeEnabled', _settings.darkModeEnabled.toString());
+        await db.saveSetting(
+          'darkModeEnabled',
+          _settings.darkModeEnabled.toString(),
+        );
         await db.saveSetting('language', _settings.language);
-        await db.saveSetting('dailyStepGoal', _settings.dailyStepGoal.toString());
-        await db.saveSetting('runTrackingInBackground', _settings.runTrackingInBackground.toString());
-        await db.saveSetting('notificationsEnabled', _settings.notificationsEnabled.toString());
+        await db.saveSetting(
+          'dailyStepGoal',
+          _settings.dailyStepGoal.toString(),
+        );
+        await db.saveSetting(
+          'runTrackingInBackground',
+          _settings.runTrackingInBackground.toString(),
+        );
+        await db.saveSetting(
+          'notificationsEnabled',
+          _settings.notificationsEnabled.toString(),
+        );
       } else {
         _settings = const UserSettings();
         notifyListeners();
@@ -76,11 +90,20 @@ class SettingsController extends ChangeNotifier {
 
     // Save locally
     final db = DatabaseHelper.instance;
-    await db.saveSetting('darkModeEnabled', newSettings.darkModeEnabled.toString());
+    await db.saveSetting(
+      'darkModeEnabled',
+      newSettings.darkModeEnabled.toString(),
+    );
     await db.saveSetting('language', newSettings.language);
     await db.saveSetting('dailyStepGoal', newSettings.dailyStepGoal.toString());
-    await db.saveSetting('runTrackingInBackground', newSettings.runTrackingInBackground.toString());
-    await db.saveSetting('notificationsEnabled', newSettings.notificationsEnabled.toString());
+    await db.saveSetting(
+      'runTrackingInBackground',
+      newSettings.runTrackingInBackground.toString(),
+    );
+    await db.saveSetting(
+      'notificationsEnabled',
+      newSettings.notificationsEnabled.toString(),
+    );
 
     final user = _auth.currentUser;
     if (user == null) return;
@@ -102,4 +125,3 @@ class SettingsController extends ChangeNotifier {
     await updateSettings(updated);
   }
 }
-

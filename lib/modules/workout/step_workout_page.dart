@@ -17,21 +17,16 @@ class StepWorkoutPage extends StatefulWidget {
 }
 
 class _StepWorkoutPageState extends State<StepWorkoutPage> {
-  bool _isTracking = false;
-  int _secondsElapsed = 0;
-  DateTime? _workoutStartTime;
-  Timer? _timer;
-
   final int _stepGoal = 50;
 
   @override
   void dispose() {
-    _timer?.cancel();
     super.dispose();
   }
 
   void _toggleTracking() {
-    if (_isTracking) {
+    final motionCtrl = context.read<MotionController>();
+    if (motionCtrl.isWorkoutActive) {
       _stopTracking();
     } else {
       _startTracking();
@@ -54,29 +49,17 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
       }
       return;
     }
-
-    setState(() {
-      _isTracking = true;
-      _secondsElapsed = 0;
-      _workoutStartTime = DateTime.now();
-    });
-
-    _timer?.cancel();
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      setState(() => _secondsElapsed++);
-    });
   }
 
-  void _stopTracking() {
+  Future<void> _stopTracking() async {
     try {
-      _timer?.cancel();
-      _timer = null;
-
       final motionCtrl = context.read<MotionController>();
-      final steps = motionCtrl.stopWorkout();
-      final duration = Duration(seconds: _secondsElapsed);
-      final distanceKm = steps * kmPerStep;
-      final calories = steps * kcalPerStep;
+      final durationSeconds = motionCtrl.workoutDurationSeconds;
+      final path = List<Map<String, dynamic>>.from(motionCtrl.workoutPath);
+      final steps = await motionCtrl.stopWorkout();
+      final duration = Duration(seconds: durationSeconds);
+      final distanceKm = (steps * MotionController.kmPerStep).toDouble();
+      final calories = (steps * MotionController.kcalPerStep).toDouble();
 
       final speedKmh = duration.inSeconds > 0
           ? distanceKm / (duration.inSeconds / 3600.0)
@@ -85,15 +68,17 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
       final session = WorkoutSession(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         title: 'workout',
-        startTime: _workoutStartTime ?? DateTime.now().subtract(duration),
+        startTime: DateTime.now().subtract(duration),
         duration: duration,
         steps: steps,
         calories: calories,
         distance: distanceKm,
         averagePace: _formatPace(duration, distanceKm),
         speedKmh: speedKmh,
+        path: path,
       );
 
+      if (!mounted) return;
       context.read<ActivityController>().saveWorkoutSession(session);
 
       _showWorkoutSummaryDialog(
@@ -101,17 +86,10 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
         calories,
         distanceKm,
         speedKmh,
-        _formattedTime,
+        _getFormattedTime(durationSeconds),
       );
     } catch (e, stack) {
       debugPrint('Error stopping tracking: $e\n$stack');
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isTracking = false;
-          _secondsElapsed = 0;
-        });
-      }
     }
   }
 
@@ -123,9 +101,9 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
     return '$paceMinutes:${paceSeconds.toString().padLeft(2, '0')}';
   }
 
-  String get _formattedTime {
-    final minutes = (_secondsElapsed / 60).floor().toString().padLeft(2, '0');
-    final seconds = (_secondsElapsed % 60).toString().padLeft(2, '0');
+  String _getFormattedTime(int secondsElapsed) {
+    final minutes = (secondsElapsed / 60).floor().toString().padLeft(2, '0');
+    final seconds = (secondsElapsed % 60).toString().padLeft(2, '0');
     return '$minutes:$seconds';
   }
 
@@ -354,7 +332,12 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
     );
   }
 
-  Widget _buildMainTimer(TextTheme textTheme, int currentSteps) {
+  Widget _buildMainTimer(
+    TextTheme textTheme,
+    int currentSteps,
+    bool isTracking,
+    String formattedTime,
+  ) {
     return Stack(
       alignment: Alignment.center,
       children: [
@@ -367,11 +350,11 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
             color: ThemeColors.getSurface(context),
             boxShadow: [
               BoxShadow(
-                color: _isTracking
+                color: isTracking
                     ? ThemeColors.getBrandAccent(context).withValues(alpha: 0.3)
                     : ThemeColors.getText(context).withValues(alpha: 0.05),
-                blurRadius: _isTracking ? 50 : 20,
-                spreadRadius: _isTracking ? 5 : 0,
+                blurRadius: isTracking ? 50 : 20,
+                spreadRadius: isTracking ? 5 : 0,
                 offset: const Offset(0, 10),
               ),
             ],
@@ -381,9 +364,9 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
           width: 280,
           height: 280,
           child: CircularProgressIndicator(
-            value: _isTracking ? null : 0.0,
+            value: isTracking ? null : 0.0,
             strokeWidth: 6,
-            color: _isTracking
+            color: isTracking
                 ? ThemeColors.getBrandAccent(context)
                 : ThemeColors.getScaffoldSoft(context),
             backgroundColor: ThemeColors.getScaffoldSoft(context),
@@ -393,17 +376,17 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              _isTracking ? Icons.timer_rounded : Icons.timer_off_rounded,
-              color: _isTracking
+              isTracking ? Icons.timer_rounded : Icons.timer_off_rounded,
+              color: isTracking
                   ? ThemeColors.getBrandAccent(context)
                   : ThemeColors.getMutedText(context).withValues(alpha: 0.5),
               size: 32,
             ),
             SizedBox(height: 8),
             Text(
-              _formattedTime,
+              formattedTime,
               style: textTheme.displayMedium?.copyWith(
-                color: _isTracking
+                color: isTracking
                     ? ThemeColors.getBrandAccent(context)
                     : ThemeColors.getText(context),
                 fontWeight: FontWeight.w900,
@@ -414,7 +397,7 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: _isTracking
+                color: isTracking
                     ? ThemeColors.getProgressChip(context)
                     : ThemeColors.getScaffoldSoft(context),
                 borderRadius: BorderRadius.circular(20),
@@ -424,7 +407,7 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
                 children: [
                   Icon(
                     Icons.directions_run_rounded,
-                    color: _isTracking
+                    color: isTracking
                         ? ThemeColors.getProgressChipText(context)
                         : ThemeColors.getMutedText(context),
                     size: 20,
@@ -433,7 +416,7 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
                   Text(
                     '$currentSteps ${'steps'.tr(context)}',
                     style: textTheme.titleMedium?.copyWith(
-                      color: _isTracking
+                      color: isTracking
                           ? ThemeColors.getProgressChipText(context)
                           : ThemeColors.getMutedText(context),
                       fontWeight: FontWeight.w800,
@@ -526,7 +509,7 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
     );
   }
 
-  Widget _buildControlButton() {
+  Widget _buildControlButton(bool isTracking) {
     return GestureDetector(
       onTap: _toggleTracking,
       child: AnimatedContainer(
@@ -535,7 +518,7 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
         padding: const EdgeInsets.symmetric(vertical: 20),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: _isTracking
+            colors: isTracking
                 ? [const Color(0xFFE53935), const Color(0xFFC62828)]
                 : [
                     ThemeColors.getPrimaryGradientStart(context),
@@ -545,7 +528,7 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: _isTracking
+              color: isTracking
                   ? const Color(0xFFE53935).withValues(alpha: 0.3)
                   : ThemeColors.getBrandAccent(context).withValues(alpha: 0.3),
               blurRadius: 16,
@@ -557,13 +540,13 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              _isTracking ? Icons.stop_rounded : Icons.play_arrow_rounded,
+              isTracking ? Icons.stop_rounded : Icons.play_arrow_rounded,
               color: Colors.white,
               size: 28,
             ),
             SizedBox(width: 8),
             Text(
-              _isTracking ? 'stop'.tr(context) : 'start'.tr(context),
+              isTracking ? 'stop'.tr(context) : 'start'.tr(context),
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 20,
@@ -580,9 +563,12 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final motionCtrl = context.watch<MotionController>();
-    final currentSteps = _isTracking ? motionCtrl.workoutSteps : 0;
-    final calories = currentSteps * kcalPerStep;
-    final distance = currentSteps * kmPerStep;
+
+    final isTracking = motionCtrl.isWorkoutActive;
+    final currentSteps = isTracking ? motionCtrl.workoutSteps : 0;
+    final calories = (currentSteps * MotionController.kcalPerStep).toDouble();
+    final distance = (currentSteps * MotionController.kmPerStep).toDouble();
+    final formattedTime = _getFormattedTime(motionCtrl.workoutDurationSeconds);
 
     return Scaffold(
       body: SafeArea(
@@ -593,7 +579,12 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
             children: [
               _buildPageHeader(textTheme),
               const Spacer(flex: 1),
-              _buildMainTimer(textTheme, currentSteps),
+              _buildMainTimer(
+                textTheme,
+                currentSteps,
+                isTracking,
+                formattedTime,
+              ),
               const Spacer(flex: 1),
               Row(
                 children: [
@@ -619,7 +610,7 @@ class _StepWorkoutPageState extends State<StepWorkoutPage> {
                 ],
               ),
               SizedBox(height: 40),
-              _buildControlButton(),
+              _buildControlButton(isTracking),
               SizedBox(height: 20),
             ],
           ),
