@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:step_detector/core/constants/app_img.dart';
+import 'package:step_detector/core/localization/app_translations.dart';
 import 'package:step_detector/core/theme/theme_colors.dart';
 import 'package:step_detector/data/controller/activity_controller.dart';
 import 'package:step_detector/data/controller/motion_controller.dart';
@@ -8,22 +10,23 @@ import 'package:step_detector/data/controller/settings_controller.dart';
 import 'package:step_detector/widgets/activity_section.dart';
 import 'package:step_detector/widgets/dashboard_widgets.dart';
 import 'package:step_detector/widgets/primary_button.dart';
+import 'package:step_detector/widgets/skeleton.dart';
 import 'package:step_detector/widgets/stat_card.dart';
+import 'package:step_detector/widgets/map_path_viewer.dart';
 import 'package:step_detector/widgets/tracking_toggle_card.dart';
+import 'package:step_detector/widgets/set_goal_dialog.dart';
 
 class StepDashboardPage extends StatefulWidget {
-  const StepDashboardPage({super.key});
+  const StepDashboardPage({super.key, this.onSeeAll});
+  final VoidCallback? onSeeAll;
 
   @override
   State<StepDashboardPage> createState() => _StepDashboardPageState();
 }
 
 class _StepDashboardPageState extends State<StepDashboardPage> {
-  final TextEditingController _goalInputController = TextEditingController();
-
   @override
   void dispose() {
-    _goalInputController.dispose();
     super.dispose();
   }
 
@@ -37,148 +40,17 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
     BuildContext context,
     SettingsController settingsCtrl,
   ) {
-    String? errorMessage;
-
     showDialog(
       context: context,
       builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return Dialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(24),
-              ),
-              backgroundColor: ThemeColors.getSurface(context),
-              elevation: 8,
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _buildDialogHeader(),
-                    SizedBox(height: 24),
-                    TextField(
-                      controller: _goalInputController,
-                      keyboardType: TextInputType.number,
-                      textAlign: TextAlign.center,
-                      cursorColor: ThemeColors.getBrandAccent(context),
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w900,
-                        color: ThemeColors.getBrandAccent(context),
-                      ),
-                      onChanged: (value) {
-                        if (errorMessage != null) {
-                          setState(() => errorMessage = null);
-                        }
-                      },
-                      decoration: InputDecoration(
-                        hintText: '${settingsCtrl.settings.dailyStepGoal}',
-                        hintStyle: TextStyle(
-                          color: ThemeColors.getBrandAccent(
-                            context,
-                          ).withValues(alpha: 0.3),
-                          fontSize: 24,
-                          fontWeight: FontWeight.w700,
-                        ),
-                        filled: true,
-                        fillColor: ThemeColors.getScaffoldSoft(context),
-                        contentPadding: const EdgeInsets.symmetric(
-                          vertical: 16,
-                        ),
-                        errorText: errorMessage,
-                        errorStyle: TextStyle(
-                          color: Colors.redAccent,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide.none,
-                        ),
-                        errorBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide(
-                            color: Colors.redAccent,
-                            width: 1.5,
-                          ),
-                        ),
-                        focusedErrorBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide(
-                            color: Colors.redAccent,
-                            width: 2,
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 28),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                              _goalInputController.clear();
-                            },
-                            style: TextButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14),
-                              ),
-                            ),
-                            child: Text(
-                              'បោះបង់',
-                              style: TextStyle(
-                                color: ThemeColors.getMutedText(context),
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: 12),
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: () {
-                              final newGoal = int.tryParse(
-                                _goalInputController.text,
-                              );
-                              if (newGoal != null && newGoal > 0) {
-                                settingsCtrl.updateStepGoal(newGoal);
-                                _showSnack('បានកំណត់គោលដៅថ្មី: $newGoal');
-                                Navigator.pop(context);
-                                _goalInputController.clear();
-                              } else {
-                                setState(
-                                  () => errorMessage =
-                                      'សូមបញ្ចូលចំនួនឲ្យបានត្រឹមត្រូវ',
-                                );
-                              }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: ThemeColors.getBrandAccent(
-                                context,
-                              ),
-                              foregroundColor: Colors.white,
-                              elevation: 0,
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14),
-                              ),
-                            ),
-                            child: Text(
-                              'រក្សាទុក',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+        return SetGoalDialog(
+          currentGoal: settingsCtrl.settings.dailyStepGoal,
+          onGoalChanged: (newGoal) {
+            settingsCtrl.updateStepGoal(newGoal);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  '${context.read<AppTranslations>().tr('newGoalSet')}$newGoal',
                 ),
               ),
             );
@@ -188,54 +60,13 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
     );
   }
 
-  Widget _buildDialogHeader() {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: ThemeColors.getBrandAccent(context).withValues(alpha: 0.1),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            Icons.flag_rounded,
-            color: ThemeColors.getBrandAccent(context),
-            size: 36,
-          ),
-        ),
-        SizedBox(height: 16),
-        Text(
-          'កំណត់គោលដៅថ្មី',
-          style: TextStyle(
-            color: ThemeColors.getText(context),
-            fontWeight: FontWeight.w800,
-            fontSize: 22,
-          ),
-        ),
-        SizedBox(height: 6),
-        Text(
-          'កំណត់គោលដៅជំហានប្រចាំថ្ងៃរបស់អ្នក',
-          style: TextStyle(
-            color: ThemeColors.getMutedText(context),
-            fontWeight: FontWeight.w500,
-            fontSize: 14,
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildTopHeader(TextTheme textTheme) {
     return Row(
       children: [
-        Icon(
-          Icons.fitness_center_rounded,
-          size: 17,
-          color: ThemeColors.getBrandAccent(context),
-        ),
+        Image.asset(AppImg.logo, width: 40, height: 40),
         SizedBox(width: 6),
         Text(
-          'Kinetic',
+          'Movexa',
           style: textTheme.labelLarge?.copyWith(
             color: ThemeColors.getBrandAccent(context),
             fontWeight: FontWeight.w700,
@@ -259,16 +90,15 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          name.isEmpty ? 'សួស្តី!' : 'សួស្តី $name!',
+          name.isEmpty ? 'hello'.tr(context) : '${'hello'.tr(context)} $name',
           style: textTheme.headlineSmall?.copyWith(
             color: ThemeColors.getText(context),
             fontWeight: FontWeight.w900,
-            letterSpacing: 0.2,
           ),
         ),
         SizedBox(height: 3),
         Text(
-          'បន្តដំណើរ! ថ្ងៃនេះល្អណាស់',
+          'keepGoing'.tr(context),
           style: textTheme.bodyMedium?.copyWith(
             color: ThemeColors.getMutedText(context),
             fontWeight: FontWeight.w600,
@@ -287,18 +117,27 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
     final newSettings = settingsCtrl.settings.copyWith(
       runTrackingInBackground: val,
     );
+    // Fire and forget update to avoid blocking UI on firestore save
     settingsCtrl.updateSettings(newSettings);
 
     if (val) {
       await motionCtrl.start(
         dailyGoal: settingsCtrl.settings.dailyStepGoal,
         alreadyCountedToday: activityCtrl.todayRecord?.steps ?? 0,
+        runInBackground: val,
       );
       if (motionCtrl.permissionDenied) {
-        _showSnack('Motion & Fitness permission is required to track steps.');
+        if (!mounted) return;
+        _showSnack(
+          context.read<AppTranslations>().tr('motionPermissionRequired'),
+        );
       }
     } else {
       motionCtrl.stop();
+      final steps = motionCtrl.todaySteps;
+      final distance = (steps * MotionController.kmPerStep).toDouble();
+      final calories = (steps * MotionController.kcalPerStep).toDouble();
+      await activityCtrl.updateTodaySteps(steps, distance, calories);
     }
   }
 
@@ -309,7 +148,7 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
           child: StatCard(
             icon: Icons.pin_drop_rounded,
             iconColor: const Color(0xFFB57D1D),
-            title: 'ចម្ងាយ',
+            title: 'distance'.tr(context),
             value: (todayRecord?.distance ?? 0.0).toStringAsFixed(2),
             unit: 'KM',
           ),
@@ -319,7 +158,7 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
           child: StatCard(
             icon: Icons.local_fire_department_rounded,
             iconColor: const Color(0xFFD45529),
-            title: 'កាឡូរី',
+            title: 'calories'.tr(context),
             value: (todayRecord?.calories ?? 0.0).toStringAsFixed(0),
             unit: 'KCAL',
           ),
@@ -332,7 +171,7 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
     return Row(
       children: [
         Text(
-          'សកម្មភាពថ្មីៗ',
+          'activityHistory'.tr(context),
           style: textTheme.titleSmall?.copyWith(
             color: ThemeColors.getText(context),
             fontWeight: FontWeight.w800,
@@ -340,14 +179,20 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
         ),
         const Spacer(),
         TextButton(
-          onPressed: () => _showSnack('See all tapped'),
+          onPressed: () {
+            if (widget.onSeeAll != null) {
+              widget.onSeeAll!();
+            } else {
+              _showSnack('${'seeAll'.tr(context)} tapped');
+            }
+          },
           style: TextButton.styleFrom(
             minimumSize: Size.zero,
             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
           ),
           child: Text(
-            'See all',
+            'seeAll'.tr(context),
             style: textTheme.labelMedium?.copyWith(
               color: ThemeColors.getBrandAccent(context),
               fontWeight: FontWeight.w800,
@@ -356,6 +201,28 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
         ),
       ],
     );
+  }
+
+  Future<void> _onRefresh(BuildContext context) async {
+    final activityCtrl = context.read<ActivityController>();
+    final profileCtrl = context.read<ProfileController>();
+    final settingsCtrl = context.read<SettingsController>();
+
+    if (activityCtrl.isFetching) return;
+
+    activityCtrl.setFetching(true);
+
+    await Future.wait([
+      profileCtrl.fetchProfile(),
+      settingsCtrl.fetchSettings(),
+      activityCtrl.fetchTodayRecord(
+        dailyGoal: settingsCtrl.settings.dailyStepGoal,
+      ),
+      activityCtrl.fetchWorkoutHistory(),
+      activityCtrl.fetchMonthlyStepHistory(),
+    ]);
+
+    activityCtrl.setFetching(false);
   }
 
   @override
@@ -374,61 +241,91 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
 
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(14, 10, 14, 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildTopHeader(textTheme),
-                SizedBox(height: 14),
-                _buildGreeting(
-                  textTheme,
-                  profileCtrl.currentProfile?.name ?? "",
-                ),
-                SizedBox(height: 12),
+        child: RefreshIndicator(
+          onRefresh: () => _onRefresh(context),
+          color: ThemeColors.getBrandAccent(context),
+          backgroundColor: ThemeColors.getSurface(context),
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            child: activityCtrl.isFetching || profileCtrl.isLoading
+                ? ListView(
+                    physics: const AlwaysScrollableScrollPhysics(
+                      parent: BouncingScrollPhysics(),
+                    ),
+                    padding: const EdgeInsets.fromLTRB(14, 10, 14, 20),
+                    children: [
+                      _buildTopHeader(textTheme),
+                      const SizedBox(height: 14),
+                      const DashboardSkeleton(),
+                    ],
+                  )
+                : SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(
+                      parent: BouncingScrollPhysics(),
+                    ),
+                    padding: const EdgeInsets.fromLTRB(14, 10, 14, 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildTopHeader(textTheme),
+                        SizedBox(height: 14),
+                        _buildGreeting(
+                          textTheme,
+                          profileCtrl.currentProfile?.name ?? "",
+                        ),
+                        SizedBox(height: 12),
 
-                ProgressPanel(
-                  progress: progress,
-                  steps: currentSteps,
-                  progressGreen: ThemeColors.getProgressValue(context),
-                  textColor: ThemeColors.getText(context),
-                  subTextColor: ThemeColors.getMutedText(context),
-                ),
-                SizedBox(height: 12),
+                        ProgressPanel(
+                          progress: progress,
+                          steps: currentSteps,
+                          goal: goal,
+                          progressGreen: ThemeColors.getProgressValue(context),
+                          textColor: ThemeColors.getText(context),
+                          subTextColor: ThemeColors.getMutedText(context),
+                        ),
+                        SizedBox(height: 12),
 
-                TrackingToggleCard(
-                  enabled: settingsCtrl.settings.runTrackingInBackground,
-                  motionStatus: motionCtrl.status,
-                  isTracking: motionCtrl.isTracking,
-                  permissionDenied: motionCtrl.permissionDenied,
-                  onChanged: (val) => _onTrackingToggled(
-                    val,
-                    settingsCtrl,
-                    motionCtrl,
-                    activityCtrl,
+                        TrackingToggleCard(
+                          enabled:
+                              settingsCtrl.settings.runTrackingInBackground,
+                          motionStatus: motionCtrl.status,
+                          isTracking: motionCtrl.isTracking,
+                          permissionDenied: motionCtrl.permissionDenied,
+                          onChanged: (val) => _onTrackingToggled(
+                            val,
+                            settingsCtrl,
+                            motionCtrl,
+                            activityCtrl,
+                          ),
+                        ),
+                        SizedBox(height: 12),
+
+                        PrimaryButton(
+                          onTap: () =>
+                              _showSetGoalDialog(context, settingsCtrl),
+                          text: 'setNewGoal'.tr(context),
+                        ),
+                        SizedBox(height: 14),
+
+                        _buildStatsGrid(todayRecord),
+                        SizedBox(height: 14),
+
+                        _buildRecentActivitiesHeader(textTheme),
+                        SizedBox(height: 8),
+
+                        MapPathViewer(
+                          path: motionCtrl.isTracking ? motionCtrl.dailyPath : todayRecord?.path,
+                          height: 250,
+                          interactive: false,
+                        ),
+                        SizedBox(height: 14),
+
+                        ActivitySection(
+                          activities: activityCtrl.monthlyStepHistory,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                SizedBox(height: 12),
-
-                PrimaryButton(
-                  onTap: () => _showSetGoalDialog(context, settingsCtrl),
-                  text: 'កំណត់គោលដៅថ្មី',
-                ),
-                SizedBox(height: 14),
-
-                _buildStatsGrid(todayRecord),
-                SizedBox(height: 14),
-
-                _buildRecentActivitiesHeader(textTheme),
-                SizedBox(height: 8),
-
-                ActivitySection(activities: activityCtrl.workoutHistory),
-
-                SizedBox(height: 8),
-              ],
-            ),
           ),
         ),
       ),

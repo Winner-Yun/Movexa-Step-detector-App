@@ -5,8 +5,6 @@ import 'package:intl/intl.dart';
 import 'package:step_detector/data/models/daily_step_record.dart';
 import 'package:step_detector/data/models/workout_session.dart';
 
-
-
 class ActivityController extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -15,13 +13,19 @@ class ActivityController extends ChangeNotifier {
   List<DailyStepRecord> _monthlyStepHistory = [];
 
   DailyStepRecord? _todayRecord;
+  bool _isFetching = false;
 
   List<WorkoutSession> get workoutHistory => _workoutHistory;
   List<DailyStepRecord> get monthlyStepHistory => _monthlyStepHistory;
   DailyStepRecord? get todayRecord => _todayRecord;
+  bool get isFetching => _isFetching;
 
   String get _todayDocId => DateFormat('yyyy-MM-dd').format(DateTime.now());
 
+  void setFetching(bool val) {
+    _isFetching = val;
+    notifyListeners();
+  }
 
   Future<void> saveWorkoutSession(WorkoutSession session) async {
     final user = _auth.currentUser;
@@ -39,6 +43,25 @@ class ActivityController extends ChangeNotifier {
       notifyListeners();
     } catch (e) {
       debugPrint('Error saving workout: $e');
+    }
+  }
+
+  Future<void> deleteWorkoutSession(String sessionId) async {
+    final user = _auth.currentUser;
+    if (user == null) return;
+
+    try {
+      await _firestore
+          .collection('users')
+          .doc(user.uid)
+          .collection('workouts')
+          .doc(sessionId)
+          .delete();
+
+      _workoutHistory.removeWhere((session) => session.id == sessionId);
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error deleting workout: $e');
     }
   }
 
@@ -63,7 +86,6 @@ class ActivityController extends ChangeNotifier {
       debugPrint('Error fetching workouts: $e');
     }
   }
-
 
   Future<void> fetchTodayRecord({int dailyGoal = 10000}) async {
     final user = _auth.currentUser;
@@ -97,19 +119,37 @@ class ActivityController extends ChangeNotifier {
   Future<void> updateTodaySteps(
     int steps,
     double distance,
-    double calories,
-  ) async {
+    double calories, {
+    List<Map<String, dynamic>>? path,
+  }) async {
     final user = _auth.currentUser;
     if (user == null) return;
+
+    final currentPath = path ?? _todayRecord?.path;
 
     final record = DailyStepRecord(
       date: DateTime.now(),
       steps: steps,
       distance: distance,
       calories: calories,
+      path: currentPath,
     );
 
     _todayRecord = record;
+
+    final index = _monthlyStepHistory.indexWhere(
+      (r) =>
+          r.date.year == record.date.year &&
+          r.date.month == record.date.month &&
+          r.date.day == record.date.day,
+    );
+
+    if (index != -1) {
+      _monthlyStepHistory[index] = record;
+    } else {
+      _monthlyStepHistory.insert(0, record);
+    }
+
     notifyListeners();
 
     try {
@@ -151,4 +191,3 @@ class ActivityController extends ChangeNotifier {
     }
   }
 }
-

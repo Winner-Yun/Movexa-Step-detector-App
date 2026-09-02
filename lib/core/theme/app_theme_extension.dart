@@ -5,28 +5,28 @@ class AppThemeExtension extends ThemeExtension<AppThemeExtension> {
   final Color primaryYellow;
   final Color text;
   final Color mutedText;
-  
+
   final Color scaffold;
   final Color scaffoldSoft;
   final Color surface;
-  
+
   final Color navBackground;
   final Color navSelected;
   final Color navUnselected;
-  
+
   final Color brandAccent;
   final Color primaryGradientStart;
   final Color primaryGradientEnd;
-  
+
   final Color progressTrack;
   final Color progressValue;
   final Color progressChip;
   final Color progressChipText;
-  
+
   final Color cardNeutral;
   final Color activityCard;
   final Color iconChip;
-  
+
   final Color positiveText;
 
   const AppThemeExtension({
@@ -115,12 +115,24 @@ class AppThemeExtension extends ThemeExtension<AppThemeExtension> {
       navSelected: Color.lerp(navSelected, other.navSelected, t)!,
       navUnselected: Color.lerp(navUnselected, other.navUnselected, t)!,
       brandAccent: Color.lerp(brandAccent, other.brandAccent, t)!,
-      primaryGradientStart: Color.lerp(primaryGradientStart, other.primaryGradientStart, t)!,
-      primaryGradientEnd: Color.lerp(primaryGradientEnd, other.primaryGradientEnd, t)!,
+      primaryGradientStart: Color.lerp(
+        primaryGradientStart,
+        other.primaryGradientStart,
+        t,
+      )!,
+      primaryGradientEnd: Color.lerp(
+        primaryGradientEnd,
+        other.primaryGradientEnd,
+        t,
+      )!,
       progressTrack: Color.lerp(progressTrack, other.progressTrack, t)!,
       progressValue: Color.lerp(progressValue, other.progressValue, t)!,
       progressChip: Color.lerp(progressChip, other.progressChip, t)!,
-      progressChipText: Color.lerp(progressChipText, other.progressChipText, t)!,
+      progressChipText: Color.lerp(
+        progressChipText,
+        other.progressChipText,
+        t,
+      )!,
       cardNeutral: Color.lerp(cardNeutral, other.cardNeutral, t)!,
       activityCard: Color.lerp(activityCard, other.activityCard, t)!,
       iconChip: Color.lerp(iconChip, other.iconChip, t)!,

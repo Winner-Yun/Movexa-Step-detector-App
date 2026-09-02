@@ -1,4 +1,5 @@
 import 'package:step_detector/core/model/base_model.dart';
+
 class UserSettings implements BaseModel {
   final int dailyStepGoal;
   final bool runTrackingInBackground;
@@ -11,7 +12,7 @@ class UserSettings implements BaseModel {
     this.runTrackingInBackground = true,
     this.notificationsEnabled = true,
     this.darkModeEnabled = false,
-    this.language = 'ខ្មែរ',
+    this.language = 'km',
   });
 
   UserSettings copyWith({
@@ -48,8 +49,7 @@ class UserSettings implements BaseModel {
       runTrackingInBackground: map['runTrackingInBackground'] ?? true,
       notificationsEnabled: map['notificationsEnabled'] ?? true,
       darkModeEnabled: map['darkModeEnabled'] ?? false,
-      language: map['language'] ?? 'ខ្មែរ',
+      language: map['language'] ?? 'km',
     );
   }
 }
-

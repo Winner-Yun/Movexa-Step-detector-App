@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:step_detector/core/localization/app_translations.dart';
 import 'package:step_detector/core/theme/theme_colors.dart';
 import 'package:step_detector/data/models/workout_session.dart';
+import 'package:step_detector/widgets/share_image_dialog.dart';
+import 'package:step_detector/widgets/map_path_viewer.dart';
 
 class StepWorkoutDetailPage extends StatelessWidget {
   final WorkoutSession session;
@@ -23,13 +26,30 @@ class StepWorkoutDetailPage extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'សេចក្តីលម្អិត',
+          'details'.tr(context),
           style: textTheme.titleMedium?.copyWith(
             color: ThemeColors.getText(context),
             fontWeight: FontWeight.w800,
           ),
         ),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: Icon(
+              Icons.download_rounded,
+              color: ThemeColors.getBrandAccent(context),
+            ),
+            tooltip: 'saveImage'.tr(context),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) =>
+                    ShareWorkoutSessionDialog(session: session),
+              );
+            },
+          ),
+          SizedBox(width: 8),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(24, 8, 24, 40),
@@ -39,6 +59,12 @@ class StepWorkoutDetailPage extends StatelessWidget {
             SizedBox(height: 24),
             _buildMainHeroCard(context, textTheme),
             SizedBox(height: 24),
+            MapPathViewer(
+              path: session.path,
+              height: 250,
+              interactive: true,
+            ),
+            SizedBox(height: 24),
             _buildMetricsGrid(context),
           ],
         ),
@@ -47,33 +73,45 @@ class StepWorkoutDetailPage extends StatelessWidget {
   }
 
   Widget _buildHeaderInfo(BuildContext context, TextTheme textTheme) {
-    return Column(
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: ThemeColors.getBrandAccent(context).withValues(alpha: 0.1),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            Icons.directions_run_rounded,
-            color: ThemeColors.getBrandAccent(context),
-            size: 32,
-          ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                Text(
+                  session.distance.toStringAsFixed(2),
+                  style: textTheme.displayLarge?.copyWith(
+                    color: ThemeColors.getText(context),
+                    fontWeight: FontWeight.w900,
+                    height: 1,
+                  ),
+                ),
+                SizedBox(width: 8),
+                Text(
+                  'KM',
+                  style: textTheme.titleLarge?.copyWith(
+                    color: ThemeColors.getMutedText(context),
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
-        SizedBox(height: 16),
-        Text(
-          session.title,
-          style: textTheme.headlineSmall?.copyWith(
-            color: ThemeColors.getText(context),
-            fontWeight: FontWeight.w900,
-          ),
-        ),
-        SizedBox(height: 4),
-        Text(
-          '${session.startTime.day}/${session.startTime.month}/${session.startTime.year}',
-          style: textTheme.bodyMedium?.copyWith(
-            color: ThemeColors.getMutedText(context),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: Text(
+            '${session.startTime.day.toString().padLeft(2, '0')}/${session.startTime.month.toString().padLeft(2, '0')}/${session.startTime.year}',
+            style: textTheme.bodyMedium?.copyWith(
+              color: ThemeColors.getMutedText(context),
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
       ],
@@ -81,30 +119,33 @@ class StepWorkoutDetailPage extends StatelessWidget {
   }
 
   Widget _buildMainHeroCard(BuildContext context, TextTheme textTheme) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 40),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            ThemeColors.getPrimaryGradientStart(context),
-            ThemeColors.getPrimaryGradientEnd(context),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(32),
-      ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 24),
       child: Column(
         children: [
-          Text(
-            session.steps.toString(),
-            style: textTheme.displayMedium?.copyWith(
-              color: Colors.white,
-              fontWeight: FontWeight.w900,
-            ),
+          TweenAnimationBuilder<int>(
+            tween: IntTween(begin: 0, end: session.steps),
+            duration: const Duration(milliseconds: 1500),
+            curve: Curves.easeOutCubic,
+            builder: (context, value, child) {
+              return Text(
+                value.toString(),
+                style: textTheme.displayMedium?.copyWith(
+                  color: ThemeColors.getBrandAccent(context),
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: -1,
+                ),
+              );
+            },
           ),
+          SizedBox(height: 4),
           Text(
-            'សរុបជំហាន (Total Steps)',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+            'totalSteps'.tr(context),
+            style: TextStyle(
+              color: ThemeColors.getMutedText(context),
+              fontWeight: FontWeight.w700,
+              letterSpacing: 1.2,
+            ),
           ),
         ],
       ),
@@ -112,99 +153,52 @@ class StepWorkoutDetailPage extends StatelessWidget {
   }
 
   Widget _buildMetricsGrid(BuildContext context) {
-    return Column(
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      decoration: BoxDecoration(
+        color: ThemeColors.getSurface(context),
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Wrap(
+        alignment: WrapAlignment.center,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: 12,
+        runSpacing: 16,
+        children: [
+          _buildTextStat(context, session.formattedDuration, 'នាទី'),
+          _buildDivider(context),
+          _buildTextStat(context, session.calories.toStringAsFixed(0), 'KCAL'),
+          _buildDivider(context),
+          _buildTextStat(context, session.speedKmh.toStringAsFixed(1), 'KM/H'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTextStat(BuildContext context, String value, String unit) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Row(
-          children: [
-            Expanded(
-              child: _buildSimpleStatBox(
-                context,
-                Icons.timer_rounded,
-                'រយៈពេល',
-                session.formattedDuration,
-                'នាទី',
-                Colors.orange,
-              ),
-            ),
-            SizedBox(width: 16),
-            Expanded(
-              child: _buildSimpleStatBox(
-                context,
-                Icons.route_rounded,
-                'ចម្ងាយ',
-                session.distance.toStringAsFixed(2),
-                'KM',
-                const Color(0xFF2980B9),
-              ),
-            ),
-          ],
-        ),
-        SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: _buildSimpleStatBox(
-                context,
-                Icons.local_fire_department_rounded,
-                'កាឡូរី',
-                session.calories.toStringAsFixed(0),
-                'KCAL',
-                const Color(0xFFD45529),
-              ),
-            ),
-            SizedBox(width: 16),
-            Expanded(
-              child: _buildSimpleStatBox(
-                context,
-                Icons.speed_rounded,
-                'ល្បឿន',
-                session.averagePace,
-                '/KM',
-                Colors.purple,
-              ),
-            ),
-          ],
+        Text(
+          '$value $unit',
+          style: TextStyle(
+            color: ThemeColors.getText(context),
+            fontWeight: FontWeight.w800,
+            fontSize: 15,
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildSimpleStatBox(
-    BuildContext context,
-    IconData icon,
-    String title,
-    String value,
-    String unit,
-    Color iconColor,
-  ) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: ThemeColors.getSurface(context),
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, color: iconColor, size: 22),
-          SizedBox(height: 16),
-          Text(
-            value,
-            style: TextStyle(
-              color: ThemeColors.getText(context),
-              fontWeight: FontWeight.w900,
-              fontSize: 22,
-            ),
-          ),
-          Text(
-            title,
-            style: TextStyle(
-              color: ThemeColors.getMutedText(context),
-              fontWeight: FontWeight.w600,
-              fontSize: 13,
-            ),
-          ),
-        ],
+  Widget _buildDivider(BuildContext context) {
+    return Text(
+      '|',
+      style: TextStyle(
+        color: ThemeColors.getMutedText(context).withValues(alpha: 0.3),
+        fontWeight: FontWeight.w400,
+        fontSize: 16,
       ),
     );
   }

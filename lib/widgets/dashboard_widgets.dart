@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:step_detector/core/theme/theme_colors.dart';
 import 'package:step_detector/widgets/format_number.dart';
+import 'package:step_detector/core/localization/app_translations.dart';
 
 class ProgressPanel extends StatelessWidget {
   const ProgressPanel({
     super.key,
     required this.progress,
     required this.steps,
+    required this.goal,
     required this.progressGreen,
     required this.textColor,
     required this.subTextColor,
@@ -14,6 +16,7 @@ class ProgressPanel extends StatelessWidget {
 
   final double progress;
   final int steps;
+  final int goal;
   final Color progressGreen;
   final Color textColor;
   final Color subTextColor;
@@ -76,7 +79,7 @@ class ProgressPanel extends StatelessWidget {
                   ),
                   SizedBox(height: 2),
                   Text(
-                    'ជំហាននៅថ្ងៃនេះ',
+                    'stepsToday'.tr(context),
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: subTextColor,
                       fontWeight: FontWeight.w700,
@@ -93,12 +96,19 @@ class ProgressPanel extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
-                      '${(progress * 100).round()}% OF GOAL',
+                      '${(progress * 100).round()}% ${'ofGoal'.tr(context)}',
                       style: Theme.of(context).textTheme.labelMedium?.copyWith(
                         fontWeight: FontWeight.w900,
                         color: ThemeColors.getProgressChipText(context),
-                        letterSpacing: 0.4,
                       ),
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    '${'stepGoal'.tr(context)}: ${formatNumber(goal)}',
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: subTextColor,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ],

@@ -39,15 +39,15 @@ class AppColors {
   static const Color surfaceDark = Color(0xFF252320);
 
   static const Color navBackgroundDark = Color(0xFF1E1C1A);
-  static const Color navSelectedDark = Color(0xFFBF8923); // Same as navSelected
+  static const Color navSelectedDark = Color(0xFFBF8923);
   static const Color navUnselectedDark = Color(0xFF8A8478);
 
-  static const Color brandAccentDark = Color(0xFFC58D20); // Same as brandAccent
-  static const Color primaryGradientStartDark = Color(0xFFB27A17); // Same as primaryGradientStart
-  static const Color primaryGradientEndDark = Color(0xFFD9A334); // Same as primaryGradientEnd
+  static const Color brandAccentDark = Color(0xFFC58D20);
+  static const Color primaryGradientStartDark = Color(0xFFB27A17);
+  static const Color primaryGradientEndDark = Color(0xFFD9A334);
 
   static const Color progressTrackDark = Color(0xFF36332E);
-  static const Color progressValueDark = Color(0xFF94D24C); // Same as progressValue
+  static const Color progressValueDark = Color(0xFF94D24C);
   static const Color progressChipDark = Color(0xFF384B22);
   static const Color progressChipTextDark = Color(0xFFD1F596);
 
@@ -55,6 +55,5 @@ class AppColors {
   static const Color activityCardDark = Color(0xFF272521);
   static const Color iconChipDark = Color(0xFF4C4229);
 
-  static const Color positiveTextDark = Color(0xFFB67918); // Same as positiveText
+  static const Color positiveTextDark = Color(0xFFB67918);
 }
-

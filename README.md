@@ -1,8 +1,8 @@
-# Movexa - Step Detector App 🏃‍♂️
+# Movexa - Step Detector App
 
 Movexa is a Flutter-based fitness application designed to track your daily steps, estimate calories burned, and monitor your physical activity. Built with a clean architecture and powered by Firebase, this app offers a seamless and engaging experience for users looking to stay active.
 
-## Features ✨
+## Features 
 
 - **Real-time Step Tracking**: Accurate background and foreground step counting using the `pedometer` package.
 - **User Authentication**: Secure Google Sign-In and Email authentication powered by Firebase Auth.
@@ -11,7 +11,7 @@ Movexa is a Flutter-based fitness application designed to track your daily steps
 - **Gamification**: Hit your daily goals and earn achievements.
 - **Beautiful UI**: Built with a sleek, modern aesthetic using Google Fonts (Kantumruy Pro & Nokora) and dynamic theming.
 
-## Tech Stack 🛠
+## Tech Stack 
 
 - **Framework**: Flutter (Dart)
 - **State Management**: Provider
@@ -22,11 +22,11 @@ Movexa is a Flutter-based fitness application designed to track your daily steps
   - `google_sign_in` for authentication
   - `google_fonts` for typography
 
-## Setup Instructions 🚀
+## Setup Instructions 
 
 1. **Clone the repository**
    ```bash
-   git clone <your-repo-url>
+   git clone <repo-url>
    cd step_detector
    ```
 
@@ -47,6 +47,6 @@ Movexa is a Flutter-based fitness application designed to track your daily steps
    flutter run
    ```
 
-## Contributing 🤝
+## Contributing 
 
 Check out the [Issues](https://github.com/your-username/your-repo/issues) page if you'd like to contribute or see the roadmap of upcoming features!

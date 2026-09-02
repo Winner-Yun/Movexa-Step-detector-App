@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:step_detector/core/localization/app_translations.dart';
 import 'package:step_detector/core/theme/theme_colors.dart';
 import 'package:step_detector/data/controller/activity_controller.dart';
+import 'package:step_detector/data/controller/profile_controller.dart';
 import 'package:step_detector/data/controller/settings_controller.dart';
+import 'package:step_detector/data/models/daily_step_record.dart';
+import 'package:step_detector/data/models/workout_session.dart';
 import 'package:step_detector/modules/workout/step_workout_detail_page.dart';
+import 'package:step_detector/widgets/share_image_dialog.dart';
+import 'package:step_detector/widgets/skeleton.dart';
+import 'package:step_detector/widgets/map_path_viewer.dart';
 
 class StepHistoryPage extends StatefulWidget {
   const StepHistoryPage({super.key});
@@ -24,6 +31,89 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
     final ampm = date.hour >= 12 ? 'PM' : 'AM';
     final min = date.minute.toString().padLeft(2, '0');
     return '${date.day}/${date.month}/${date.year}, $hour:$min $ampm';
+  }
+
+  void _showDeleteConfirmationDialog(
+    BuildContext context,
+    WorkoutSession session,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: ThemeColors.getSurface(context),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Text(
+            'deleteWorkout'.tr(context),
+            style: TextStyle(
+              color: ThemeColors.getText(context),
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: Text(
+            'confirmDeleteWorkout'.tr(context),
+            style: TextStyle(color: ThemeColors.getMutedText(context)),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                'cancel'.tr(context),
+                style: TextStyle(
+                  color: ThemeColors.getMutedText(context),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                context.read<ActivityController>().deleteWorkoutSession(
+                  session.id,
+                );
+                Navigator.pop(context);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.redAccent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: Text(
+                'delete'.tr(context),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _onRefresh(BuildContext context) async {
+    final activityCtrl = context.read<ActivityController>();
+    final profileCtrl = context.read<ProfileController>();
+    final settingsCtrl = context.read<SettingsController>();
+
+    if (activityCtrl.isFetching) return;
+
+    activityCtrl.setFetching(true);
+
+    await Future.wait([
+      profileCtrl.fetchProfile(),
+      settingsCtrl.fetchSettings(),
+      activityCtrl.fetchTodayRecord(
+        dailyGoal: settingsCtrl.settings.dailyStepGoal,
+      ),
+      activityCtrl.fetchWorkoutHistory(),
+      activityCtrl.fetchMonthlyStepHistory(),
+    ]);
+
+    activityCtrl.setFetching(false);
   }
 
   @override
@@ -47,14 +137,38 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
             ),
             SizedBox(height: 24),
             Expanded(
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 300),
-                child: _selectedTabIndex == 0
-                    ? _buildDailyView(
-                        textTheme,
-                        activityCtrl.monthlyStepHistory,
-                      )
-                    : _buildSessionView(textTheme, activityCtrl.workoutHistory),
+              child: RefreshIndicator(
+                onRefresh: () => _onRefresh(context),
+                color: ThemeColors.getBrandAccent(context),
+                backgroundColor: ThemeColors.getSurface(context),
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  child: activityCtrl.isFetching
+                      ? ListView(
+                          physics: const AlwaysScrollableScrollPhysics(
+                            parent: BouncingScrollPhysics(),
+                          ),
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                              ),
+                              child: _selectedTabIndex == 0
+                                  ? const HistoryDailySkeleton()
+                                  : const ListSkeleton(),
+                            ),
+                          ],
+                        )
+                      : _selectedTabIndex == 0
+                      ? _buildDailyView(
+                          textTheme,
+                          activityCtrl.monthlyStepHistory,
+                        )
+                      : _buildSessionView(
+                          textTheme,
+                          activityCtrl.workoutHistory,
+                        ),
+                ),
               ),
             ),
           ],
@@ -80,12 +194,10 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
         ),
         SizedBox(width: 12),
         Text(
-          'ប្រវត្តិសកម្មភាព',
-
+          'activityHistory'.tr(context),
           style: textTheme.titleLarge?.copyWith(
             color: ThemeColors.getText(context),
             fontWeight: FontWeight.w900,
-            letterSpacing: 0.5,
           ),
         ),
       ],
@@ -108,9 +220,9 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
       ),
       child: Row(
         children: [
-          Expanded(child: _buildTabButton('ប្រចាំថ្ងៃ', 0)),
+          Expanded(child: _buildTabButton('daily'.tr(context), 0)),
 
-          Expanded(child: _buildTabButton('ការហាត់ប្រាណ', 1)),
+          Expanded(child: _buildTabButton('workout'.tr(context), 1)),
         ],
       ),
     );
@@ -155,13 +267,24 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
     );
   }
 
-  Widget _buildDailyView(TextTheme textTheme, List<dynamic> monthlyData) {
+  Widget _buildDailyView(
+    TextTheme textTheme,
+    List<DailyStepRecord> monthlyData,
+  ) {
     if (monthlyData.isEmpty) {
-      return Center(
-        child: Text(
-          'មិនទាន់មានទិន្នន័យ (No data yet)',
-          style: TextStyle(color: ThemeColors.getMutedText(context)),
+      return ListView(
+        physics: const AlwaysScrollableScrollPhysics(
+          parent: BouncingScrollPhysics(),
         ),
+        children: [
+          SizedBox(height: 100),
+          Center(
+            child: Text(
+              'noDataYet'.tr(context),
+              style: TextStyle(color: ThemeColors.getMutedText(context)),
+            ),
+          ),
+        ],
       );
     }
 
@@ -177,7 +300,9 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
     });
 
     return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
+      physics: const AlwaysScrollableScrollPhysics(
+        parent: BouncingScrollPhysics(),
+      ),
       padding: const EdgeInsets.fromLTRB(0, 0, 0, 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -187,22 +312,50 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(
-                  width: 4,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    color: ThemeColors.getBrandAccent(context),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
+                Row(
+                  children: [
+                    Container(
+                      width: 4,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        color: ThemeColors.getBrandAccent(context),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      '${'summaryFor'.tr(context)} $_selectedDay',
+                      style: textTheme.titleMedium?.copyWith(
+                        color: ThemeColors.getText(context),
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox(width: 8),
-                Text(
-                  'សេចក្តីសង្ខេប ថ្ងៃទី $_selectedDay',
-
-                  style: textTheme.titleMedium?.copyWith(
-                    color: ThemeColors.getText(context),
-                    fontWeight: FontWeight.w900,
+                IconButton(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => ShareDailySummaryDialog(
+                        record: selectedDayData,
+                        stepGoal: context
+                            .read<SettingsController>()
+                            .settings
+                            .dailyStepGoal,
+                      ),
+                    );
+                  },
+                  icon: Icon(
+                    Icons.download_rounded,
+                    color: ThemeColors.getBrandAccent(context),
+                  ),
+                  tooltip: 'saveImage'.tr(context),
+                  style: IconButton.styleFrom(
+                    backgroundColor: ThemeColors.getBrandAccent(
+                      context,
+                    ).withValues(alpha: 0.1),
                   ),
                 ),
               ],
@@ -218,7 +371,7 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
     );
   }
 
-  Widget _buildMonthChart(TextTheme textTheme, List<dynamic> data) {
+  Widget _buildMonthChart(TextTheme textTheme, List<DailyStepRecord> data) {
     final goal = context.read<SettingsController>().settings.dailyStepGoal;
     final avgSteps =
         data.fold<num>(0, (sum, record) => sum + record.steps) ~/ data.length;
@@ -249,8 +402,7 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'មធ្យមប្រចាំខែ',
-
+                    'monthlyAvg'.tr(context),
                     style: textTheme.titleSmall?.copyWith(
                       color: ThemeColors.getMutedText(context),
                       fontWeight: FontWeight.w700,
@@ -271,7 +423,7 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                       Padding(
                         padding: EdgeInsets.only(bottom: 6),
                         child: Text(
-                          'ជំហាន',
+                          'steps'.tr(context),
                           style: TextStyle(
                             color: ThemeColors.getBrandAccent(context),
                             fontWeight: FontWeight.w800,
@@ -428,8 +580,13 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
     );
   }
 
-  Widget _buildDailySummaryCard(dynamic record, TextTheme textTheme) {
+  Widget _buildDailySummaryCard(DailyStepRecord record, TextTheme textTheme) {
     final goal = context.read<SettingsController>().settings.dailyStepGoal;
+    final now = DateTime.now();
+    final isToday =
+        record.date.year == now.year &&
+        record.date.month == now.month &&
+        record.date.day == now.day;
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -476,22 +633,29 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                     Icon(
                       record.isGoalReached(goal)
                           ? Icons.emoji_events_rounded
-                          : Icons.directions_walk_rounded,
+                          : isToday
+                          ? Icons.directions_walk_rounded
+                          : Icons.close_rounded,
                       color: record.isGoalReached(goal)
                           ? ThemeColors.getProgressChipText(context)
-                          : ThemeColors.getMutedText(context),
+                          : isToday
+                          ? ThemeColors.getMutedText(context)
+                          : Colors.redAccent,
                       size: 16,
                     ),
                     SizedBox(width: 6),
                     Text(
                       record.isGoalReached(goal)
-                          ? 'សម្រេចគោលដៅ'
-                          : 'កំពុងដំណើរការ',
-
+                          ? 'goalReachedShort'.tr(context)
+                          : isToday
+                          ? 'inProgress'.tr(context)
+                          : 'failed'.tr(context),
                       style: TextStyle(
                         color: record.isGoalReached(goal)
                             ? ThemeColors.getProgressChipText(context)
-                            : ThemeColors.getMutedText(context),
+                            : isToday
+                            ? ThemeColors.getMutedText(context)
+                            : Colors.redAccent,
                         fontWeight: FontWeight.w800,
                         fontSize: 12,
                       ),
@@ -500,7 +664,7 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                 ),
               ),
               Text(
-                'គោលដៅ: ${record.target}',
+                '${'stepGoal'.tr(context)}: $goal',
                 style: TextStyle(
                   color: ThemeColors.getMutedText(context),
                   fontWeight: FontWeight.w700,
@@ -530,7 +694,7 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
               Column(
                 children: [
                   Icon(
-                    Icons.do_not_step_rounded,
+                    Icons.directions_run_rounded,
                     color: record.isGoalReached(goal)
                         ? ThemeColors.getProgressValue(context)
                         : ThemeColors.getBrandAccent(context),
@@ -542,7 +706,6 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                     style: textTheme.headlineSmall?.copyWith(
                       color: ThemeColors.getText(context),
                       fontWeight: FontWeight.w900,
-                      letterSpacing: -0.5,
                     ),
                   ),
                 ],
@@ -551,6 +714,13 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
           ),
 
           SizedBox(height: 40),
+
+          MapPathViewer(
+            path: record.path,
+            height: 200,
+            interactive: false,
+          ),
+          SizedBox(height: 24),
 
           Container(
             padding: const EdgeInsets.all(16),
@@ -582,6 +752,23 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                 ),
               ],
             ),
+          ),
+
+          SizedBox(height: 24),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset('assets/Movexa.png', width: 20, height: 20),
+              SizedBox(width: 8),
+              Text(
+                'Movexa',
+                style: TextStyle(
+                  color: ThemeColors.getText(context),
+                  fontWeight: FontWeight.w800,
+                  fontSize: 14,
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -630,18 +817,28 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
     );
   }
 
-  Widget _buildSessionView(TextTheme textTheme, List<dynamic> sessions) {
+  Widget _buildSessionView(TextTheme textTheme, List<WorkoutSession> sessions) {
     if (sessions.isEmpty) {
-      return Center(
-        child: Text(
-          'មិនទាន់មានទិន្នន័យហាត់ប្រាណ (No workouts yet)',
-          style: TextStyle(color: ThemeColors.getMutedText(context)),
+      return ListView(
+        physics: const AlwaysScrollableScrollPhysics(
+          parent: BouncingScrollPhysics(),
         ),
+        children: [
+          SizedBox(height: 100),
+          Center(
+            child: Text(
+              'noDataYet'.tr(context),
+              style: TextStyle(color: ThemeColors.getMutedText(context)),
+            ),
+          ),
+        ],
       );
     }
 
     return ListView.builder(
-      physics: const BouncingScrollPhysics(),
+      physics: const AlwaysScrollableScrollPhysics(
+        parent: BouncingScrollPhysics(),
+      ),
       padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
       itemCount: sessions.length,
       itemBuilder: (context, index) {
@@ -680,13 +877,13 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                       Row(
                         children: [
                           Icon(
-                            Icons.timer_outlined,
+                            Icons.route_rounded,
                             color: ThemeColors.getBrandAccent(context),
                             size: 20,
                           ),
                           SizedBox(width: 8),
                           Text(
-                            session.title,
+                            '${session.distance.toStringAsFixed(2)} KM',
                             style: TextStyle(
                               color: ThemeColors.getText(context),
                               fontWeight: FontWeight.w800,
@@ -695,13 +892,31 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                           ),
                         ],
                       ),
-                      Text(
-                        '${session.steps}',
-                        style: TextStyle(
-                          color: ThemeColors.getBrandAccent(context),
-                          fontWeight: FontWeight.w900,
-                          fontSize: 18,
-                        ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            '${session.steps}',
+                            style: TextStyle(
+                              color: ThemeColors.getBrandAccent(context),
+                              fontWeight: FontWeight.w900,
+                              fontSize: 18,
+                            ),
+                          ),
+                          SizedBox(width: 8),
+                          IconButton(
+                            icon: Icon(
+                              Icons.delete_outline_rounded,
+                              color: Colors.redAccent,
+                              size: 22,
+                            ),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                            onPressed: () {
+                              _showDeleteConfirmationDialog(context, session);
+                            },
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -728,7 +943,7 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                         Icons.schedule_rounded,
                         session.formattedDuration,
 
-                        'នាទី',
+                        'minutes'.tr(context),
                       ),
                       Container(
                         width: 1,
@@ -739,6 +954,16 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
                         Icons.local_fire_department_rounded,
                         session.calories.toStringAsFixed(0),
                         'KCAL',
+                      ),
+                      Container(
+                        width: 1,
+                        height: 24,
+                        color: ThemeColors.getScaffoldSoft(context),
+                      ),
+                      _buildSessionMiniStat(
+                        Icons.speed_rounded,
+                        session.speedKmh.toStringAsFixed(1),
+                        'KM/H',
                       ),
                     ],
                   ),

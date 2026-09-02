@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:step_detector/data/local/database_helper.dart';
 import 'package:step_detector/data/models/user_settings.dart';
 
 class SettingsController extends ChangeNotifier {
@@ -10,10 +11,37 @@ class SettingsController extends ChangeNotifier {
   UserSettings _settings = const UserSettings();
   final bool _isLoading = false;
 
+  SettingsController() {
+    _initLocalSettings();
+  }
+
+  Future<void> _initLocalSettings() async {
+    final db = DatabaseHelper.instance;
+    final isDarkStr = await db.getSetting('darkModeEnabled');
+    final lang = await db.getSetting('language');
+    final stepGoalStr = await db.getSetting('dailyStepGoal');
+    final bgTrackingStr = await db.getSetting('runTrackingInBackground');
+    final notifsStr = await db.getSetting('notificationsEnabled');
+
+    _settings = _settings.copyWith(
+      darkModeEnabled: isDarkStr == 'true',
+      language: lang ?? 'km',
+      dailyStepGoal: stepGoalStr != null ? int.tryParse(stepGoalStr) : null,
+      runTrackingInBackground: bgTrackingStr != null
+          ? bgTrackingStr == 'true'
+          : null,
+      notificationsEnabled: notifsStr != null ? notifsStr == 'true' : null,
+    );
+    notifyListeners();
+  }
+
   UserSettings get settings => _settings;
   bool get isLoading => _isLoading;
 
   Future<void> fetchSettings() async {
+    // Also trigger a local fetch to ensure we have the latest local data
+    await _initLocalSettings();
+
     final user = _auth.currentUser;
     if (user == null) return;
 
@@ -28,6 +56,25 @@ class SettingsController extends ChangeNotifier {
       if (doc.exists) {
         _settings = UserSettings.fromMap(doc.data() as Map<String, dynamic>);
         notifyListeners();
+        // Sync fetched firestore settings to local db
+        final db = DatabaseHelper.instance;
+        await db.saveSetting(
+          'darkModeEnabled',
+          _settings.darkModeEnabled.toString(),
+        );
+        await db.saveSetting('language', _settings.language);
+        await db.saveSetting(
+          'dailyStepGoal',
+          _settings.dailyStepGoal.toString(),
+        );
+        await db.saveSetting(
+          'runTrackingInBackground',
+          _settings.runTrackingInBackground.toString(),
+        );
+        await db.saveSetting(
+          'notificationsEnabled',
+          _settings.notificationsEnabled.toString(),
+        );
       } else {
         _settings = const UserSettings();
         notifyListeners();
@@ -38,11 +85,28 @@ class SettingsController extends ChangeNotifier {
   }
 
   Future<void> updateSettings(UserSettings newSettings) async {
-    final user = _auth.currentUser;
-    if (user == null) return;
-
     _settings = newSettings;
     notifyListeners();
+
+    // Save locally
+    final db = DatabaseHelper.instance;
+    await db.saveSetting(
+      'darkModeEnabled',
+      newSettings.darkModeEnabled.toString(),
+    );
+    await db.saveSetting('language', newSettings.language);
+    await db.saveSetting('dailyStepGoal', newSettings.dailyStepGoal.toString());
+    await db.saveSetting(
+      'runTrackingInBackground',
+      newSettings.runTrackingInBackground.toString(),
+    );
+    await db.saveSetting(
+      'notificationsEnabled',
+      newSettings.notificationsEnabled.toString(),
+    );
+
+    final user = _auth.currentUser;
+    if (user == null) return;
 
     try {
       await _firestore
@@ -61,4 +125,3 @@ class SettingsController extends ChangeNotifier {
     await updateSettings(updated);
   }
 }
-

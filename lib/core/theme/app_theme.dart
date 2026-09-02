@@ -14,18 +14,27 @@ class AppTheme {
         elevation: 0,
       ),
       colorScheme: ColorScheme.fromSeed(
-        seedColor: AppColors.primaryYellow,
-        primary: AppColors.primaryYellow,
+        seedColor: AppColors.primaryGradientEnd,
+        primary: AppColors.primaryGradientEnd,
         onPrimary: AppColors.darkText,
         surface: AppColors.surface,
         onSurface: AppColors.darkText,
+      ),
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: AppColors.primaryGradientEnd,
+        contentTextStyle: GoogleFonts.nokora(
+          color: AppColors.activityCard,
+          fontWeight: FontWeight.w700,
+        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        elevation: 8,
       ),
       extensions: const [AppThemeExtension.light],
       textTheme: GoogleFonts.kantumruyProTextTheme().copyWith(
         headlineSmall: GoogleFonts.nokora(
           fontSize: 27,
           fontWeight: FontWeight.w800,
-          letterSpacing: 0.2,
         ),
         displaySmall: GoogleFonts.nokora(
           fontSize: 46,
@@ -61,6 +70,16 @@ class AppTheme {
         surface: AppColors.surfaceDark,
         onSurface: AppColors.textLight,
       ),
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: AppColors.primaryGradientEnd,
+        contentTextStyle: GoogleFonts.nokora(
+          color: AppColors.activityCard, // Keep text dark on yellow bg
+          fontWeight: FontWeight.w700,
+        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        elevation: 8,
+      ),
       extensions: const [AppThemeExtension.dark],
       textTheme:
           GoogleFonts.kantumruyProTextTheme(
@@ -69,7 +88,6 @@ class AppTheme {
             headlineSmall: GoogleFonts.nokora(
               fontSize: 27,
               fontWeight: FontWeight.w800,
-              letterSpacing: 0.2,
               color: AppColors.textLight,
             ),
             displaySmall: GoogleFonts.nokora(

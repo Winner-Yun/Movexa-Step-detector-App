@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:step_detector/core/localization/app_translations.dart';
 import 'package:step_detector/core/theme/theme_colors.dart';
 import 'package:step_detector/data/controller/activity_controller.dart';
 import 'package:step_detector/data/controller/motion_controller.dart';
@@ -19,18 +21,55 @@ class StepMainApp extends StatefulWidget {
 
 class _StepMainAppState extends State<StepMainApp> {
   int _selectedTab = 0;
+  static const _channel = MethodChannel('com.khansha.movexa/widget');
 
-  static const List<Widget> _pages = [
-    StepDashboardPage(),
-    StepWorkoutPage(),
-    StepHistoryPage(),
-    StepSettingsPage(),
+  late final List<Widget> _pages = [
+    StepDashboardPage(onSeeAll: () => _onSelected(2)),
+    const StepWorkoutPage(),
+    const StepHistoryPage(),
+    const StepSettingsPage(),
   ];
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _bootstrap());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _bootstrap();
+      _setupWidgetChannel();
+    });
+  }
+
+  Future<void> _setupWidgetChannel() async {
+    _channel.setMethodCallHandler((call) async {
+      if (mounted) {
+        if (call.method == 'SWITCH_TO_WORKOUT_MODE' ||
+            call.method == 'switchToWorkoutMode' ||
+            call.method == 'OPEN_WORKOUT_PAGE') {
+          _onSelected(1);
+        } else if (call.method == 'OPEN_DASHBOARD') {
+          _onSelected(0);
+        }
+      }
+    });
+
+    try {
+      final dynamic pendingLaunch = await _channel.invokeMethod(
+        'checkWidgetLaunch',
+      );
+      if (pendingLaunch is String && mounted) {
+        if (pendingLaunch == 'SWITCH_TO_WORKOUT_MODE' ||
+            pendingLaunch == 'switchToWorkoutMode' ||
+            pendingLaunch == 'OPEN_WORKOUT_PAGE') {
+          _onSelected(1);
+        } else if (pendingLaunch == 'OPEN_DASHBOARD') {
+          _onSelected(0);
+        }
+      } else if (pendingLaunch == true && mounted) {
+        _onSelected(1); // Fallback for old boolean just in case
+      }
+    } catch (e) {
+      // ignore errors
+    }
   }
 
   Future<void> _bootstrap() async {
@@ -38,6 +77,8 @@ class _StepMainAppState extends State<StepMainApp> {
     final settingsCtrl = context.read<SettingsController>();
     final activityCtrl = context.read<ActivityController>();
     final motionCtrl = context.read<MotionController>();
+
+    activityCtrl.setFetching(true);
 
     await Future.wait([
       profileCtrl.fetchProfile(),
@@ -53,13 +94,29 @@ class _StepMainAppState extends State<StepMainApp> {
       activityCtrl.fetchMonthlyStepHistory(),
     ]);
 
+    activityCtrl.setFetching(false);
+
     if (!mounted) return;
+    motionCtrl.onServiceStoppedExternally = () async {
+      final newSettings = settingsCtrl.settings.copyWith(
+        runTrackingInBackground: false,
+      );
+      settingsCtrl.updateSettings(newSettings);
+
+      final steps = motionCtrl.todaySteps;
+      final distance = (steps * MotionController.kmPerStep).toDouble();
+      final calories = (steps * MotionController.kcalPerStep).toDouble();
+      await activityCtrl.updateTodaySteps(steps, distance, calories);
+    };
+
     if (settingsCtrl.settings.runTrackingInBackground) {
       motionCtrl.start(
         dailyGoal: settingsCtrl.settings.dailyStepGoal,
         alreadyCountedToday: activityCtrl.todayRecord?.steps ?? 0,
       );
     }
+
+    await motionCtrl.restoreWorkout();
   }
 
   @override
@@ -80,7 +137,7 @@ class _StepMainAppState extends State<StepMainApp> {
                 index: 0,
                 selectedIndex: _selectedTab,
                 icon: Icons.dashboard_rounded,
-                label: 'Dashboard',
+                label: 'dashboard'.tr(context),
                 onSelected: _onSelected,
               ),
             ),
@@ -89,7 +146,7 @@ class _StepMainAppState extends State<StepMainApp> {
                 index: 1,
                 selectedIndex: _selectedTab,
                 icon: Icons.directions_run_rounded,
-                label: 'Workout',
+                label: 'workout'.tr(context),
                 onSelected: _onSelected,
               ),
             ),
@@ -98,7 +155,7 @@ class _StepMainAppState extends State<StepMainApp> {
                 index: 2,
                 selectedIndex: _selectedTab,
                 icon: Icons.history_toggle_off_rounded,
-                label: 'History',
+                label: 'history'.tr(context),
                 onSelected: _onSelected,
               ),
             ),
@@ -107,7 +164,7 @@ class _StepMainAppState extends State<StepMainApp> {
                 index: 3,
                 selectedIndex: _selectedTab,
                 icon: Icons.settings_rounded,
-                label: 'Settings',
+                label: 'settings'.tr(context),
                 onSelected: _onSelected,
               ),
             ),

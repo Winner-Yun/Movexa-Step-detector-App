@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:step_detector/core/localization/app_translations.dart';
 import 'package:step_detector/core/theme/theme_colors.dart';
+import 'package:step_detector/data/controller/activity_controller.dart';
 import 'package:step_detector/data/controller/auth_controller.dart';
 import 'package:step_detector/data/controller/motion_controller.dart';
 import 'package:step_detector/data/controller/profile_controller.dart';
 import 'package:step_detector/data/controller/settings_controller.dart';
 import 'package:step_detector/modules/profile/step_profile_edit_page.dart';
+import 'package:step_detector/modules/settings/about_us_page.dart';
+import 'package:step_detector/widgets/skeleton.dart';
+import 'package:step_detector/widgets/set_goal_dialog.dart';
 
 class StepSettingsPage extends StatefulWidget {
   const StepSettingsPage({super.key});
@@ -15,186 +20,24 @@ class StepSettingsPage extends StatefulWidget {
 }
 
 class _StepSettingsPageState extends State<StepSettingsPage> {
-  final TextEditingController _goalInputController = TextEditingController();
-
   void _showSetGoalDialog(SettingsController settingsCtrl) {
-    String? errorMessage;
-
     showDialog(
       context: context,
       builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return Dialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(24),
-              ),
-              backgroundColor: ThemeColors.getSurface(context),
-              elevation: 8,
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _buildGoalDialogHeader(),
-                    SizedBox(height: 24),
-                    _buildGoalInput(errorMessage, setState),
-                    SizedBox(height: 28),
-                    _buildGoalDialogActions(context, setState, settingsCtrl),
-                  ],
+        return SetGoalDialog(
+          currentGoal: settingsCtrl.settings.dailyStepGoal,
+          onGoalChanged: (newGoal) {
+            settingsCtrl.updateStepGoal(newGoal);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  '${context.read<AppTranslations>().tr('newGoalSet')}$newGoal',
                 ),
               ),
             );
           },
         );
       },
-    );
-  }
-
-  Widget _buildGoalDialogHeader() {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: ThemeColors.getBrandAccent(context).withValues(alpha: 0.1),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            Icons.flag_rounded,
-            color: ThemeColors.getBrandAccent(context),
-            size: 36,
-          ),
-        ),
-        SizedBox(height: 16),
-        Text(
-          'កំណត់គោលដៅថ្មី',
-          style: TextStyle(
-            color: ThemeColors.getText(context),
-            fontWeight: FontWeight.w800,
-            fontSize: 22,
-          ),
-        ),
-        SizedBox(height: 6),
-        Text(
-          'កំណត់គោលដៅជំហានប្រចាំថ្ងៃរបស់អ្នក',
-          style: TextStyle(
-            color: ThemeColors.getMutedText(context),
-            fontWeight: FontWeight.w500,
-            fontSize: 14,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildGoalInput(String? errorMessage, StateSetter setState) {
-    return TextField(
-      controller: _goalInputController,
-      keyboardType: TextInputType.number,
-      textAlign: TextAlign.center,
-      cursorColor: ThemeColors.getBrandAccent(context),
-      style: TextStyle(
-        fontSize: 28,
-        fontWeight: FontWeight.w900,
-        color: ThemeColors.getBrandAccent(context),
-      ),
-      onChanged: (value) {
-        if (errorMessage != null) {
-          setState(() => errorMessage = null);
-        }
-      },
-      decoration: InputDecoration(
-        hintText: '10000',
-        hintStyle: TextStyle(
-          color: ThemeColors.getBrandAccent(context).withValues(alpha: 0.3),
-          fontSize: 24,
-          fontWeight: FontWeight.w700,
-        ),
-        filled: true,
-        fillColor: ThemeColors.getScaffoldSoft(context),
-        contentPadding: const EdgeInsets.symmetric(vertical: 16),
-        errorText: errorMessage,
-        errorStyle: TextStyle(
-          color: Colors.redAccent,
-          fontWeight: FontWeight.w600,
-          fontSize: 13,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide.none,
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Colors.redAccent, width: 1.5),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Colors.redAccent, width: 2),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildGoalDialogActions(
-    BuildContext context,
-    StateSetter setState,
-    SettingsController settingsCtrl,
-  ) {
-    return Row(
-      children: [
-        Expanded(
-          child: TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _goalInputController.clear();
-            },
-            style: TextButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-              ),
-            ),
-            child: Text(
-              'បោះបង់',
-              style: TextStyle(
-                color: ThemeColors.getMutedText(context),
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-            ),
-          ),
-        ),
-        SizedBox(width: 12),
-        Expanded(
-          child: ElevatedButton(
-            onPressed: () {
-              final newGoal = int.tryParse(_goalInputController.text);
-              if (newGoal != null && newGoal > 0) {
-                settingsCtrl.updateStepGoal(newGoal);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('បានកំណត់គោលដៅថ្មី: $newGoal')),
-                );
-                Navigator.pop(context);
-                _goalInputController.clear();
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: ThemeColors.getBrandAccent(context),
-              foregroundColor: Colors.white,
-              elevation: 0,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-              ),
-            ),
-            child: Text(
-              'រក្សាទុក',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
-          ),
-        ),
-      ],
     );
   }
 
@@ -233,7 +76,7 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
                 ),
                 SizedBox(height: 16),
                 Text(
-                  'ចាកចេញពីគណនី?',
+                  'logoutAccount'.tr(context),
                   style: TextStyle(
                     color: ThemeColors.getText(context),
                     fontSize: 22,
@@ -242,7 +85,7 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'តើអ្នកពិតជាចង់ចាកចេញពីគណនីមែនទេ?',
+                  'confirmLogout'.tr(context),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: ThemeColors.getMutedText(context),
@@ -259,7 +102,7 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
                           padding: const EdgeInsets.symmetric(vertical: 16),
                         ),
                         child: Text(
-                          'បោះបង់',
+                          'cancel'.tr(context),
                           style: TextStyle(
                             color: ThemeColors.getMutedText(context),
                             fontWeight: FontWeight.bold,
@@ -287,7 +130,7 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
                           elevation: 0,
                         ),
                         child: Text(
-                          'ចាកចេញ',
+                          'logout'.tr(context),
                           style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -303,6 +146,28 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
         );
       },
     );
+  }
+
+  Future<void> _onRefresh(BuildContext context) async {
+    final activityCtrl = context.read<ActivityController>();
+    final profileCtrl = context.read<ProfileController>();
+    final settingsCtrl = context.read<SettingsController>();
+
+    if (activityCtrl.isFetching) return;
+
+    activityCtrl.setFetching(true);
+
+    await Future.wait([
+      profileCtrl.fetchProfile(),
+      settingsCtrl.fetchSettings(),
+      activityCtrl.fetchTodayRecord(
+        dailyGoal: settingsCtrl.settings.dailyStepGoal,
+      ),
+      activityCtrl.fetchWorkoutHistory(),
+      activityCtrl.fetchMonthlyStepHistory(),
+    ]);
+
+    activityCtrl.setFetching(false);
   }
 
   @override
@@ -335,11 +200,10 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
             ),
             SizedBox(width: 12),
             Text(
-              'ការកំណត់',
+              'settings'.tr(context),
               style: textTheme.titleLarge?.copyWith(
                 color: ThemeColors.getText(context),
                 fontWeight: FontWeight.w900,
-                letterSpacing: 0.5,
               ),
             ),
           ],
@@ -348,63 +212,180 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
         toolbarHeight: 64,
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(24, 0, 24, 40),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: 24),
-              _buildProfileCard(textTheme, profileCtrl),
-              SizedBox(height: 32),
+        child: RefreshIndicator(
+          onRefresh: () => _onRefresh(context),
+          color: ThemeColors.getBrandAccent(context),
+          backgroundColor: ThemeColors.getSurface(context),
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            child:
+                profileCtrl.isLoading ||
+                    context.watch<ActivityController>().isFetching
+                ? ListView(
+                    physics: const AlwaysScrollableScrollPhysics(
+                      parent: BouncingScrollPhysics(),
+                    ),
+                    padding: const EdgeInsets.fromLTRB(24, 0, 24, 40),
+                    children: const [ProfileSkeleton()],
+                  )
+                : SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(
+                      parent: BouncingScrollPhysics(),
+                    ),
+                    padding: const EdgeInsets.fromLTRB(24, 0, 24, 40),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 24),
+                        _buildProfileCard(textTheme, profileCtrl),
+                        SizedBox(height: 32),
 
-              _buildSectionTitle('គណនី (Account)', textTheme),
-              _buildSettingsGroup([
-                _SettingsItemTile(
-                  context: context,
-                  icon: Icons.person_outline_rounded,
-                  title: 'ព័ត៌មានផ្ទាល់ខ្លួន',
-                  onTap: _navigateToProfileEdit,
-                ),
-                _SettingsItemTile(
-                  context: context,
-                  icon: Icons.flag_outlined,
-                  title: 'គោលដៅជំហាន',
-                  trailingText: '${settingsCtrl.settings.dailyStepGoal}',
-                  onTap: () => _showSetGoalDialog(settingsCtrl),
-                ),
-              ]),
-              SizedBox(height: 24),
+                        _buildSectionTitle('account'.tr(context), textTheme),
+                        _buildSettingsGroup([
+                          _SettingsItemTile(
+                            context: context,
+                            icon: Icons.person_outline_rounded,
+                            title: 'personalInfo'.tr(context),
+                            onTap: _navigateToProfileEdit,
+                          ),
+                          _SettingsItemTile(
+                            context: context,
+                            icon: Icons.flag_outlined,
+                            title: 'stepGoal'.tr(context),
+                            trailingText:
+                                '${settingsCtrl.settings.dailyStepGoal}',
+                            onTap: () => _showSetGoalDialog(settingsCtrl),
+                          ),
+                        ]),
 
-              _buildSectionTitle('ចំណូលចិត្ត (Preferences)', textTheme),
-              _buildSettingsGroup([
-                _SettingsItemTile(
-                  context: context,
-                  icon: Icons.dark_mode_outlined,
-                  title: 'ម៉ូដងងឹត (Dark Mode)',
-                  isSwitch: true,
-                  switchValue: settingsCtrl.settings.darkModeEnabled,
-                  onSwitchChanged: (val) => settingsCtrl.updateSettings(
-                    settingsCtrl.settings.copyWith(darkModeEnabled: val),
-                  ),
-                ),
-              ]),
+                        SizedBox(height: 24),
 
-              SizedBox(height: 40),
-              Center(
-                child: TextButton.icon(
-                  onPressed: _showLogoutDialog,
-                  icon: Icon(Icons.logout_rounded, color: Colors.redAccent),
-                  label: Text(
-                    'ចាកចេញ (Log Out)',
-                    style: TextStyle(
-                      color: Colors.redAccent,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                        _buildSectionTitle(
+                          'preferences'.tr(context),
+                          textTheme,
+                        ),
+                        _buildSettingsGroup([
+                          _SettingsItemTile(
+                            context: context,
+                            icon: Icons.dark_mode_outlined,
+                            title: 'darkMode'.tr(context),
+                            isSwitch: true,
+                            switchValue: settingsCtrl.settings.darkModeEnabled,
+                            onSwitchChanged: (val) =>
+                                settingsCtrl.updateSettings(
+                                  settingsCtrl.settings.copyWith(
+                                    darkModeEnabled: val,
+                                  ),
+                                ),
+                          ),
+                          _SettingsItemTile(
+                            context: context,
+                            icon: Icons.language_rounded,
+                            title: 'language'.tr(context),
+                            trailingText: settingsCtrl.settings.language == 'km'
+                                ? 'ខ្មែរ'
+                                : 'English',
+                            isSwitch: true,
+                            switchValue: settingsCtrl.settings.language == 'km',
+                            onSwitchChanged: (val) {
+                              final newLang = val ? 'km' : 'en';
+                              settingsCtrl.updateSettings(
+                                settingsCtrl.settings.copyWith(
+                                  language: newLang,
+                                ),
+                              );
+                            },
+                          ),
+                          _SettingsItemTile(
+                            context: context,
+                            icon: Icons.track_changes_rounded,
+                            title: 'dailyTrackRecord'.tr(context),
+                            isSwitch: true,
+                            switchValue:
+                                settingsCtrl.settings.runTrackingInBackground,
+                            onSwitchChanged: (val) async {
+                              final activityCtrl = context
+                                  .read<ActivityController>();
+                              final motionCtrl = context
+                                  .read<MotionController>();
+
+                              final newSettings = settingsCtrl.settings
+                                  .copyWith(runTrackingInBackground: val);
+                              settingsCtrl.updateSettings(newSettings);
+
+                              if (val) {
+                                await motionCtrl.start(
+                                  dailyGoal:
+                                      settingsCtrl.settings.dailyStepGoal,
+                                  alreadyCountedToday:
+                                      activityCtrl.todayRecord?.steps ?? 0,
+                                  runInBackground: val,
+                                );
+                                if (motionCtrl.permissionDenied) {
+                                  if (!context.mounted) return;
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        context.read<AppTranslations>().tr(
+                                          'motionPermissionRequired',
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }
+                              } else {
+                                motionCtrl.stop();
+                                final steps = motionCtrl.todaySteps;
+                                final distance =
+                                    (steps * MotionController.kmPerStep)
+                                        .toDouble();
+                                final calories =
+                                    (steps * MotionController.kcalPerStep)
+                                        .toDouble();
+                                await activityCtrl.updateTodaySteps(
+                                  steps,
+                                  distance,
+                                  calories,
+                                );
+                              }
+                            },
+                          ),
+                          _SettingsItemTile(
+                            context: context,
+                            icon: Icons.info_outline_rounded,
+                            title: 'aboutUs'.tr(context),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const AboutUsPage(),
+                                ),
+                              );
+                            },
+                          ),
+                        ]),
+
+                        SizedBox(height: 40),
+                        Center(
+                          child: TextButton.icon(
+                            onPressed: _showLogoutDialog,
+                            icon: Icon(
+                              Icons.logout_rounded,
+                              color: Colors.redAccent,
+                            ),
+                            label: Text(
+                              'logoutAction'.tr(context),
+                              style: TextStyle(
+                                color: Colors.redAccent,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ),
-              ),
-            ],
           ),
         ),
       ),
@@ -449,17 +430,26 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
                 color: Colors.white.withValues(alpha: 0.5),
                 width: 3,
               ),
+              image:
+                  (profile?.avatarUrl != null && profile!.avatarUrl!.isNotEmpty)
+                  ? DecorationImage(
+                      image: NetworkImage(profile.avatarUrl!),
+                      fit: BoxFit.cover,
+                    )
+                  : null,
             ),
-            child: Center(
-              child: Text(
-                initial,
-                style: TextStyle(
-                  color: ThemeColors.getBrandAccent(context),
-                  fontSize: 32,
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
-            ),
+            child: (profile?.avatarUrl == null || profile!.avatarUrl!.isEmpty)
+                ? Center(
+                    child: Text(
+                      initial,
+                      style: TextStyle(
+                        color: ThemeColors.getBrandAccent(context),
+                        fontSize: 32,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  )
+                : null,
           ),
           SizedBox(width: 16),
           Expanded(
@@ -481,6 +471,37 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
+
+                if (profile != null &&
+                    (profile.age > 0 ||
+                        profile.weight > 0 ||
+                        profile.height > 0)) ...[
+                  SizedBox(height: 12),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      if (profile.age > 0)
+                        _buildProfileStatBadge(
+                          context,
+                          Icons.cake_rounded,
+                          '${profile.age}',
+                        ),
+                      if (profile.weight > 0)
+                        _buildProfileStatBadge(
+                          context,
+                          Icons.monitor_weight_rounded,
+                          '${profile.weight} kg',
+                        ),
+                      if (profile.height > 0)
+                        _buildProfileStatBadge(
+                          context,
+                          Icons.height_rounded,
+                          '${profile.height} cm',
+                        ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ),
@@ -496,6 +517,35 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
     );
   }
 
+  Widget _buildProfileStatBadge(
+    BuildContext context,
+    IconData icon,
+    String text,
+  ) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: Colors.white, size: 14),
+          SizedBox(width: 4),
+          Text(
+            text,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildSectionTitle(String title, TextTheme textTheme) {
     return Padding(
       padding: const EdgeInsets.only(left: 8, bottom: 12),
@@ -504,7 +554,6 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
         style: textTheme.titleSmall?.copyWith(
           color: ThemeColors.getMutedText(context),
           fontWeight: FontWeight.w800,
-          letterSpacing: 0.5,
         ),
       ),
     );
@@ -656,7 +705,7 @@ class _SettingsItemTileState extends State<_SettingsItemTile> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
                   color: _localSwitchValue
-                      ? ThemeColors.getBrandAccent(context)
+                      ? ThemeColors.getPrimaryGradientStart(context)
                       : ThemeColors.getMutedText(
                           context,
                         ).withValues(alpha: 0.2),

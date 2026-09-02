@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:step_detector/core/constants/app_img.dart';
 import 'package:step_detector/core/localization/app_translations.dart';
 import 'package:step_detector/core/theme/theme_colors.dart';
 import 'package:step_detector/data/controller/auth_controller.dart';
@@ -31,129 +32,141 @@ class _StepLoginPageState extends State<StepLoginPage> {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final isLoading = context.watch<AuthController>().isLoading;
+    final locale = context.watch<AppTranslations>().locale;
 
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: SafeArea(
+        child: Stack(
           children: [
-            Container(
+            SizedBox(
               width: double.infinity,
-              height: 300,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    ThemeColors.getPrimaryGradientStart(context),
-                    ThemeColors.getPrimaryGradientEnd(context),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(40),
-                  bottomRight: Radius.circular(40),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: ThemeColors.getBrandAccent(
-                      context,
-                    ).withValues(alpha: 0.3),
-                    blurRadius: 20,
-                    offset: const Offset(0, 10),
+              child: Column(
+                children: [
+                  const Spacer(flex: 3),
+                  // Logo
+                  Image.asset(
+                    AppImg.logo,
+                    width: 100,
+                    height: 100,
+                    fit: BoxFit.cover,
                   ),
+                  const Spacer(flex: 1),
+                  // Title
+                  Text(
+                    'appSlogan'.tr(context),
+                    textAlign: TextAlign.center,
+                    style: textTheme.displaySmall?.copyWith(
+                      color: ThemeColors.getText(context),
+                      fontWeight: FontWeight.w900,
+                      height: 1.2,
+                    ),
+                  ),
+                  const Spacer(flex: 2),
+                  // Continue with Google Button
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                    child: ElevatedButton.icon(
+                      onPressed: isLoading ? null : _handleGoogleSignIn,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: ThemeColors.getBrandAccent(context),
+                        foregroundColor: Colors.white,
+                        minimumSize: const Size(double.infinity, 64),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(32),
+                        ),
+                        elevation: 0,
+                      ),
+                      icon: isLoading
+                          ? const SizedBox.shrink()
+                          : const Icon(
+                              Icons.g_mobiledata_rounded,
+                              color: Colors.white,
+                              size: 36,
+                            ),
+                      label: isLoading
+                          ? const SizedBox(
+                              height: 24,
+                              width: 24,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 3,
+                              ),
+                            )
+                          : Text(
+                              'continueWithGoogle'.tr(context),
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                    ),
+                  ),
+                  const Spacer(flex: 1),
                 ],
-              ),
-              child: SafeArea(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.directions_run_rounded,
-                        color: Colors.white,
-                        size: 50,
-                      ),
-                    ),
-                    SizedBox(height: 16),
-                    Text(
-                      'Kinetic',
-                      style: textTheme.displaySmall?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      'trackingSteps'.tr(context),
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
               ),
             ),
 
-            Padding(
-              padding: const EdgeInsets.all(32.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'loginTitle'.tr(context),
-                    style: textTheme.headlineSmall?.copyWith(
-                      color: ThemeColors.getText(context),
-                      fontWeight: FontWeight.w900,
+            // Language Changer top right
+            Positioned(
+              top: 16,
+              right: 16,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: ThemeColors.getBrandAccent(
+                    context,
+                  ).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildLangBtn(
+                      context,
+                      'EN',
+                      'en',
+                      locale.languageCode == 'en',
                     ),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    'ចូលគណនីតាមរយៈ Google របស់អ្នក',
-                    style: textTheme.bodyMedium?.copyWith(
-                      color: ThemeColors.getMutedText(context),
-                      fontWeight: FontWeight.w600,
+                    _buildLangBtn(
+                      context,
+                      'KM',
+                      'km',
+                      locale.languageCode == 'km',
                     ),
-                  ),
-
-                  SizedBox(height: 40),
-
-                  ElevatedButton.icon(
-                    onPressed: isLoading ? null : _handleGoogleSignIn,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ThemeColors.getBrandAccent(context),
-                      minimumSize: const Size(double.infinity, 56),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      elevation: 0,
-                    ),
-                    icon: isLoading
-                        ? const SizedBox.shrink()
-                        : Icon(
-                            Icons.g_mobiledata_rounded,
-                            color: Colors.white,
-                            size: 28,
-                          ),
-                    label: isLoading
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : Text(
-                            'loginWithGoogle'.tr(context),
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLangBtn(
+    BuildContext context,
+    String text,
+    String langCode,
+    bool isSelected,
+  ) {
+    return GestureDetector(
+      onTap: () {
+        context.read<AppTranslations>().changeLocale(Locale(langCode));
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? ThemeColors.getBrandAccent(context)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Text(
+          text,
+          style: TextStyle(
+            color: isSelected ? Colors.white : ThemeColors.getText(context),
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
     );
