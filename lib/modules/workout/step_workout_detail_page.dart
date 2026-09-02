@@ -3,6 +3,7 @@ import 'package:step_detector/core/localization/app_translations.dart';
 import 'package:step_detector/core/theme/theme_colors.dart';
 import 'package:step_detector/data/models/workout_session.dart';
 import 'package:step_detector/widgets/share_image_dialog.dart';
+import 'package:step_detector/widgets/map_path_viewer.dart';
 
 class StepWorkoutDetailPage extends StatelessWidget {
   final WorkoutSession session;
@@ -57,6 +58,12 @@ class StepWorkoutDetailPage extends StatelessWidget {
             _buildHeaderInfo(context, textTheme),
             SizedBox(height: 24),
             _buildMainHeroCard(context, textTheme),
+            SizedBox(height: 24),
+            MapPathViewer(
+              path: session.path,
+              height: 250,
+              interactive: true,
+            ),
             SizedBox(height: 24),
             _buildMetricsGrid(context),
           ],

@@ -11,6 +11,7 @@ class WorkoutSession implements BaseModel {
   final String averagePace;
   final double speedKmh;
   final List<double>? paceChartData;
+  final List<Map<String, dynamic>>? path;
 
   const WorkoutSession({
     required this.id,
@@ -23,6 +24,7 @@ class WorkoutSession implements BaseModel {
     required this.averagePace,
     required this.speedKmh,
     this.paceChartData,
+    this.path,
   });
 
   String get formattedDuration {
@@ -48,6 +50,7 @@ class WorkoutSession implements BaseModel {
       'averagePace': averagePace,
       'speedKmh': speedKmh,
       'paceChartData': paceChartData,
+      'path': path,
     };
   }
 
@@ -69,6 +72,9 @@ class WorkoutSession implements BaseModel {
               ?.map((e) => (e as num).toDouble())
               .toList() ??
           [],
+      path: (map['path'] as List<dynamic>?)
+          ?.map((e) => Map<String, dynamic>.from(e as Map))
+          .toList(),
     );
   }
 }

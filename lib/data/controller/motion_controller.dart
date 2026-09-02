@@ -3,6 +3,7 @@ import 'dart:io' show Platform;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -21,6 +22,15 @@ class MotionController extends ChangeNotifier {
 
   StreamSubscription<StepCount>? _stepCountSub;
   StreamSubscription<PedestrianStatus>? _statusSub;
+  StreamSubscription<Position>? _positionSub;
+
+  Position? _latestPosition;
+
+  List<Map<String, dynamic>> _dailyPath = [];
+  List<Map<String, dynamic>> _workoutPath = [];
+
+  List<Map<String, dynamic>> get dailyPath => _dailyPath;
+  List<Map<String, dynamic>> get workoutPath => _workoutPath;
 
   bool _isTracking = false;
   bool _permissionDenied = false;
@@ -64,11 +74,20 @@ class MotionController extends ChangeNotifier {
   }
 
   Future<bool> _ensurePermission() async {
-    if (!Platform.isAndroid) return true;
+    bool hasLocation = false;
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+    if (permission == LocationPermission.always || permission == LocationPermission.whileInUse) {
+      hasLocation = true;
+    }
+
+    if (!Platform.isAndroid) return hasLocation;
     final status = await Permission.activityRecognition.request();
     // Also request notification permission for Android 13+
     await Permission.notification.request();
-    return status.isGranted;
+    return status.isGranted && hasLocation;
   }
 
   void _initForegroundTask() {
@@ -153,6 +172,17 @@ class MotionController extends ChangeNotifier {
       onError: (Object e) => debugPrint('Pedestrian status stream error: $e'),
     );
 
+    _dailyPath = List.from(_activityCtrl?.todayRecord?.path ?? []);
+    
+    _positionSub = Geolocator.getPositionStream(
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 10,
+      ),
+    ).listen((Position position) {
+      _latestPosition = position;
+    }, onError: (e) => debugPrint('Location error: $e'));
+
     notifyListeners();
     _updateDailyWidget();
   }
@@ -171,10 +201,22 @@ class MotionController extends ChangeNotifier {
     // We update local state so the UI reflects it.
     _alreadyCountedToday = totalSteps;
     _liveSteps = 0; // live steps handled by background
+
+    if (_latestPosition != null) {
+      final point = {
+        'lat': _latestPosition!.latitude,
+        'lng': _latestPosition!.longitude,
+      };
+      if (_dailyPath.isEmpty || _dailyPath.last['lat'] != point['lat'] || _dailyPath.last['lng'] != point['lng']) {
+        _dailyPath.add(point);
+      }
+    }
+
     _activityCtrl?.updateTodaySteps(
       totalSteps,
       totalSteps * kmPerStep,
       totalSteps * kcalPerStep,
+      path: _dailyPath,
     );
     notifyListeners();
   }
@@ -184,6 +226,7 @@ class MotionController extends ChangeNotifier {
 
     _stepCountSub?.cancel();
     _statusSub?.cancel();
+    _positionSub?.cancel();
     FlutterForegroundTask.removeTaskDataCallback(_onReceiveTaskData);
 
     _stepCountSub = null;
@@ -215,6 +258,7 @@ class MotionController extends ChangeNotifier {
     _workoutBaselineSteps = null;
     _workoutSteps = 0;
     _workoutDurationSeconds = 0;
+    _workoutPath = [];
 
     _workoutStepSub = Pedometer.stepCountStream.listen(
       _onWorkoutStepCount,
@@ -297,6 +341,17 @@ class MotionController extends ChangeNotifier {
       await prefs.setInt('workoutBaselineSteps', event.steps);
     }
     _workoutSteps = event.steps - _workoutBaselineSteps!;
+
+    if (_latestPosition != null) {
+      final point = {
+        'lat': _latestPosition!.latitude,
+        'lng': _latestPosition!.longitude,
+      };
+      if (_workoutPath.isEmpty || _workoutPath.last['lat'] != point['lat'] || _workoutPath.last['lng'] != point['lng']) {
+        _workoutPath.add(point);
+      }
+    }
+
     notifyListeners();
     _updateWorkoutWidget();
   }
@@ -314,10 +369,22 @@ class MotionController extends ChangeNotifier {
     _liveSteps = deviceSteps - _deviceBaselineSteps!;
 
     final totalSteps = todaySteps;
+
+    if (_latestPosition != null) {
+      final point = {
+        'lat': _latestPosition!.latitude,
+        'lng': _latestPosition!.longitude,
+      };
+      if (_dailyPath.isEmpty || _dailyPath.last['lat'] != point['lat'] || _dailyPath.last['lng'] != point['lng']) {
+        _dailyPath.add(point);
+      }
+    }
+
     _activityCtrl?.updateTodaySteps(
       totalSteps,
       totalSteps * kmPerStep,
       totalSteps * kcalPerStep,
+      path: _dailyPath,
     );
 
     notifyListeners();
@@ -362,6 +429,7 @@ class MotionController extends ChangeNotifier {
   void dispose() {
     _stepCountSub?.cancel();
     _statusSub?.cancel();
+    _positionSub?.cancel();
     _workoutStepSub?.cancel();
     _workoutTimer?.cancel();
     FlutterForegroundTask.removeTaskDataCallback(_onReceiveTaskData);
