@@ -8,9 +8,9 @@ import 'package:step_detector/data/controller/settings_controller.dart';
 import 'package:step_detector/data/models/daily_step_record.dart';
 import 'package:step_detector/data/models/workout_session.dart';
 import 'package:step_detector/modules/workout/step_workout_detail_page.dart';
+import 'package:step_detector/widgets/map_path_viewer.dart';
 import 'package:step_detector/widgets/share_image_dialog.dart';
 import 'package:step_detector/widgets/skeleton.dart';
-import 'package:step_detector/widgets/map_path_viewer.dart';
 
 class StepHistoryPage extends StatefulWidget {
   const StepHistoryPage({super.key});
@@ -376,7 +376,7 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
     final avgSteps =
         data.fold<num>(0, (sum, record) => sum + record.steps) ~/ data.length;
 
-    final chartData = data.reversed.toList();
+    final chartData = data;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 24),
@@ -453,6 +453,7 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
           SizedBox(
             height: 160,
             child: ListView.builder(
+              reverse: true,
               scrollDirection: Axis.horizontal,
               physics: const BouncingScrollPhysics(),
               itemCount: chartData.length,
@@ -673,52 +674,118 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
               ),
             ],
           ),
-          SizedBox(height: 32),
-
-          Stack(
-            alignment: Alignment.center,
-            children: [
-              SizedBox(
-                width: 140,
-                height: 140,
-                child: CircularProgressIndicator(
-                  value: record.getProgress(goal),
-                  strokeWidth: 12,
-                  backgroundColor: ThemeColors.getScaffoldSoft(context),
-                  color: record.isGoalReached(goal)
-                      ? ThemeColors.getProgressValue(context)
-                      : ThemeColors.getBrandAccent(context),
-                  strokeCap: StrokeCap.round,
-                ),
-              ),
-              Column(
-                children: [
-                  Icon(
-                    Icons.directions_run_rounded,
-                    color: record.isGoalReached(goal)
-                        ? ThemeColors.getProgressValue(context)
-                        : ThemeColors.getBrandAccent(context),
-                    size: 28,
-                  ),
-                  SizedBox(height: 4),
-                  Text(
-                    '${record.steps}',
-                    style: textTheme.headlineSmall?.copyWith(
-                      color: ThemeColors.getText(context),
-                      fontWeight: FontWeight.w900,
+          SizedBox(height: 12),
+          DefaultTabController(
+            length: 2,
+            initialIndex: context
+                .read<SettingsController>()
+                .settings
+                .defaultTabMode,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: ThemeColors.getSurface(context),
+                    borderRadius: BorderRadius.circular(25),
+                    border: Border.all(
+                      color: ThemeColors.getMutedText(
+                        context,
+                      ).withValues(alpha: 0.1),
                     ),
                   ),
-                ],
-              ),
-            ],
-          ),
-
-          SizedBox(height: 40),
-
-          MapPathViewer(
-            path: record.path,
-            height: 200,
-            interactive: false,
+                  child: TabBar(
+                    onTap: (index) {
+                      final settingsCtrl = context.read<SettingsController>();
+                      settingsCtrl.updateSettings(
+                        settingsCtrl.settings.copyWith(defaultTabMode: index),
+                      );
+                    },
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    dividerColor: Colors.transparent,
+                    indicator: BoxDecoration(
+                      color: ThemeColors.getBrandAccent(context),
+                      borderRadius: BorderRadius.circular(25),
+                      boxShadow: [
+                        BoxShadow(
+                          color: ThemeColors.getBrandAccent(
+                            context,
+                          ).withValues(alpha: 0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    labelColor: Colors.white,
+                    unselectedLabelColor: ThemeColors.getMutedText(context),
+                    labelStyle: textTheme.labelLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                    tabs: [
+                      Tab(text: 'progress'.tr(context)),
+                      Tab(text: 'map'.tr(context)),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 16),
+                SizedBox(
+                  height: 220,
+                  child: TabBarView(
+                    physics: const BouncingScrollPhysics(),
+                    children: [
+                      Center(
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            SizedBox(
+                              width: 160,
+                              height: 160,
+                              child: CircularProgressIndicator(
+                                value: record.getProgress(goal),
+                                strokeWidth: 14,
+                                backgroundColor: ThemeColors.getScaffoldSoft(
+                                  context,
+                                ),
+                                color: record.isGoalReached(goal)
+                                    ? ThemeColors.getProgressValue(context)
+                                    : ThemeColors.getBrandAccent(context),
+                                strokeCap: StrokeCap.round,
+                              ),
+                            ),
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.directions_run_rounded,
+                                  color: record.isGoalReached(goal)
+                                      ? ThemeColors.getProgressValue(context)
+                                      : ThemeColors.getBrandAccent(context),
+                                  size: 32,
+                                ),
+                                SizedBox(height: 4),
+                                Text(
+                                  '${record.steps}',
+                                  style: textTheme.headlineSmall?.copyWith(
+                                    color: ThemeColors.getText(context),
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      MapPathViewer(
+                        path: record.path,
+                        height: 220,
+                        interactive: true,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
           SizedBox(height: 24),
 

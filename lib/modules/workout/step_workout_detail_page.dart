@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:step_detector/core/localization/app_translations.dart';
 import 'package:step_detector/core/theme/theme_colors.dart';
 import 'package:step_detector/data/models/workout_session.dart';
@@ -16,6 +17,9 @@ class StepWorkoutDetailPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        systemOverlayStyle: Theme.of(context).brightness == Brightness.dark
+            ? SystemUiOverlayStyle.light
+            : SystemUiOverlayStyle.dark,
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(

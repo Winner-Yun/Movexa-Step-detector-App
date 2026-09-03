@@ -275,15 +275,80 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
                         ),
                         SizedBox(height: 12),
 
-                        ProgressPanel(
-                          progress: progress,
-                          steps: currentSteps,
-                          goal: goal,
-                          progressGreen: ThemeColors.getProgressValue(context),
-                          textColor: ThemeColors.getText(context),
-                          subTextColor: ThemeColors.getMutedText(context),
+                        DefaultTabController(
+                          length: 2,
+                          initialIndex: settingsCtrl.settings.defaultTabMode,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                  color: ThemeColors.getSurface(context),
+                                  borderRadius: BorderRadius.circular(25),
+                                  border: Border.all(
+                                    color: ThemeColors.getMutedText(context)
+                                        .withValues(alpha: 0.1),
+                                  ),
+                                ),
+                                child: TabBar(
+                                  onTap: (index) {
+                                    settingsCtrl.updateSettings(
+                                      settingsCtrl.settings.copyWith(
+                                        defaultTabMode: index,
+                                      ),
+                                    );
+                                  },
+                                  indicatorSize: TabBarIndicatorSize.tab,
+                                  dividerColor: Colors.transparent,
+                                  indicator: BoxDecoration(
+                                    color: ThemeColors.getBrandAccent(context),
+                                    borderRadius: BorderRadius.circular(25),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: ThemeColors.getBrandAccent(context).withValues(alpha: 0.3),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  labelColor: Colors.white,
+                                  unselectedLabelColor: ThemeColors.getMutedText(context),
+                                  labelStyle: textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
+                                  tabs: [
+                                    Tab(text: 'progress'.tr(context)),
+                                    Tab(text: 'map'.tr(context)),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(height: 16),
+                              SizedBox(
+                                height: 260,
+                                child: TabBarView(
+                                  physics: const BouncingScrollPhysics(),
+                                  children: [
+                                    ProgressPanel(
+                                      progress: progress,
+                                      steps: currentSteps,
+                                      goal: goal,
+                                      progressGreen: ThemeColors.getProgressValue(context),
+                                      textColor: ThemeColors.getText(context),
+                                      subTextColor: ThemeColors.getMutedText(context),
+                                    ),
+                                    MapPathViewer(
+                                      path: motionCtrl.isTracking
+                                          ? motionCtrl.dailyPath
+                                          : todayRecord?.path,
+                                      height: 260,
+                                      interactive: true,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                        SizedBox(height: 12),
+                        SizedBox(height: 16),
 
                         TrackingToggleCard(
                           enabled:
@@ -312,13 +377,6 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
 
                         _buildRecentActivitiesHeader(textTheme),
                         SizedBox(height: 8),
-
-                        MapPathViewer(
-                          path: motionCtrl.isTracking ? motionCtrl.dailyPath : todayRecord?.path,
-                          height: 250,
-                          interactive: false,
-                        ),
-                        SizedBox(height: 14),
 
                         ActivitySection(
                           activities: activityCtrl.monthlyStepHistory,

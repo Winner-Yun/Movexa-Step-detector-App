@@ -23,6 +23,10 @@ class SettingsController extends ChangeNotifier {
     final bgTrackingStr = await db.getSetting('runTrackingInBackground');
     final notifsStr = await db.getSetting('notificationsEnabled');
 
+    final lineSizeStr = await db.getSetting('mapLineSize');
+    final markerSizeStr = await db.getSetting('mapMarkerSize');
+    final tabModeStr = await db.getSetting('defaultTabMode');
+
     _settings = _settings.copyWith(
       darkModeEnabled: isDarkStr == 'true',
       language: lang ?? 'km',
@@ -31,6 +35,9 @@ class SettingsController extends ChangeNotifier {
           ? bgTrackingStr == 'true'
           : null,
       notificationsEnabled: notifsStr != null ? notifsStr == 'true' : null,
+      mapLineSize: lineSizeStr != null ? double.tryParse(lineSizeStr) : null,
+      mapMarkerSize: markerSizeStr != null ? double.tryParse(markerSizeStr) : null,
+      defaultTabMode: tabModeStr != null ? int.tryParse(tabModeStr) : null,
     );
     notifyListeners();
   }
@@ -54,7 +61,12 @@ class SettingsController extends ChangeNotifier {
           .get();
 
       if (doc.exists) {
-        _settings = UserSettings.fromMap(doc.data() as Map<String, dynamic>);
+        final firestoreSettings = UserSettings.fromMap(doc.data() as Map<String, dynamic>);
+        _settings = firestoreSettings.copyWith(
+          mapLineSize: _settings.mapLineSize,
+          mapMarkerSize: _settings.mapMarkerSize,
+          defaultTabMode: _settings.defaultTabMode,
+        );
         notifyListeners();
         // Sync fetched firestore settings to local db
         final db = DatabaseHelper.instance;
@@ -76,7 +88,11 @@ class SettingsController extends ChangeNotifier {
           _settings.notificationsEnabled.toString(),
         );
       } else {
-        _settings = const UserSettings();
+        _settings = UserSettings(
+          mapLineSize: _settings.mapLineSize,
+          mapMarkerSize: _settings.mapMarkerSize,
+          defaultTabMode: _settings.defaultTabMode,
+        );
         notifyListeners();
       }
     } catch (e) {
@@ -104,6 +120,9 @@ class SettingsController extends ChangeNotifier {
       'notificationsEnabled',
       newSettings.notificationsEnabled.toString(),
     );
+    await db.saveSetting('mapLineSize', newSettings.mapLineSize.toString());
+    await db.saveSetting('mapMarkerSize', newSettings.mapMarkerSize.toString());
+    await db.saveSetting('defaultTabMode', newSettings.defaultTabMode.toString());
 
     final user = _auth.currentUser;
     if (user == null) return;

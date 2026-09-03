@@ -7,7 +7,7 @@ class MapStyles {
     "elementType": "geometry",
     "stylers": [
       {
-        "color": "#1d2c2f"
+        "color": "#161513"
       }
     ]
   },
@@ -15,7 +15,7 @@ class MapStyles {
     "elementType": "labels.text.fill",
     "stylers": [
       {
-        "color": "#8ec3b9"
+        "color": "#a39e93"
       }
     ]
   },
@@ -23,7 +23,7 @@ class MapStyles {
     "elementType": "labels.text.stroke",
     "stylers": [
       {
-        "color": "#1a3646"
+        "color": "#161513"
       }
     ]
   },
@@ -32,16 +32,7 @@ class MapStyles {
     "elementType": "geometry.stroke",
     "stylers": [
       {
-        "color": "#405d59"
-      }
-    ]
-  },
-  {
-    "featureType": "administrative.country",
-    "elementType": "geometry.stroke",
-    "stylers": [
-      {
-        "color": "#4b6878"
+        "color": "#252320"
       }
     ]
   },
@@ -50,16 +41,7 @@ class MapStyles {
     "elementType": "labels.text.fill",
     "stylers": [
       {
-        "color": "#64779e"
-      }
-    ]
-  },
-  {
-    "featureType": "administrative.province",
-    "elementType": "geometry.stroke",
-    "stylers": [
-      {
-        "color": "#4b6878"
+        "color": "#a39e93"
       }
     ]
   },
@@ -68,7 +50,7 @@ class MapStyles {
     "elementType": "geometry.stroke",
     "stylers": [
       {
-        "color": "#334e87"
+        "color": "#1e1c1a"
       }
     ]
   },
@@ -77,7 +59,7 @@ class MapStyles {
     "elementType": "geometry",
     "stylers": [
       {
-        "color": "#0F1E1E"
+        "color": "#1e1c1a"
       }
     ]
   },
@@ -86,7 +68,7 @@ class MapStyles {
     "elementType": "geometry",
     "stylers": [
       {
-        "color": "#142625"
+        "color": "#252320"
       }
     ]
   },
@@ -95,7 +77,7 @@ class MapStyles {
     "elementType": "geometry",
     "stylers": [
       {
-        "color": "#283d4a"
+        "color": "#272521"
       }
     ]
   },
@@ -104,16 +86,7 @@ class MapStyles {
     "elementType": "labels.text.fill",
     "stylers": [
       {
-        "color": "#6f9ba5"
-      }
-    ]
-  },
-  {
-    "featureType": "poi",
-    "elementType": "labels.text.stroke",
-    "stylers": [
-      {
-        "color": "#1d2c2f"
+        "color": "#a39e93"
       }
     ]
   },
@@ -122,7 +95,7 @@ class MapStyles {
     "elementType": "geometry.fill",
     "stylers": [
       {
-        "color": "#1A3835"
+        "color": "#2b2925"
       }
     ]
   },
@@ -131,7 +104,7 @@ class MapStyles {
     "elementType": "labels.text.fill",
     "stylers": [
       {
-        "color": "#5C9991"
+        "color": "#94d24c"
       }
     ]
   },
@@ -140,7 +113,7 @@ class MapStyles {
     "elementType": "geometry",
     "stylers": [
       {
-        "color": "#304a4d"
+        "color": "#2b2925"
       }
     ]
   },
@@ -149,7 +122,7 @@ class MapStyles {
     "elementType": "labels.text.fill",
     "stylers": [
       {
-        "color": "#98a5be"
+        "color": "#8a8478"
       }
     ]
   },
@@ -158,16 +131,7 @@ class MapStyles {
     "elementType": "labels.text.stroke",
     "stylers": [
       {
-        "color": "#1d2c2f"
-      }
-    ]
-  },
-  {
-    "featureType": "road.arterial",
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#304a4d"
+        "color": "#161513"
       }
     ]
   },
@@ -176,7 +140,7 @@ class MapStyles {
     "elementType": "geometry",
     "stylers": [
       {
-        "color": "#2c6675"
+        "color": "#36332e"
       }
     ]
   },
@@ -185,7 +149,7 @@ class MapStyles {
     "elementType": "geometry.stroke",
     "stylers": [
       {
-        "color": "#255763"
+        "color": "#2b2925"
       }
     ]
   },
@@ -194,34 +158,7 @@ class MapStyles {
     "elementType": "labels.text.fill",
     "stylers": [
       {
-        "color": "#b0d5ce"
-      }
-    ]
-  },
-  {
-    "featureType": "road.highway.controlled_access",
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#4e7c87"
-      }
-    ]
-  },
-  {
-    "featureType": "road.highway.controlled_access",
-    "elementType": "geometry.stroke",
-    "stylers": [
-      {
-        "color": "#255763"
-      }
-    ]
-  },
-  {
-    "featureType": "road.local",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#98a5be"
+        "color": "#f2efe9"
       }
     ]
   },
@@ -230,7 +167,7 @@ class MapStyles {
     "elementType": "labels.text.fill",
     "stylers": [
       {
-        "color": "#98a5be"
+        "color": "#a39e93"
       }
     ]
   },
@@ -239,7 +176,7 @@ class MapStyles {
     "elementType": "labels.text.stroke",
     "stylers": [
       {
-        "color": "#1d2c2f"
+        "color": "#161513"
       }
     ]
   },
@@ -248,7 +185,7 @@ class MapStyles {
     "elementType": "geometry.fill",
     "stylers": [
       {
-        "color": "#283d4a"
+        "color": "#36332e"
       }
     ]
   },
@@ -257,7 +194,7 @@ class MapStyles {
     "elementType": "geometry",
     "stylers": [
       {
-        "color": "#3a4762"
+        "color": "#272521"
       }
     ]
   },
@@ -266,7 +203,7 @@ class MapStyles {
     "elementType": "geometry",
     "stylers": [
       {
-        "color": "#0e1617"
+        "color": "#11100f"
       }
     ]
   },
@@ -275,7 +212,7 @@ class MapStyles {
     "elementType": "labels.text.fill",
     "stylers": [
       {
-        "color": "#4e6d70"
+        "color": "#a39e93"
       }
     ]
   }

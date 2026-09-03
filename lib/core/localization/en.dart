@@ -84,4 +84,13 @@ const Map<String, String> enTranslations = {
   'download': 'Download',
   'appSlogan': 'The App\nthat Lets You\nMove',
   'continueWithGoogle': 'Continue with Google',
+  'progress': 'Progress',
+  'map': 'Map',
+  'movexaDailySummary': 'Movexa | Daily Summary',
+  'editMap': 'Edit Map',
+  'center': 'Center',
+  'darkMapStyle': 'Dark Map Style',
+  'zoomLevel': 'Zoom Level',
+  'lineSize': 'Line Size',
+  'movexaWorkout': 'Movexa | Workout',
 };
