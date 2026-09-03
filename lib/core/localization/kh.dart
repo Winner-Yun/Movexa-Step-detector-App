@@ -84,4 +84,13 @@ const Map<String, String> khTranslations = {
   'download': 'រក្សាទុក',
   'appSlogan': 'កម្មវិធី\nដែលឲ្យអ្នក\nធ្វើចលនា',
   'continueWithGoogle': 'បន្តជាមួយ Google',
+  'progress': 'វឌ្ឍនភាព',
+  'map': 'ផែនទី',
+  'movexaDailySummary': 'Movexa | សេចក្តីសង្ខេបប្រចាំថ្ងៃ',
+  'editMap': 'កែប្រែផែនទី',
+  'center': 'កណ្តាល',
+  'darkMapStyle': 'រចនាប័ទ្មផែនទីងងឹត',
+  'zoomLevel': 'កម្រិតពង្រីក',
+  'lineSize': 'ទំហំបន្ទាត់',
+  'movexaWorkout': 'Movexa | ការហាត់ប្រាណ',
 };

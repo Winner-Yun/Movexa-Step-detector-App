@@ -6,6 +6,7 @@ import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:step_detector/core/utils/widget_updater.dart';
+import 'package:intl/intl.dart';
 
 const kmPerStep = 0.000762;
 const kcalPerStep = 0.04;
@@ -27,12 +28,32 @@ class BackgroundStepHandler extends TaskHandler {
   @override
   Future<void> onStart(DateTime timestamp, TaskStarter starter) async {
     final prefs = await SharedPreferences.getInstance();
-    _alreadyCountedToday = prefs.getInt('bg_alreadyCountedToday') ?? 0;
+    
+    final lastSavedDateStr = prefs.getString('bg_lastSavedDate');
+    final todayStr = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    
+    if (lastSavedDateStr != todayStr) {
+      _alreadyCountedToday = 0;
+      await prefs.setInt('bg_alreadyCountedToday', 0);
+      await prefs.setString('bg_lastSavedDate', todayStr);
+    } else {
+      _alreadyCountedToday = prefs.getInt('bg_alreadyCountedToday') ?? 0;
+    }
+    
     _lastDeviceSteps = prefs.getInt('bg_lastDeviceSteps') ?? 0;
 
     _stepCountSub = Pedometer.stepCountStream.listen(
       (StepCount event) async {
         final deviceSteps = event.steps;
+
+        final todayStr = DateFormat('yyyy-MM-dd').format(DateTime.now());
+        final lastSavedDateStr = prefs.getString('bg_lastSavedDate');
+        if (lastSavedDateStr != null && lastSavedDateStr != todayStr) {
+           _alreadyCountedToday = 0;
+           _deviceBaselineSteps = deviceSteps; 
+           _liveSteps = 0;
+           await prefs.setString('bg_lastSavedDate', todayStr);
+        }
 
         if (_deviceBaselineSteps == null) {
           _deviceBaselineSteps = deviceSteps;
