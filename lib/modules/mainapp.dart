@@ -65,10 +65,9 @@ class _StepMainAppState extends State<StepMainApp> {
           _onSelected(0);
         }
       } else if (pendingLaunch == true && mounted) {
-        _onSelected(1); // Fallback for old boolean just in case
+        _onSelected(1);
       }
     } catch (e) {
-      // ignore errors
     }
   }
 

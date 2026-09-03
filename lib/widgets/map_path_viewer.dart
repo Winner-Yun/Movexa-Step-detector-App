@@ -55,7 +55,6 @@ class _MapPathViewerState extends State<MapPathViewer> {
     if (oldWidget.isDarkStyle != widget.isDarkStyle) {
       _updateMapStyle();
     }
-    // We will build the icon in build() because it depends on SettingsController now.
   }
 
   Future<void> _buildCircleIcon(double size) async {
@@ -68,7 +67,6 @@ class _MapPathViewerState extends State<MapPathViewer> {
     final Paint paint = Paint()..color = Colors.lightBlueAccent;
     canvas.drawCircle(Offset(physicalSize / 2, physicalSize / 2), physicalSize / 2, paint);
     
-    // Add a slight white border
     final Paint borderPaint = Paint()
       ..color = Colors.white
       ..style = PaintingStyle.stroke
@@ -168,7 +166,6 @@ class _MapPathViewerState extends State<MapPathViewer> {
       );
     }
 
-    // Calculate bounds to fit the path
     double minLat = validPoints.first.latitude;
     double maxLat = validPoints.first.latitude;
     double minLng = validPoints.first.longitude;
@@ -298,7 +295,6 @@ class _MapPathViewerState extends State<MapPathViewer> {
         ),
       ),
     ),
-    // Floating Reset Button overlay
       if (widget.showResetButton && validPoints.isNotEmpty)
         Positioned(
           top: 12,
