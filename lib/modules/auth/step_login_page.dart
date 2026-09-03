@@ -44,7 +44,6 @@ class _StepLoginPageState extends State<StepLoginPage> {
               child: Column(
                 children: [
                   const Spacer(flex: 3),
-                  // Logo
                   Image.asset(
                     AppImg.logo,
                     width: 100,
@@ -52,7 +51,6 @@ class _StepLoginPageState extends State<StepLoginPage> {
                     fit: BoxFit.cover,
                   ),
                   const Spacer(flex: 1),
-                  // Title
                   Text(
                     'appSlogan'.tr(context),
                     textAlign: TextAlign.center,
@@ -63,7 +61,6 @@ class _StepLoginPageState extends State<StepLoginPage> {
                     ),
                   ),
                   const Spacer(flex: 2),
-                  // Continue with Google Button
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 32.0),
                     child: ElevatedButton.icon(
@@ -107,7 +104,6 @@ class _StepLoginPageState extends State<StepLoginPage> {
               ),
             ),
 
-            // Language Changer top right
             Positioned(
               top: 16,
               right: 16,
