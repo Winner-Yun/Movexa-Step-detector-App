@@ -376,7 +376,7 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
     final avgSteps =
         data.fold<num>(0, (sum, record) => sum + record.steps) ~/ data.length;
 
-    final chartData = data.reversed.toList();
+    final chartData = data;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 24),
@@ -453,6 +453,7 @@ class _StepHistoryPageState extends State<StepHistoryPage> {
           SizedBox(
             height: 160,
             child: ListView.builder(
+              reverse: true,
               scrollDirection: Axis.horizontal,
               physics: const BouncingScrollPhysics(),
               itemCount: chartData.length,
