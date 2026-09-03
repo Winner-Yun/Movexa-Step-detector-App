@@ -46,7 +46,6 @@ class SettingsController extends ChangeNotifier {
   bool get isLoading => _isLoading;
 
   Future<void> fetchSettings() async {
-    // Also trigger a local fetch to ensure we have the latest local data
     await _initLocalSettings();
 
     final user = _auth.currentUser;
@@ -68,7 +67,6 @@ class SettingsController extends ChangeNotifier {
           defaultTabMode: _settings.defaultTabMode,
         );
         notifyListeners();
-        // Sync fetched firestore settings to local db
         final db = DatabaseHelper.instance;
         await db.saveSetting(
           'darkModeEnabled',
@@ -104,7 +102,6 @@ class SettingsController extends ChangeNotifier {
     _settings = newSettings;
     notifyListeners();
 
-    // Save locally
     final db = DatabaseHelper.instance;
     await db.saveSetting(
       'darkModeEnabled',

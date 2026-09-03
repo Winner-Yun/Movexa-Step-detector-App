@@ -128,7 +128,6 @@ class MotionController extends ChangeNotifier {
 
     if (!Platform.isAndroid) return hasLocation;
     final status = await Permission.activityRecognition.request();
-    // Also request notification permission for Android 13+
     await Permission.notification.request();
     return status.isGranted && hasLocation;
   }
@@ -172,12 +171,11 @@ class MotionController extends ChangeNotifier {
     if (runInBackground != null) {
       _runInBackground = runInBackground;
     } else {
-      // Check settings for background tracking
       final bgSetting = await DatabaseHelper.instance.getSetting(
         'runTrackingInBackground',
       );
       _runInBackground =
-          bgSetting == 'true' || bgSetting == null; // Default true
+          bgSetting == 'true' || bgSetting == null;
     }
 
     _permissionDenied = false;
@@ -204,7 +202,6 @@ class MotionController extends ChangeNotifier {
 
       FlutterForegroundTask.addTaskDataCallback(_onReceiveTaskData);
     } else {
-      // Local tracking only
       _stepCountSub = Pedometer.stepCountStream.listen(
         _onStepCount,
         onError: (Object e) => debugPrint('Step count stream error: $e'),
@@ -241,10 +238,8 @@ class MotionController extends ChangeNotifier {
   }
 
   void _updateFromBackground(int totalSteps) {
-    // Background task handles baseline and live steps, it just sends us the total.
-    // We update local state so the UI reflects it.
     _alreadyCountedToday = totalSteps;
-    _liveSteps = 0; // live steps handled by background
+    _liveSteps = 0;
 
     _checkNewDay();
 

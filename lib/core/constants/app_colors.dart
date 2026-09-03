@@ -30,7 +30,6 @@ class AppColors {
 
   static const Color positiveText = Color(0xFFB67918);
 
-  // --- Dark Mode Colors ---
   static const Color textLight = Color(0xFFF2EFE9);
   static const Color mutedTextLight = Color(0xFFA39E93);
 

@@ -74,7 +74,7 @@ class AppTheme {
         behavior: SnackBarBehavior.floating,
         backgroundColor: AppColors.primaryGradientEnd,
         contentTextStyle: GoogleFonts.nokora(
-          color: AppColors.activityCard, // Keep text dark on yellow bg
+          color: AppColors.activityCard,
           fontWeight: FontWeight.w700,
         ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),

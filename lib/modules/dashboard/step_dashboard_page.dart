@@ -117,7 +117,6 @@ class _StepDashboardPageState extends State<StepDashboardPage> {
     final newSettings = settingsCtrl.settings.copyWith(
       runTrackingInBackground: val,
     );
-    // Fire and forget update to avoid blocking UI on firestore save
     settingsCtrl.updateSettings(newSettings);
 
     if (val) {

@@ -36,7 +36,6 @@ class AboutUsPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // App Logo
             SizedBox(
               width: 120,
               height: 120,
@@ -63,7 +62,6 @@ class AboutUsPage extends StatelessWidget {
             ),
             const SizedBox(height: 32),
 
-            // Khmer Section
             _buildSection(
               context: context,
               title: 'ភាសាខ្មែរ',
@@ -86,7 +84,6 @@ class AboutUsPage extends StatelessWidget {
             Divider(color: ThemeColors.getScaffoldSoft(context)),
             const SizedBox(height: 32),
 
-            // English Section
             _buildSection(
               context: context,
               title: 'English',

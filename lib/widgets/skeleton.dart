@@ -22,7 +22,7 @@ class Skeleton extends StatelessWidget {
       height: height,
       decoration: BoxDecoration(
         color: Colors
-            .white, // Color doesn't matter, just needs to be solid for Shimmer
+            .white,
         borderRadius: shape == BoxShape.circle
             ? null
             : BorderRadius.circular(borderRadius),
@@ -56,25 +56,20 @@ class DashboardSkeleton extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Greeting
           const Skeleton(width: 150, height: 28),
           const SizedBox(height: 8),
           const Skeleton(width: 100, height: 16),
           const SizedBox(height: 24),
 
-          // Progress Panel
           const Skeleton(width: double.infinity, height: 250, borderRadius: 24),
           const SizedBox(height: 16),
 
-          // Toggle card
           const Skeleton(width: double.infinity, height: 80, borderRadius: 16),
           const SizedBox(height: 16),
 
-          // Button
           const Skeleton(width: double.infinity, height: 56, borderRadius: 16),
           const SizedBox(height: 16),
 
-          // Stats
           Row(
             children: const [
               Expanded(child: Skeleton(height: 120, borderRadius: 16)),
@@ -84,11 +79,9 @@ class DashboardSkeleton extends StatelessWidget {
           ),
           const SizedBox(height: 24),
 
-          // Recent activities header
           const Skeleton(width: 120, height: 20),
           const SizedBox(height: 12),
 
-          // Activities List
           const Skeleton(width: double.infinity, height: 80, borderRadius: 16),
           const SizedBox(height: 8),
           const Skeleton(width: double.infinity, height: 80, borderRadius: 16),
@@ -132,18 +125,15 @@ class ProfileSkeleton extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 24),
-          // Profile Card
           const Skeleton(width: double.infinity, height: 110, borderRadius: 24),
           const SizedBox(height: 32),
 
-          // Account section
           const Skeleton(width: 100, height: 24),
           const SizedBox(height: 12),
           const Skeleton(width: double.infinity, height: 110, borderRadius: 24),
 
           const SizedBox(height: 24),
 
-          // Preferences section
           const Skeleton(width: 120, height: 24),
           const SizedBox(height: 12),
           const Skeleton(width: double.infinity, height: 220, borderRadius: 24),
@@ -165,11 +155,9 @@ class HistoryDailySkeleton extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Month chart
           const Skeleton(width: double.infinity, height: 250, borderRadius: 24),
           const SizedBox(height: 32),
 
-          // "Summary for X" header
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: const [
@@ -179,15 +167,12 @@ class HistoryDailySkeleton extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
-          // Summary Card
           const Skeleton(width: double.infinity, height: 160, borderRadius: 28),
           const SizedBox(height: 24),
 
-          // Activity Breakdown Header
           const Skeleton(width: 140, height: 20),
           const SizedBox(height: 16),
 
-          // Activity breakdown list
           const Skeleton(width: double.infinity, height: 70, borderRadius: 16),
           const SizedBox(height: 12),
           const Skeleton(width: double.infinity, height: 70, borderRadius: 16),
