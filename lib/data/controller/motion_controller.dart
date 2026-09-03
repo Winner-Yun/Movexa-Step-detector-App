@@ -11,6 +11,7 @@ import 'package:step_detector/core/utils/widget_updater.dart';
 import 'package:step_detector/data/controller/activity_controller.dart';
 import 'package:step_detector/data/controller/background_service_handler.dart';
 import 'package:step_detector/data/local/database_helper.dart';
+import 'package:intl/intl.dart';
 
 enum MotionStatus { idle, walking, stopped, unknown }
 
@@ -50,6 +51,7 @@ class MotionController extends ChangeNotifier {
   bool _workoutPermissionDenied = false;
 
   bool _runInBackground = false;
+  String? _currentDayStr;
 
   bool get isTracking => _isTracking;
   bool get permissionDenied => _permissionDenied;
@@ -71,6 +73,47 @@ class MotionController extends ChangeNotifier {
 
   void attach(ActivityController activityCtrl) {
     _activityCtrl = activityCtrl;
+  }
+
+  void _checkNewDay() {
+    final todayStr = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    if (_currentDayStr != null && _currentDayStr != todayStr) {
+      _currentDayStr = todayStr;
+      _dailyPath.clear();
+      _alreadyCountedToday = 0;
+      _liveSteps = 0;
+      _deviceBaselineSteps = _lastDeviceSteps;
+      _activityCtrl?.fetchTodayRecord();
+    }
+  }
+
+  void _addPointToPath(Map<String, dynamic> point, List<Map<String, dynamic>> path) {
+    if (path.isEmpty) {
+      path.add(point);
+      return;
+    }
+    
+    if (path.last['gap'] == true) {
+      path.add(point);
+      return;
+    }
+    
+    final lastPoint = path.last;
+    if (lastPoint['lat'] == point['lat'] && lastPoint['lng'] == point['lng']) {
+      return; 
+    }
+    
+    final lastTs = lastPoint['ts'] as int?;
+    final currentTs = point['ts'] as int?;
+
+    if (lastTs != null && currentTs != null) {
+      final diffSeconds = (currentTs - lastTs) / 1000;
+      if (diffSeconds >= 60) {
+        path.add({'gap': true});
+      }
+    }
+    
+    path.add(point);
   }
 
   Future<bool> _ensurePermission() async {
@@ -143,6 +186,7 @@ class MotionController extends ChangeNotifier {
     _lastDeviceSteps = 0;
     _liveSteps = 0;
     _isTracking = true;
+    _currentDayStr = DateFormat('yyyy-MM-dd').format(DateTime.now());
 
     if (_runInBackground && Platform.isAndroid) {
       _initForegroundTask();
@@ -202,14 +246,14 @@ class MotionController extends ChangeNotifier {
     _alreadyCountedToday = totalSteps;
     _liveSteps = 0; // live steps handled by background
 
+    _checkNewDay();
+
     if (_latestPosition != null) {
       final point = {
         'lat': _latestPosition!.latitude,
         'lng': _latestPosition!.longitude,
       };
-      if (_dailyPath.isEmpty || _dailyPath.last['lat'] != point['lat'] || _dailyPath.last['lng'] != point['lng']) {
-        _dailyPath.add(point);
-      }
+      _addPointToPath(point, _dailyPath);
     }
 
     _activityCtrl?.updateTodaySteps(
@@ -347,9 +391,7 @@ class MotionController extends ChangeNotifier {
         'lat': _latestPosition!.latitude,
         'lng': _latestPosition!.longitude,
       };
-      if (_workoutPath.isEmpty || _workoutPath.last['lat'] != point['lat'] || _workoutPath.last['lng'] != point['lng']) {
-        _workoutPath.add(point);
-      }
+      _addPointToPath(point, _workoutPath);
     }
 
     notifyListeners();
@@ -370,14 +412,14 @@ class MotionController extends ChangeNotifier {
 
     final totalSteps = todaySteps;
 
+    _checkNewDay();
+
     if (_latestPosition != null) {
       final point = {
         'lat': _latestPosition!.latitude,
         'lng': _latestPosition!.longitude,
       };
-      if (_dailyPath.isEmpty || _dailyPath.last['lat'] != point['lat'] || _dailyPath.last['lng'] != point['lng']) {
-        _dailyPath.add(point);
-      }
+      _addPointToPath(point, _dailyPath);
     }
 
     _activityCtrl?.updateTodaySteps(

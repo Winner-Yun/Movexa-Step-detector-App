@@ -9,8 +9,8 @@ import 'package:step_detector/data/controller/profile_controller.dart';
 import 'package:step_detector/data/controller/settings_controller.dart';
 import 'package:step_detector/modules/profile/step_profile_edit_page.dart';
 import 'package:step_detector/modules/settings/about_us_page.dart';
-import 'package:step_detector/widgets/skeleton.dart';
 import 'package:step_detector/widgets/set_goal_dialog.dart';
+import 'package:step_detector/widgets/skeleton.dart';
 
 class StepSettingsPage extends StatefulWidget {
   const StepSettingsPage({super.key});
@@ -143,6 +143,137 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
               ],
             ),
           ),
+        );
+      },
+    );
+  }
+
+  void _showMapSettingsDialog(SettingsController settingsCtrl) {
+    double currentLineSize = settingsCtrl.settings.mapLineSize;
+    double currentMarkerSize = settingsCtrl.settings.mapMarkerSize;
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24),
+              ),
+              backgroundColor: ThemeColors.getSurface(context),
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Map Settings',
+                      style: TextStyle(
+                        color: ThemeColors.getText(context),
+                        fontSize: 20,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    SizedBox(height: 24),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Line Size: ${currentLineSize.toInt()}',
+                          style: TextStyle(
+                            color: ThemeColors.getText(context),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Slider(
+                      value: currentLineSize,
+                      min: 1,
+                      max: 20,
+                      divisions: 19,
+                      activeColor: ThemeColors.getBrandAccent(context),
+                      inactiveColor: ThemeColors.getScaffoldSoft(context),
+                      onChanged: (val) {
+                        setState(() {
+                          currentLineSize = val;
+                        });
+                      },
+                    ),
+                    SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Marker Size: ${currentMarkerSize.toInt()}',
+                          style: TextStyle(
+                            color: ThemeColors.getText(context),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Slider(
+                      value: currentMarkerSize,
+                      min: 10,
+                      max: 50,
+                      divisions: 40,
+                      activeColor: ThemeColors.getBrandAccent(context),
+                      inactiveColor: ThemeColors.getScaffoldSoft(context),
+                      onChanged: (val) {
+                        setState(() {
+                          currentMarkerSize = val;
+                        });
+                      },
+                    ),
+                    SizedBox(height: 24),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text(
+                            'cancel'.tr(context),
+                            style: TextStyle(
+                              color: ThemeColors.getMutedText(context),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        ElevatedButton(
+                          onPressed: () {
+                            settingsCtrl.updateSettings(
+                              settingsCtrl.settings.copyWith(
+                                mapLineSize: currentLineSize,
+                                mapMarkerSize: currentMarkerSize,
+                              ),
+                            );
+                            Navigator.pop(context);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: ThemeColors.getBrandAccent(
+                              context,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: Text(
+                            'Save',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
         );
       },
     );
@@ -349,6 +480,12 @@ class _StepSettingsPageState extends State<StepSettingsPage> {
                                 );
                               }
                             },
+                          ),
+                          _SettingsItemTile(
+                            context: context,
+                            icon: Icons.map_rounded,
+                            title: 'Map Settings',
+                            onTap: () => _showMapSettingsDialog(settingsCtrl),
                           ),
                           _SettingsItemTile(
                             context: context,
@@ -679,7 +816,7 @@ class _SettingsItemTileState extends State<_SettingsItemTile> {
                 widget.title,
                 style: TextStyle(
                   color: ThemeColors.getText(context),
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w300,
                   fontSize: 16,
                 ),
               ),
@@ -689,7 +826,7 @@ class _SettingsItemTileState extends State<_SettingsItemTile> {
                 widget.trailingText!,
                 style: TextStyle(
                   color: ThemeColors.getMutedText(context),
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w200,
                   fontSize: 14,
                 ),
               ),

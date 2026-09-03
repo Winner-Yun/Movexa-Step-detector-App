@@ -6,6 +6,9 @@ class UserSettings implements BaseModel {
   final bool notificationsEnabled;
   final bool darkModeEnabled;
   final String language;
+  final double mapLineSize;
+  final double mapMarkerSize;
+  final int defaultTabMode;
 
   const UserSettings({
     this.dailyStepGoal = 10000,
@@ -13,6 +16,9 @@ class UserSettings implements BaseModel {
     this.notificationsEnabled = true,
     this.darkModeEnabled = false,
     this.language = 'km',
+    this.mapLineSize = 5.0,
+    this.mapMarkerSize = 20.0,
+    this.defaultTabMode = 0,
   });
 
   UserSettings copyWith({
@@ -21,6 +27,9 @@ class UserSettings implements BaseModel {
     bool? notificationsEnabled,
     bool? darkModeEnabled,
     String? language,
+    double? mapLineSize,
+    double? mapMarkerSize,
+    int? defaultTabMode,
   }) {
     return UserSettings(
       dailyStepGoal: dailyStepGoal ?? this.dailyStepGoal,
@@ -29,6 +38,9 @@ class UserSettings implements BaseModel {
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
       darkModeEnabled: darkModeEnabled ?? this.darkModeEnabled,
       language: language ?? this.language,
+      mapLineSize: mapLineSize ?? this.mapLineSize,
+      mapMarkerSize: mapMarkerSize ?? this.mapMarkerSize,
+      defaultTabMode: defaultTabMode ?? this.defaultTabMode,
     );
   }
 
@@ -50,6 +62,9 @@ class UserSettings implements BaseModel {
       notificationsEnabled: map['notificationsEnabled'] ?? true,
       darkModeEnabled: map['darkModeEnabled'] ?? false,
       language: map['language'] ?? 'km',
+      mapLineSize: map['mapLineSize']?.toDouble() ?? 5.0,
+      mapMarkerSize: map['mapMarkerSize']?.toDouble() ?? 20.0,
+      defaultTabMode: map['defaultTabMode']?.toInt() ?? 0,
     );
   }
 }
